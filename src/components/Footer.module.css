@@ -1,0 +1,38 @@
+.footer {
+  background: var(--text);
+  border-top: 3px solid var(--border);
+  padding: 40px 6%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+
+.logo {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem;
+  font-weight: 400;
+  text-decoration: none;
+  color: var(--coral);
+  letter-spacing: 0.02em;
+}
+
+.footer p {
+  font-size: 0.8rem;
+  color: #888;
+  font-weight: 600;
+}
+
+.links { display: flex; gap: 22px; flex-wrap: wrap; }
+.links a {
+  color: #888;
+  font-size: 0.8rem;
+  text-decoration: none;
+  text-transform: capitalize;
+  transition: color 0.2s;
+  font-weight: 700;
+}
+.links a:hover { color: var(--coral); }

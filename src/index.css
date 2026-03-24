@@ -1,0 +1,175 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&display=swap");
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #f0fdf8;
+  --surface: #e8fdf4;
+  --card: #ffffff;
+  --border: #c6f0e0;
+  --coral: #34d399;
+  --yellow: #ffd23f;
+  --blue: #4a8fe2;
+  --mint: #10b981;
+  --purple: #9b6bff;
+  --pink: #ff6ba8;
+  --orange: #ff9f1c;
+  --text: #1a1a2e;
+  --muted: #6b7a72;
+  --radius: 20px;
+  --radius-lg: 28px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Nunito", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    circle,
+    rgba(52, 211, 153, 0.07) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 30px 30px;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--coral);
+  border-radius: 4px;
+}
+
+.grad-text {
+  background: linear-gradient(
+    135deg,
+    var(--coral) 0%,
+    var(--blue) 60%,
+    var(--purple) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--coral);
+  margin-bottom: 14px;
+  background: rgba(52, 211, 153, 0.1);
+  padding: 5px 14px;
+  border-radius: 50px;
+  border: 2px solid rgba(52, 211, 153, 0.2);
+}
+
+h2 {
+  font-family: "Fredoka One", cursive;
+  font-size: clamp(1.8rem, 3.2vw, 2.8rem);
+  font-weight: 400;
+  line-height: 1.15;
+  margin-bottom: 14px;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+
+.section-sub {
+  color: var(--muted);
+  max-width: 540px;
+  font-size: 1rem;
+  line-height: 1.75;
+  font-weight: 600;
+}
+
+.btn-primary {
+  display: inline-block;
+  background: var(--coral);
+  color: #fff;
+  padding: 14px 30px;
+  border-radius: 50px;
+  font-weight: 800;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: all 0.15s;
+  cursor: pointer;
+  border: none;
+  font-family: "Nunito", sans-serif;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 0 #059669;
+}
+
+.btn-primary:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #059669;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-ghost {
+  display: inline-block;
+  border: 2.5px solid var(--border);
+  color: var(--text);
+  padding: 14px 30px;
+  border-radius: 50px;
+  font-weight: 800;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: all 0.15s;
+  background: white;
+  font-family: "Nunito", sans-serif;
+}
+
+.btn-ghost:hover {
+  border-color: var(--coral);
+  color: var(--coral);
+  transform: translateY(-2px);
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}

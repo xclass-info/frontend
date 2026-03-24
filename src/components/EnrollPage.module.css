@@ -1,0 +1,387 @@
+.page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 48px 6% 96px;
+}
+
+.inner {
+  max-width: 640px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── Back link ── */
+.backLink {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s;
+}
+.backLink:hover {
+  color: var(--coral);
+}
+
+/* ── Course summary card ── */
+.courseCard {
+  background: var(--card);
+  border: 2.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+.courseAccent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: var(--line);
+  border-radius: 20px 20px 0 0;
+}
+
+.courseHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.courseIcon {
+  font-size: 2rem;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 50px;
+  border: 2px solid;
+}
+.begin {
+  border-color: rgba(45, 203, 133, 0.5);
+  color: var(--mint);
+  background: rgba(45, 203, 133, 0.1);
+}
+.inter {
+  border-color: rgba(74, 143, 226, 0.5);
+  color: var(--blue);
+  background: rgba(74, 143, 226, 0.1);
+}
+.adv {
+  border-color: rgba(155, 107, 255, 0.5);
+  color: var(--purple);
+  background: rgba(155, 107, 255, 0.1);
+}
+
+.courseTitle {
+  font-family: "Fredoka One", cursive;
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.courseDesc {
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.65;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.courseMeta {
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.coursePrice {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--coral);
+  margin-top: 4px;
+}
+
+/* ── Slot selection ── */
+.slotsHeading {
+  font-family: "Fredoka One", cursive;
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--text);
+}
+
+.slots {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.slot {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--card);
+  border: 2.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.slot:hover {
+  border-color: var(--coral);
+  transform: translateY(-2px);
+}
+.slotSelected {
+  border-color: var(--coral);
+  background: rgba(255, 107, 74, 0.06);
+}
+
+.radioInput {
+  display: none;
+}
+
+.radioCircle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2.5px solid var(--border);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s;
+}
+.slotSelected .radioCircle {
+  border-color: var(--coral);
+}
+
+.radioDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--coral);
+}
+
+.slotInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.slotLabel {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text);
+}
+.slotSelected .slotLabel {
+  color: var(--coral);
+}
+
+.slotTime {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.slotDates {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* ── Confirm button ── */
+.confirmBtn {
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--radius);
+  border: none;
+  font-family: "Nunito", sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  background: var(--line);
+  color: white;
+  transition: opacity 0.15s, transform 0.15s;
+  letter-spacing: 0.02em;
+}
+.confirmBtn:not(:disabled):hover {
+  opacity: 0.88;
+  transform: translateY(-2px);
+}
+.confirmBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ── Success ── */
+.successCard {
+  max-width: 480px;
+  margin: 80px auto 0;
+  background: var(--card);
+  border: 2.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 48px 36px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.successCard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: var(--line);
+}
+
+.successEmoji {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+.successTitle {
+  font-family: "Fredoka One", cursive;
+  font-size: 2rem;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.successCourse {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+
+.successSlot {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(255, 107, 74, 0.07);
+  border: 2px dashed rgba(255, 107, 74, 0.3);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--coral);
+}
+
+.successNote {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 28px;
+}
+
+.backBtn {
+  background: none;
+  border: 2.5px solid var(--border);
+  border-radius: 50px;
+  padding: 10px 24px;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.backBtn:hover {
+  border-color: var(--coral);
+  color: var(--coral);
+}
+
+/* ── Not found ── */
+.notFound {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  font-size: 1rem;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+/* ── Form ── */
+.formSection {
+  background: var(--card);
+  border: 2.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 480px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.input {
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  transition: border-color 0.15s;
+  width: 100%;
+}
+.input:focus {
+  outline: none;
+  border-color: var(--coral);
+}
+.input::placeholder {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.inputError {
+  border-color: #ff4444;
+}
+
+.error {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #ff4444;
+}

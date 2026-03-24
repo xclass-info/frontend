@@ -1,0 +1,268 @@
+.loadingPage {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.page {
+  min-height: 100vh;
+  background: var(--surface);
+  padding: 80px 6% 60px;
+}
+
+.inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 48px;
+}
+
+.title {
+  font-family: "Fredoka One", cursive;
+  font-size: 2rem;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.sub {
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.empty {
+  background: var(--card);
+  border: 2.5px dashed var(--border);
+  border-radius: var(--radius-lg);
+  padding: 60px;
+  text-align: center;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.card {
+  background: var(--card);
+  border: 2.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 6px 6px 0 var(--border);
+}
+
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.subject {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--coral);
+  background: rgba(255, 107, 74, 0.1);
+  border: 2px solid rgba(255, 107, 74, 0.3);
+  padding: 3px 10px;
+  border-radius: 50px;
+}
+
+.seats {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--mint);
+}
+
+.seats.full {
+  color: var(--coral);
+}
+
+.cardTitle {
+  font-family: "Fredoka One", cursive;
+  font-size: 1.2rem;
+  color: var(--text);
+}
+
+.cardDesc {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 12px 0;
+  border-top: 2px dashed var(--border);
+  border-bottom: 2px dashed var(--border);
+}
+
+.bookingForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  background: var(--surface);
+  border-radius: 12px;
+  border: 2px solid var(--border);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.input {
+  border: 2.5px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--card);
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--coral);
+}
+
+.inputError {
+  border-color: var(--coral) !important;
+}
+
+.errorMsg {
+  color: var(--coral);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.bookingBtns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.confirmBtn {
+  background: var(--coral);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 10px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: "Nunito", sans-serif;
+  transition: all 0.15s;
+}
+
+.confirmBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 #c94530;
+}
+
+.confirmBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.cancelBtn {
+  background: transparent;
+  color: var(--muted);
+  border: 2.5px solid var(--border);
+  border-radius: 50px;
+  padding: 10px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: "Nunito", sans-serif;
+  transition: all 0.15s;
+}
+
+.cancelBtn:hover {
+  border-color: var(--coral);
+  color: var(--coral);
+}
+
+.bookBtn {
+  background: var(--coral);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 12px;
+  font-size: 0.875rem;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: "Nunito", sans-serif;
+  transition: all 0.15s;
+  margin-top: auto;
+}
+
+.bookBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 #c94530;
+}
+
+.bookedBadge {
+  background: rgba(45, 203, 133, 0.1);
+  border: 2px solid rgba(45, 203, 133, 0.4);
+  color: var(--mint);
+  border-radius: 50px;
+  padding: 10px;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+
+.fullBadge {
+  background: rgba(255, 107, 74, 0.08);
+  border: 2px solid rgba(255, 107, 74, 0.3);
+  color: var(--coral);
+  border-radius: 50px;
+  padding: 10px;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
