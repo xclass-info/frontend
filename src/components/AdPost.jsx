@@ -52,6 +52,14 @@ export default function AdPost() {
     page * POSTS_PER_PAGE + POSTS_PER_PAGE,
   );
 
+  function formatUrl(url) {
+    if (!url) return null;
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+      return url;
+    }
+    return `https://${url}`;
+  }
+
   return (
     <section className={styles.section}>
       <div className={styles.inner}>
@@ -80,7 +88,7 @@ export default function AdPost() {
                 {p.message && <p className={styles.message}>{p.message}</p>}
                 {p.url && (
                   <a
-                    href={p.url}
+                    href={formatUrl(p.url)}
                     target='_blank'
                     rel='noopener noreferrer'
                     className={styles.url}
