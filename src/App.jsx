@@ -15,7 +15,8 @@ import TeacherDashboard from "./components/TeacherDashboard";
 import CreateClass from "./components/CreateClass";
 import ClassListing from "./components/ClassListing";
 import Classroom from "./components/Classroom";
-import AdForm from "./components/AdForm";
+import AdPostForm from "./components/AdPostForm";
+import AdPost from "./components/AdPost";
 
 function HomePage() {
   useEffect(() => {
@@ -37,6 +38,7 @@ function HomePage() {
     <>
       <LoadingScreen />
       <Navbar />
+      <AdPost />
       <Hero />
       <HowItWorks />
       <Subjects />
@@ -59,7 +61,7 @@ export default function App() {
         <Route path='/teacher/login' element={<TeacherLogin />} />
         <Route path='/teacher/dashboard' element={<TeacherDashboard />} />
         <Route path='/teacher/create-class' element={<CreateClass />} />
-        <Route path='/post' element={<AdForm />} />
+        <Route path='/adpost' element={<AdPostForm />} />
       </Routes>
     </BrowserRouter>
   );

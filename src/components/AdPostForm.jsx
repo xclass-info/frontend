@@ -3,9 +3,9 @@ import { db, storage } from "../firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
-import styles from "./AdForm.module.css";
+import styles from "./AdPostForm.module.css";
 
-export default function AdForm() {
+export default function AdPostForm() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
@@ -67,7 +67,7 @@ export default function AdForm() {
         setUploadingImage(false);
       }
 
-      await addDoc(collection(db, "posts"), {
+      await addDoc(collection(db, "adposts"), {
         name: form.name,
         email: form.email,
         phone: form.phone || null,

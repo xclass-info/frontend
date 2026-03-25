@@ -28,7 +28,7 @@ export default function Navbar() {
           <Link to='/classes'>📚 Classes</Link>
         </li>
         <li>
-          <Link to='/post'>📌 Post Ad</Link>
+          <Link to='/adpost'>📌 Post Ad</Link>
         </li>
       </ul>
 
@@ -63,7 +63,7 @@ export default function Navbar() {
             <Link to='/classes'>📚 Classes</Link>
           </li>
           <li>
-            <Link to='/post'>📌 Post Ad</Link>
+            <Link to='/adpost'>📌 Post Ad</Link>
           </li>
           <li>
             <Link to='/teacher/login'>👩‍🏫 Tutor Login</Link>
