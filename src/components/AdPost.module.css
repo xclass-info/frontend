@@ -1,5 +1,5 @@
 .section {
-  padding: 96px 6%;
+  padding: 120px 6% 96px;
   background: var(--card);
   position: relative;
 }
