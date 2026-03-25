@@ -5,6 +5,11 @@ import { Link } from "react-router-dom";
 export default function Navbar() {
   const [open, setOpen] = useState(false);
 
+  function scrollTo(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  }
+
   return (
     <nav className={styles.nav}>
       {/* Logo */}
@@ -16,13 +21,19 @@ export default function Navbar() {
       {/* Desktop links */}
       <ul className={styles.links}>
         <li>
-          <a href='#how'>How it works</a>
+          <a onClick={() => scrollTo("how")} style={{ cursor: "pointer" }}>
+            How it works
+          </a>
         </li>
         <li>
-          <a href='#subjects'>Subjects</a>
+          <a onClick={() => scrollTo("subjects")} style={{ cursor: "pointer" }}>
+            Subjects
+          </a>
         </li>
         <li>
-          <a href='#tutors'>Tutors</a>
+          <a onClick={() => scrollTo("tutors")} style={{ cursor: "pointer" }}>
+            Tutors
+          </a>
         </li>
         <li>
           <Link to='/classes'>📚 Classes</Link>
@@ -51,13 +62,22 @@ export default function Navbar() {
       {open && (
         <ul className={styles.mobileMenu} onClick={() => setOpen(false)}>
           <li>
-            <a href='#how'>How it works</a>
+            <a onClick={() => scrollTo("how")} style={{ cursor: "pointer" }}>
+              How it works
+            </a>
           </li>
           <li>
-            <a href='#subjects'>Subjects</a>
+            <a
+              onClick={() => scrollTo("subjects")}
+              style={{ cursor: "pointer" }}
+            >
+              Subjects
+            </a>
           </li>
           <li>
-            <a href='#tutors'>Tutors</a>
+            <a onClick={() => scrollTo("tutors")} style={{ cursor: "pointer" }}>
+              Tutors
+            </a>
           </li>
           <li>
             <Link to='/classes'>📚 Classes</Link>
