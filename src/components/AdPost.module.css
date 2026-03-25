@@ -258,3 +258,11 @@
     transform: translateX(0);
   }
 }
+
+.cardTitle {
+  font-family: "Fredoka One", cursive;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--text);
+  padding: 16px 20px 0;
+}

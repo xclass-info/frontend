@@ -5,6 +5,14 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import styles from "./AdPostForm.module.css";
 
+function formatUrl(url) {
+  if (!url) return null;
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+  return `https://${url}`;
+}
+
 export default function AdPostForm() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
@@ -13,6 +21,7 @@ export default function AdPostForm() {
     phone: "",
     url: "",
     message: "",
+    title: "",
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
@@ -40,6 +49,7 @@ export default function AdPostForm() {
     if (!form.email.trim()) newErrors.email = "Required";
     else if (!/\S+@\S+\.\S+/.test(form.email))
       newErrors.email = "Invalid email";
+    if (!form.title.trim()) newErrors.title = "Required";
     if (!imageFile && !form.url.trim() && !form.message.trim()) {
       newErrors.content = "At least one of image, URL, or message is required";
     }
@@ -68,11 +78,12 @@ export default function AdPostForm() {
       }
 
       await addDoc(collection(db, "adposts"), {
+        title: form.title,
         name: form.name,
         email: form.email,
         phone: form.phone || null,
         image: imageUrl,
-        url: form.url || null,
+        url: formatUrl(form.url),
         message: form.message || null,
         createdAt: new Date(),
       });
@@ -102,7 +113,14 @@ export default function AdPostForm() {
             className='btn-primary'
             onClick={() => {
               setSubmitted(false);
-              setForm({ name: "", email: "", phone: "", url: "", message: "" });
+              setForm({
+                name: "",
+                email: "",
+                phone: "",
+                url: "",
+                message: "",
+                title: "",
+              });
               setImageFile(null);
               setImagePreview("");
             }}
@@ -186,7 +204,7 @@ export default function AdPostForm() {
               <div>
                 <h3 className={styles.sectionTitle}>Ad Info</h3>
                 <p className={styles.sectionDesc}>
-                  At least one field is required
+                  At least one of image, URL or message is required
                 </p>
               </div>
             </div>
@@ -198,6 +216,19 @@ export default function AdPostForm() {
             )}
 
             <div className={styles.fields}>
+              {/* Title */}
+              <div className={styles.field}>
+                <label className={styles.label}>Title *</label>
+                <input
+                  className={`${styles.input} ${errors.title ? styles.inputError : ""}`}
+                  name='title'
+                  value={form.title}
+                  onChange={handleChange}
+                  placeholder='e.g. Python Tutor Available'
+                />
+                {errors.title && <p className={styles.error}>{errors.title}</p>}
+              </div>
+
               {/* Image upload */}
               <div className={styles.field}>
                 <label className={styles.label}>

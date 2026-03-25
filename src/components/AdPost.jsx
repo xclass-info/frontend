@@ -3,6 +3,14 @@ import { db } from "../firebase";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import styles from "./AdPost.module.css";
 
+function formatUrl(url) {
+  if (!url) return null;
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+  return `https://${url}`;
+}
+
 export default function AdPost() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -52,14 +60,6 @@ export default function AdPost() {
     page * POSTS_PER_PAGE + POSTS_PER_PAGE,
   );
 
-  function formatUrl(url) {
-    if (!url) return null;
-    if (url.startsWith("http://") || url.startsWith("https://")) {
-      return url;
-    }
-    return `https://${url}`;
-  }
-
   return (
     <section className={styles.section}>
       <div className={styles.inner}>
@@ -76,6 +76,10 @@ export default function AdPost() {
         >
           {visiblePosts.map((p) => (
             <div key={p.id} className={styles.card}>
+              {/* Title */}
+              {p.title && <div className={styles.cardTitle}>{p.title}</div>}
+
+              {/* Image */}
               {p.image && (
                 <img
                   src={p.image}
@@ -84,6 +88,8 @@ export default function AdPost() {
                   onClick={() => setSelectedImage(p.image)}
                 />
               )}
+
+              {/* Body */}
               <div className={styles.body}>
                 {p.message && <p className={styles.message}>{p.message}</p>}
                 {p.url && (
@@ -97,6 +103,8 @@ export default function AdPost() {
                   </a>
                 )}
               </div>
+
+              {/* Footer */}
               <div className={styles.footer}>
                 <div className={styles.contactLabel}>📬 Contact</div>
                 <div className={styles.author}>
