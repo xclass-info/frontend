@@ -1,3 +1,5 @@
+import styles from "./FeaturedTutors.module.css";
+
 const TUTORS = [
   {
     name: "Sarah Johnson",
@@ -39,58 +41,37 @@ const TUTORS = [
 
 export default function FeaturedTutors() {
   return (
-    <section id='tutors' className='py-24 px-6 lg:px-16 bg-white'>
-      <div className='max-w-7xl mx-auto'>
-        <div className='text-center mb-16'>
-          <div className='inline-block bg-orange-100 text-orange-600 font-bold text-sm px-4 py-2 rounded-full mb-4'>
-            Featured Tutors
-          </div>
-          <h2 className="font-['Fredoka_One'] text-4xl lg:text-5xl text-gray-900 mb-4">
-            Meet our top tutors 🌟
-          </h2>
-          <p className='text-gray-400 font-semibold text-lg max-w-xl mx-auto'>
+    <section id='tutors' className={styles.section}>
+      <div className={styles.inner}>
+        <div className={`${styles.top} reveal`}>
+          <div className='section-label'>🌟 Featured Tutors</div>
+          <h2>Meet our top tutors 🌟</h2>
+          <p className='section-sub'>
             Handpicked experts with proven track records and glowing reviews.
           </p>
         </div>
 
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
+        <div className={styles.grid}>
           {TUTORS.map((t) => (
-            <div
-              key={t.name}
-              className='bg-white border-2 border-gray-100 rounded-3xl p-6 hover:shadow-2xl hover:-translate-y-2 transition-all'
-            >
-              <div className='relative mb-4'>
-                <div className='w-20 h-20 bg-gradient-to-br from-purple-400 to-pink-400 rounded-2xl flex items-center justify-center text-4xl mx-auto'>
-                  {t.emoji}
-                </div>
-                <div className='absolute -top-2 -right-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full'>
-                  {t.tag}
-                </div>
+            <div key={t.name} className={`${styles.card} reveal`}>
+              <div className={styles.avatarWrap}>
+                <div className={styles.avatar}>{t.emoji}</div>
+                <span className={styles.tag}>{t.tag}</span>
               </div>
-              <h3 className="font-['Fredoka_One'] text-lg text-gray-800 text-center mb-1">
-                {t.name}
-              </h3>
-              <p className='text-purple-500 text-sm font-bold text-center mb-3'>
-                {t.subject}
-              </p>
-              <div className='flex justify-center gap-1 mb-3'>
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <span key={i} className='text-yellow-400 text-sm'>
-                    ★
-                  </span>
-                ))}
-                <span className='text-gray-400 text-xs ml-1 font-bold'>
+              <h3 className={styles.name}>{t.name}</h3>
+              <p className={styles.subject}>{t.subject}</p>
+              <div className={styles.stars}>
+                {"★★★★★"}
+                <span className={styles.rating}>
                   {t.rating} ({t.reviews})
                 </span>
               </div>
-              <div className='flex items-center justify-between pt-3 border-t-2 border-dashed border-gray-100'>
-                <span className="font-['Fredoka_One'] text-purple-600 text-lg">
+              <div className={styles.footer}>
+                <span className={styles.price}>
                   ${t.price}
-                  <span className='text-gray-400 text-sm'>/hr</span>
+                  <span className={styles.perHr}>/hr</span>
                 </span>
-                <button className='bg-purple-600 text-white text-sm font-bold px-4 py-2 rounded-xl hover:bg-purple-700 transition-colors'>
-                  Book →
-                </button>
+                <button className={styles.bookBtn}>Book →</button>
               </div>
             </div>
           ))}

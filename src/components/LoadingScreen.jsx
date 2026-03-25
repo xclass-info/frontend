@@ -18,7 +18,7 @@ export default function LoadingScreen() {
 
   return (
     <div className={`${styles.screen} ${hiding ? styles.hide : ""}`}>
-      <div className={styles.logo}>💻 Happy Programming</div>
+      <div className={styles.logo}>💻 Xclass</div>
       <div className={styles.dots}>
         <span />
         <span />

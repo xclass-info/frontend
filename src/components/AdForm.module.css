@@ -1,0 +1,266 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  padding: 100px 24px 40px;
+}
+
+.card {
+  background: var(--card);
+  border: 2.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  width: 100%;
+  max-width: 560px;
+  box-shadow: 6px 6px 0 var(--border);
+  position: relative;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  font-family: "Nunito", sans-serif;
+}
+
+.closeBtn:hover {
+  border-color: var(--coral);
+  color: var(--coral);
+  background: rgba(255, 107, 74, 0.08);
+}
+
+.title {
+  font-family: "Fredoka One", cursive;
+  font-size: 1.8rem;
+  color: var(--coral);
+  margin-bottom: 6px;
+}
+
+.sub {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section {
+  background: var(--surface);
+  border: 2.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.sectionNum {
+  width: 36px;
+  height: 36px;
+  background: var(--coral);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Fredoka One", cursive;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.sectionTitle {
+  font-family: "Fredoka One", cursive;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.sectionDesc {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.optional {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.input {
+  border: 2.5px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--card);
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--coral);
+}
+
+.inputError {
+  border-color: var(--coral) !important;
+}
+
+.textarea {
+  resize: vertical;
+  border-radius: 12px;
+  font-family: "Nunito", sans-serif;
+}
+
+.error {
+  color: var(--coral);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.contentError {
+  background: rgba(255, 107, 74, 0.08);
+  border: 2px solid rgba(255, 107, 74, 0.2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.82rem !important;
+}
+
+.fileInput {
+  display: none;
+}
+
+.uploadLabel {
+  cursor: pointer;
+  display: block;
+}
+
+.uploadBox {
+  border: 2.5px dashed var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.uploadBox:hover {
+  border-color: var(--coral);
+}
+
+.uploadPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  gap: 8px;
+}
+
+.uploadIcon {
+  font-size: 2rem;
+}
+
+.uploadText {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.uploadHint {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.imagePreview {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.successEmoji {
+  font-size: 3rem;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.successTitle {
+  font-family: "Fredoka One", cursive;
+  font-size: 1.8rem;
+  color: var(--coral);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.successSub {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+@media (max-width: 560px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    padding: 24px;
+  }
+}

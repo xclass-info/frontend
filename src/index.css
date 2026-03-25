@@ -9,19 +9,19 @@
 }
 
 :root {
-  --bg: #f0fdf8;
-  --surface: #e8fdf4;
+  --bg: #fffbf5;
+  --surface: #fff3e8;
   --card: #ffffff;
-  --border: #c6f0e0;
-  --coral: #34d399;
+  --border: #ede0cc;
+  --coral: #ff6b4a;
   --yellow: #ffd23f;
   --blue: #4a8fe2;
-  --mint: #10b981;
+  --mint: #2dcb85;
   --purple: #9b6bff;
   --pink: #ff6ba8;
   --orange: #ff9f1c;
   --text: #1a1a2e;
-  --muted: #6b7a72;
+  --muted: #8b7e6e;
   --radius: 20px;
   --radius-lg: 28px;
 }
@@ -46,7 +46,7 @@ body::before {
   pointer-events: none;
   background-image: radial-gradient(
     circle,
-    rgba(52, 211, 153, 0.07) 1.5px,
+    rgba(255, 107, 74, 0.07) 1.5px,
     transparent 1.5px
   );
   background-size: 30px 30px;
@@ -55,9 +55,11 @@ body::before {
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--bg);
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--coral);
   border-radius: 4px;
@@ -67,8 +69,8 @@ body::before {
   background: linear-gradient(
     135deg,
     var(--coral) 0%,
-    var(--blue) 60%,
-    var(--purple) 100%
+    var(--purple) 60%,
+    var(--pink) 100%
   );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -85,10 +87,10 @@ body::before {
   text-transform: uppercase;
   color: var(--coral);
   margin-bottom: 14px;
-  background: rgba(52, 211, 153, 0.1);
+  background: rgba(255, 107, 74, 0.1);
   padding: 5px 14px;
   border-radius: 50px;
-  border: 2px solid rgba(52, 211, 153, 0.2);
+  border: 2px solid rgba(255, 107, 74, 0.2);
 }
 
 h2 {
@@ -126,12 +128,12 @@ h2 {
 
 .btn-primary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 0 #059669;
+  box-shadow: 0 8px 0 #c94530;
 }
 
 .btn-primary:active {
   transform: translateY(2px);
-  box-shadow: 0 2px 0 #059669;
+  box-shadow: 0 2px 0 #c94530;
 }
 
 .btn-primary:disabled {

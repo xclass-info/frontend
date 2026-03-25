@@ -7,43 +7,38 @@ export default function Navbar() {
 
   return (
     <nav className={styles.nav}>
-      <a href='#' className={styles.logo}>
-        Happy Programming
-      </a>
+      {/* Logo */}
+      <Link to='/' className={styles.logo}>
+        x<span className={styles.logoClass}>class</span>
+        <span className={styles.logoInfo}>.info</span>
+      </Link>
 
       {/* Desktop links */}
       <ul className={styles.links}>
         <li>
-          <a
-            href='#courses'
-            style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
-          >
-            <span className={styles.fire}>🔥</span>
-            <span className={styles.summerLink}>2026 Summer Camp</span>
-          </a>
+          <a href='#how'>How it works</a>
+        </li>
+        <li>
+          <a href='#subjects'>Subjects</a>
+        </li>
+        <li>
+          <a href='#tutors'>Tutors</a>
         </li>
         <li>
           <Link to='/classes'>📚 Classes</Link>
-        </li>{" "}
-        {/* ← added */}
-        <li>
-          <a href='#private'>Private</a>
         </li>
         <li>
-          <a href='#about'>About</a>
-        </li>
-        <li>
-          <a href='#faq'>FAQ</a>
+          <Link to='/post'>📌 Post Ad</Link>
         </li>
       </ul>
 
       {/* Desktop right side buttons */}
       <div className={styles.navRight}>
-        <a href='#contact' className={styles.cta}>
-          Contact Us
-        </a>
         <Link to='/teacher/login' className={styles.teacherBtn}>
-          👩‍🏫 Teacher Login
+          👩‍🏫 Tutor Login
+        </Link>
+        <Link to='/register' className={styles.cta}>
+          Get Started →
         </Link>
       </div>
 
@@ -56,26 +51,25 @@ export default function Navbar() {
       {open && (
         <ul className={styles.mobileMenu} onClick={() => setOpen(false)}>
           <li>
-            <a href='#courses'>🔥 2026 Summer Camp</a>
+            <a href='#how'>How it works</a>
+          </li>
+          <li>
+            <a href='#subjects'>Subjects</a>
+          </li>
+          <li>
+            <a href='#tutors'>Tutors</a>
           </li>
           <li>
             <Link to='/classes'>📚 Classes</Link>
-          </li>{" "}
-          {/* ← added */}
-          <li>
-            <a href='#private'>Private</a>
           </li>
           <li>
-            <a href='#about'>About</a>
+            <Link to='/post'>📌 Post Ad</Link>
           </li>
           <li>
-            <a href='#faq'>FAQ</a>
+            <Link to='/teacher/login'>👩‍🏫 Tutor Login</Link>
           </li>
           <li>
-            <a href='#contact'>Contact Us</a>
-          </li>
-          <li>
-            <Link to='/teacher/login'>👩‍🏫 Teacher Login</Link>
+            <Link to='/register'>Get Started →</Link>
           </li>
         </ul>
       )}

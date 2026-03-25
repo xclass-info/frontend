@@ -1,0 +1,154 @@
+.section {
+  padding: 96px 6%;
+  background: var(--surface);
+  position: relative;
+}
+
+.inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.top {
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.top .section-sub {
+  margin: 0 auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.card {
+  background: var(--card);
+  border: 2.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 6px 6px 0 var(--border);
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.emoji {
+  font-size: 2.4rem;
+}
+
+.tag {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 50px;
+  border: 2px solid;
+}
+
+.tagLive {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+  animation: pulse 1.5s infinite;
+}
+
+.tagUpcoming {
+  color: var(--coral);
+  background: rgba(52, 211, 153, 0.1);
+  border-color: rgba(52, 211, 153, 0.3);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.title {
+  font-family: "Fredoka One", cursive;
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: var(--text);
+}
+
+.tutor {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--coral);
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 10px 0;
+  border-top: 2px dashed var(--border);
+  border-bottom: 2px dashed var(--border);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.price {
+  font-family: "Fredoka One", cursive;
+  font-size: 1.5rem;
+  color: var(--coral);
+}
+
+.bookBtn {
+  background: var(--coral);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 10px 20px;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.bookBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 #059669;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .section {
+    padding: 72px 4%;
+  }
+}

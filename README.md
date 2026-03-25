@@ -1,6 +1,6 @@
-# Happy Programming
+# Xclass
 
-A dark, futuristic React + Vite website for Happy Programming — a programming and AI training school for high school students.
+A dark, futuristic React + Vite website for Xclass — a programming and AI training school for high school students.
 
 ## Tech Stack
 
@@ -70,4 +70,5 @@ Key values:
 7. **FAQ** — interactive accordion (React state)
 8. **Contact** — form with success state
 9. **Footer**
+
 # frontend

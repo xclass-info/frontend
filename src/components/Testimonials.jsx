@@ -3,28 +3,28 @@ import styles from "./Testimonials.module.css";
 const TESTIMONIALS = [
   {
     quote:
-      "I had zero coding experience before Happy Programming. Now I have a working ML model, a GitHub portfolio, and I'm applying to CS programs at top universities. This place changed everything.",
-    name: "Jamie L.",
-    info: "Grade 11 · AI & ML Course",
-    initials: "JL",
+      "I found the perfect math tutor in minutes. My SAT score went up 200 points in just 6 weeks. The live classroom is so easy to use and my tutor was incredibly patient.",
+    name: "Emily R.",
+    info: "10th Grade · SAT Math Prep",
+    initials: "ER",
     gradient: "linear-gradient(135deg, #FF6BA8, #9B6BFF)",
     featured: false,
   },
   {
     quote:
-      "The instructors are incredible. Super patient, always available, and they explain the 'why' behind everything — not just the 'how'. I learned more here than in two years of school CS class.",
-    name: "Maya K.",
-    info: "Grade 10 · Web Dev Course",
-    initials: "MK",
+      "xclass matched me with an AI tutor who actually knew what they were teaching. I went from zero Python knowledge to building my own ML model in 8 weeks. Absolutely worth it!",
+    name: "Michael T.",
+    info: "College Student · Python & AI",
+    initials: "MT",
     gradient: "linear-gradient(135deg, #FF6B4A, #FF9F1C)",
     featured: true,
   },
   {
     quote:
-      "I won my school science fair with an AI project I built here. The Gen AI course is next-level — I was working with real LLMs in week two. Nothing else comes close.",
-    name: "Ryan T.",
-    info: "Grade 12 · Generative AI",
-    initials: "RT",
+      "My daughter's confidence has skyrocketed. Her tutor doesn't just teach — she inspires. We tried other platforms but xclass is in a different league.",
+    name: "Lisa K.",
+    info: "Parent · 7th Grade Math",
+    initials: "LK",
     gradient: "linear-gradient(135deg, #4A8FE2, #2DCB85)",
     featured: false,
   },
@@ -35,9 +35,13 @@ export default function Testimonials() {
     <section id='testimonials' className={styles.section}>
       <div className={`${styles.header} reveal`}>
         <div className='section-label' style={{ justifyContent: "center" }}>
-          Student Stories
+          ❤️ Student Stories
         </div>
-        <h2>What our students say</h2>
+        <h2>What our students say 🌟</h2>
+        <p className='section-sub' style={{ margin: "0 auto" }}>
+          Join thousands of happy learners who found their perfect tutor on
+          xclass.
+        </p>
       </div>
       <div className={styles.grid}>
         {TESTIMONIALS.map((t) => (

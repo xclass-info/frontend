@@ -65,7 +65,7 @@ export default function TeacherDashboard() {
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
-          <h1 className={styles.logo}>💻 Happy Programming</h1>
+          <h1 className={styles.logo}>💻 Xclass</h1>
           <p className={styles.welcome}>
             Welcome back, <strong>{teacher?.name}</strong> 👋
           </p>

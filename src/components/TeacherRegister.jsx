@@ -54,9 +54,7 @@ export default function TeacherRegister() {
           ✕
         </button>
         <h1 className={styles.title}>👩‍🏫 Teacher Register</h1>
-        <p className={styles.sub}>
-          Create your Happy Programming teacher account
-        </p>
+        <p className={styles.sub}>Create your Xclass teacher account</p>
 
         {error && <p className={styles.error}>{error}</p>}
 

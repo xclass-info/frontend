@@ -1,38 +1,117 @@
 .footer {
   background: var(--text);
-  border-top: 3px solid var(--border);
-  padding: 40px 6%;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 64px 6% 32px;
+}
+
+.inner {
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  align-items: center;
   justify-content: space-between;
-  position: relative;
-  z-index: 1;
+  gap: 48px;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+
+.brand {
+  max-width: 280px;
 }
 
 .logo {
-  font-family: 'Fredoka One', cursive;
-  font-size: 1.1rem;
-  font-weight: 400;
+  font-family: "Fredoka One", cursive;
+  font-size: 1.6rem;
   text-decoration: none;
-  color: var(--coral);
-  letter-spacing: 0.02em;
+  color: #fff;
+  display: inline-block;
+  margin-bottom: 12px;
 }
 
-.footer p {
-  font-size: 0.8rem;
-  color: #888;
+.logoClass {
+  color: var(--coral);
+}
+
+.logoInfo {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 1.1rem;
+}
+
+.tagline {
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.cols {
+  display: flex;
+  gap: 64px;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.col h4 {
+  font-family: "Fredoka One", cursive;
+  font-size: 1rem;
+  color: #fff;
+  font-weight: 400;
+  margin-bottom: 4px;
+}
+
+.col a {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.col a:hover {
+  color: var(--coral);
+}
+
+.bottom {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.82rem;
   font-weight: 600;
 }
 
-.links { display: flex; gap: 22px; flex-wrap: wrap; }
-.links a {
-  color: #888;
-  font-size: 0.8rem;
-  text-decoration: none;
-  text-transform: capitalize;
-  transition: color 0.2s;
-  font-weight: 700;
+.bottomLinks {
+  display: flex;
+  gap: 24px;
 }
-.links a:hover { color: var(--coral); }
+
+.bottomLinks a {
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.bottomLinks a:hover {
+  color: var(--coral);
+}
+
+@media (max-width: 768px) {
+  .inner {
+    flex-direction: column;
+  }
+  .cols {
+    gap: 32px;
+  }
+  .bottom {
+    flex-direction: column;
+    text-align: center;
+  }
+}
