@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import HowItWorks from "./components/HowItWorks";
@@ -17,6 +16,7 @@ import ClassListing from "./components/ClassListing";
 import Classroom from "./components/Classroom";
 import AdPostForm from "./components/AdPostForm";
 import AdPost from "./components/AdPost";
+import { HashRouter, Routes, Route } from "react-router-dom";
 
 function HomePage() {
   useEffect(() => {
@@ -52,7 +52,7 @@ function HomePage() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path='/' element={<HomePage />} />
         <Route path='/classes' element={<ClassListing />} />
@@ -63,6 +63,6 @@ export default function App() {
         <Route path='/teacher/create-class' element={<CreateClass />} />
         <Route path='/adpost' element={<AdPostForm />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
