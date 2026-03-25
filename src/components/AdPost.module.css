@@ -1,14 +1,15 @@
 .section {
-  padding: 120px 6% 96px;
+  padding: 96px 6%;
   background: var(--card);
   position: relative;
   z-index: 1;
-  margin-top: 5%;
+  margin-top: 80px;
 }
 
 .inner {
   max-width: 1200px;
   margin: 0 auto;
+  overflow: hidden;
 }
 
 .top {
@@ -26,6 +27,24 @@
   gap: 24px;
 }
 
+.fadeIn {
+  animation: slideIn 0.4s ease forwards;
+}
+
+.fadeOut {
+  animation: slideOut 0.4s ease forwards;
+}
+
+@keyframes slideOut {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(-60px); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(60px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
 .card {
   background: var(--surface);
   border: 2.5px solid var(--border);
@@ -41,10 +60,24 @@
   box-shadow: 6px 6px 0 var(--border);
 }
 
+.cardTitle {
+  font-family: "Fredoka One", cursive;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--text);
+  padding: 16px 20px 0;
+}
+
 .image {
   width: 100%;
   height: 180px;
   object-fit: cover;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.image:hover {
+  opacity: 0.85;
 }
 
 .body {
@@ -77,6 +110,15 @@
 .footer {
   padding: 14px 20px;
   border-top: 2px dashed var(--border);
+}
+
+.contactLabel {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 10px;
 }
 
 .author {
@@ -113,30 +155,6 @@
   display: block;
 }
 
-@media (max-width: 900px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 560px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
-  .section {
-    padding: 72px 4%;
-  }
-}
-
-.contactLabel {
-  font-size: 0.72rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-  margin-bottom: 10px;
-}
-
 .phone {
   font-size: 0.75rem;
   font-weight: 600;
@@ -145,16 +163,27 @@
   margin-top: 2px;
 }
 
-.image {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  cursor: pointer;
-  transition: opacity 0.2s;
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 32px;
 }
 
-.image:hover {
-  opacity: 0.85;
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  background: var(--border);
+  cursor: pointer;
+  transition: all 0.3s;
+  padding: 0;
+}
+
+.dotActive {
+  background: var(--coral);
+  transform: scale(1.3);
 }
 
 .lightbox {
@@ -202,69 +231,23 @@
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
 }
 
-.dots {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 32px;
+@media (max-width: 900px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  border: none;
-  background: var(--border);
-  cursor: pointer;
-  transition: all 0.3s;
-  padding: 0;
-}
-
-.dotActive {
-  background: var(--coral);
-  transform: scale(1.3);
-}
-
-.fadeIn {
-  animation: slideIn 0.8s ease forwards;
-}
-
-.fadeOut {
-  animation: slideOut 0.8s ease forwards;
-}
-
-@keyframes slideOut {
-  from {
-    opacity: 1;
-    transform: translateX(0);
+@media (max-width: 560px) {
+  .grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    gap: 16px;
   }
-  to {
-    opacity: 0;
-    transform: translateX(-60px);
-  }
-}
 
-.inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  overflow: hidden;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(60px);
+  .section {
+    padding: 72px 4% 48px;
+    margin-top: 40px;
   }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
 
-.cardTitle {
-  font-family: "Fredoka One", cursive;
-  font-size: 1.1rem;
-  font-weight: 400;
-  color: var(--text);
-  padding: 16px 20px 0;
+  .image {
+    height: 140px;
+  }
 }

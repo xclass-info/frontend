@@ -18,7 +18,7 @@ export default function AdPost() {
   const [page, setPage] = useState(0);
   const [fading, setFading] = useState(false);
 
-  const POSTS_PER_PAGE = 6;
+  const POSTS_PER_PAGE = window.innerWidth <= 560 ? 2 : 6;
 
   useEffect(() => {
     const q = query(collection(db, "adposts"), orderBy("createdAt", "desc"));
