@@ -1,5 +1,4 @@
-import { useMemo, useState } from "react";
-import { State, City } from "country-state-city";
+import { useState } from "react";
 import { db, storage } from "../firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -8,27 +7,22 @@ import styles from "./AdPostForm.module.css";
 
 function formatUrl(url) {
   if (!url) return null;
-  const trimmed = url.trim();
-  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
-    return trimmed;
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
   }
-  return `https://${trimmed}`;
+  return `https://${url}`;
 }
 
 export default function AdPostForm() {
   const navigate = useNavigate();
-
   const [form, setForm] = useState({
     name: "",
     email: "",
     phone: "",
-    state: "",
-    city: "",
     url: "",
     message: "",
     title: "",
   });
-
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -36,76 +30,34 @@ export default function AdPostForm() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const states = useMemo(() => {
-    return State.getStatesOfCountry("US");
-  }, []);
-
-  const cities = useMemo(() => {
-    if (!form.state) return [];
-    return City.getCitiesOfState("US", form.state);
-  }, [form.state]);
-
   function handleChange(e) {
-    const { name, value } = e.target;
-
-    if (name === "state") {
-      setForm((prev) => ({
-        ...prev,
-        state: value,
-        city: "",
-      }));
-      setErrors((prev) => ({
-        ...prev,
-        state: "",
-        city: "",
-        content: "",
-      }));
-      return;
-    }
-
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    setErrors((prev) => ({
-      ...prev,
-      [name]: "",
-      content: "",
-    }));
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "", content: "" });
   }
 
   function handleImageChange(e) {
     const file = e.target.files[0];
     if (!file) return;
-
     setImageFile(file);
     setImagePreview(URL.createObjectURL(file));
-    setErrors((prev) => ({ ...prev, content: "" }));
+    setErrors({ ...errors, content: "" });
   }
 
   function validate() {
     const newErrors = {};
-
     if (!form.name.trim()) newErrors.name = "Required";
-    if (!form.email.trim()) {
-      newErrors.email = "Required";
-    } else if (!/\S+@\S+\.\S+/.test(form.email)) {
+    if (!form.email.trim()) newErrors.email = "Required";
+    else if (!/\S+@\S+\.\S+/.test(form.email))
       newErrors.email = "Invalid email";
-    }
-
     if (!form.title.trim()) newErrors.title = "Required";
-
     if (!imageFile && !form.url.trim() && !form.message.trim()) {
       newErrors.content = "At least one of image, URL, or message is required";
     }
-
     return newErrors;
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
-
     const newErrors = validate();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -113,10 +65,10 @@ export default function AdPostForm() {
     }
 
     setLoading(true);
-
     try {
       let imageUrl = null;
 
+      // Upload image if selected
       if (imageFile) {
         setUploadingImage(true);
         const imageRef = ref(storage, `posts/${Date.now()}_${imageFile.name}`);
@@ -126,18 +78,15 @@ export default function AdPostForm() {
       }
 
       await addDoc(collection(db, "adposts"), {
-        title: form.title.trim(),
-        name: form.name.trim(),
-        email: form.email.trim(),
-        phone: form.phone.trim() || null,
-        state: form.state || null,
-        city: form.city || null,
+        title: form.title,
+        name: form.name,
+        email: form.email,
+        phone: form.phone || null,
         image: imageUrl,
         url: formatUrl(form.url),
-        message: form.message.trim() || null,
+        message: form.message || null,
         createdAt: new Date(),
       });
-
       setSubmitted(true);
     } catch (err) {
       console.error(err);
@@ -152,23 +101,15 @@ export default function AdPostForm() {
     return (
       <div className={styles.page}>
         <div className={styles.card}>
-          <button
-            type='button'
-            className={styles.closeBtn}
-            onClick={() => navigate(-1)}
-            aria-label='Close'
-          >
-            &times;
+          <button className={styles.closeBtn} onClick={() => navigate(-1)}>
+            ✕
           </button>
-
           <div className={styles.successEmoji}>🎉</div>
           <h2 className={styles.successTitle}>Ad submitted!</h2>
           <p className={styles.successSub}>
             Your ad has been submitted and will appear on the homepage shortly.
           </p>
-
           <button
-            type='button'
             className='btn-primary'
             onClick={() => {
               setSubmitted(false);
@@ -176,15 +117,12 @@ export default function AdPostForm() {
                 name: "",
                 email: "",
                 phone: "",
-                state: "",
-                city: "",
                 url: "",
                 message: "",
                 title: "",
               });
               setImageFile(null);
               setImagePreview("");
-              setErrors({});
             }}
           >
             Submit another ad
@@ -197,13 +135,9 @@ export default function AdPostForm() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        <button
-          type='button'
-          className={styles.closeBtn}
-          onClick={() => navigate(-1)}
-          aria-label='Close'
-        >
-          &times;
+        {/* X close button */}
+        <button className={styles.closeBtn} onClick={() => navigate(-1)}>
+          ✕
         </button>
 
         <h1 className={styles.title}>📌 Post an Ad</h1>
@@ -212,6 +146,7 @@ export default function AdPostForm() {
         </p>
 
         <form onSubmit={handleSubmit} className={styles.form}>
+          {/* Section 1 — Contact Info */}
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
               <span className={styles.sectionNum}>1</span>
@@ -220,7 +155,6 @@ export default function AdPostForm() {
                 <p className={styles.sectionDesc}>How others can reach you</p>
               </div>
             </div>
-
             <div className={styles.fields}>
               <div className={styles.row}>
                 <div className={styles.field}>
@@ -234,7 +168,6 @@ export default function AdPostForm() {
                   />
                   {errors.name && <p className={styles.error}>{errors.name}</p>}
                 </div>
-
                 <div className={styles.field}>
                   <label className={styles.label}>
                     Phone <span className={styles.optional}>(optional)</span>
@@ -249,7 +182,6 @@ export default function AdPostForm() {
                   />
                 </div>
               </div>
-
               <div className={styles.field}>
                 <label className={styles.label}>Email *</label>
                 <input
@@ -265,6 +197,7 @@ export default function AdPostForm() {
             </div>
           </div>
 
+          {/* Section 2 — Ad Info */}
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
               <span className={styles.sectionNum}>2</span>
@@ -283,6 +216,7 @@ export default function AdPostForm() {
             )}
 
             <div className={styles.fields}>
+              {/* Title */}
               <div className={styles.field}>
                 <label className={styles.label}>Title *</label>
                 <input
@@ -295,6 +229,7 @@ export default function AdPostForm() {
                 {errors.title && <p className={styles.error}>{errors.title}</p>}
               </div>
 
+              {/* Image upload */}
               <div className={styles.field}>
                 <label className={styles.label}>
                   Image <span className={styles.optional}>(optional)</span>
@@ -330,6 +265,7 @@ export default function AdPostForm() {
                 </label>
               </div>
 
+              {/* URL */}
               <div className={styles.field}>
                 <label className={styles.label}>
                   Link URL <span className={styles.optional}>(optional)</span>
@@ -343,52 +279,7 @@ export default function AdPostForm() {
                 />
               </div>
 
-              <div className={styles.row}>
-                <div className={styles.field}>
-                  <label className={styles.label}>
-                    State <span className={styles.optional}>(optional)</span>
-                  </label>
-                  <select
-                    className={styles.input}
-                    name='state'
-                    value={form.state}
-                    onChange={handleChange}
-                  >
-                    <option value=''>Select a state</option>
-                    {states.map((state) => (
-                      <option key={state.isoCode} value={state.isoCode}>
-                        {state.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className={styles.field}>
-                  <label className={styles.label}>
-                    City <span className={styles.optional}>(optional)</span>
-                  </label>
-                  <select
-                    className={styles.input}
-                    name='city'
-                    value={form.city}
-                    onChange={handleChange}
-                    disabled={!form.state}
-                  >
-                    <option value=''>
-                      {form.state ? "Select a city" : "Select state first"}
-                    </option>
-                    {cities.map((city) => (
-                      <option
-                        key={`${city.stateCode}-${city.name}`}
-                        value={city.name}
-                      >
-                        {city.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
+              {/* Message */}
               <div className={styles.field}>
                 <label className={styles.label}>
                   Message <span className={styles.optional}>(optional)</span>
