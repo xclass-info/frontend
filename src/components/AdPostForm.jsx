@@ -1,5 +1,4 @@
-import { useMemo, useState } from "react";
-import { State, City } from "country-state-city";
+import { useState } from "react";
 import { db, storage } from "../firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -26,7 +25,6 @@ export default function AdPostForm() {
     message: "",
     title: "",
   });
-
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -34,32 +32,8 @@ export default function AdPostForm() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const states = useMemo(() => {
-    return State.getStatesOfCountry("US");
-  }, []);
-
-  const cities = useMemo(() => {
-    if (!form.state) return [];
-    return City.getCitiesOfState("US", form.state);
-  }, [form.state]);
-
   function handleChange(e) {
     const { name, value } = e.target;
-
-    if (name === "state") {
-      setForm((prev) => ({
-        ...prev,
-        state: value,
-        city: "",
-      }));
-      setErrors((prev) => ({
-        ...prev,
-        state: "",
-        city: "",
-        content: "",
-      }));
-      return;
-    }
 
     setForm((prev) => ({
       ...prev,
@@ -86,6 +60,7 @@ export default function AdPostForm() {
     const newErrors = {};
 
     if (!form.name.trim()) newErrors.name = "Required";
+
     if (!form.email.trim()) {
       newErrors.email = "Required";
     } else if (!/\S+@\S+\.\S+/.test(form.email)) {
@@ -115,7 +90,6 @@ export default function AdPostForm() {
     try {
       let imageUrl = null;
 
-      // Upload image if selected
       if (imageFile) {
         setUploadingImage(true);
         const imageRef = ref(storage, `posts/${Date.now()}_${imageFile.name}`);
@@ -129,8 +103,8 @@ export default function AdPostForm() {
         name: form.name.trim(),
         email: form.email.trim(),
         phone: form.phone.trim() || null,
-        state: form.state || null,
-        city: form.city || null,
+        state: form.state.trim() || null,
+        city: form.city.trim() || null,
         image: imageUrl,
         url: formatUrl(form.url),
         message: form.message.trim() || null,
@@ -151,15 +125,23 @@ export default function AdPostForm() {
     return (
       <div className={styles.page}>
         <div className={styles.card}>
-          <button className={styles.closeBtn} onClick={() => navigate(-1)}>
-            ✕
+          <button
+            type='button'
+            className={styles.closeBtn}
+            onClick={() => navigate(-1)}
+            aria-label='Close'
+          >
+            &times;
           </button>
+
           <div className={styles.successEmoji}>🎉</div>
           <h2 className={styles.successTitle}>Ad submitted!</h2>
           <p className={styles.successSub}>
             Your ad has been submitted and will appear on the homepage shortly.
           </p>
+
           <button
+            type='button'
             className='btn-primary'
             onClick={() => {
               setSubmitted(false);
@@ -188,9 +170,13 @@ export default function AdPostForm() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        {/* X close button */}
-        <button className={styles.closeBtn} onClick={() => navigate(-1)}>
-          ✕
+        <button
+          type='button'
+          className={styles.closeBtn}
+          onClick={() => navigate(-1)}
+          aria-label='Close'
+        >
+          &times;
         </button>
 
         <h1 className={styles.title}>📌 Post an Ad</h1>
@@ -199,7 +185,6 @@ export default function AdPostForm() {
         </p>
 
         <form onSubmit={handleSubmit} className={styles.form}>
-          {/* Section 1 — Contact Info */}
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
               <span className={styles.sectionNum}>1</span>
@@ -208,6 +193,7 @@ export default function AdPostForm() {
                 <p className={styles.sectionDesc}>How others can reach you</p>
               </div>
             </div>
+
             <div className={styles.fields}>
               <div className={styles.row}>
                 <div className={styles.field}>
@@ -221,6 +207,7 @@ export default function AdPostForm() {
                   />
                   {errors.name && <p className={styles.error}>{errors.name}</p>}
                 </div>
+
                 <div className={styles.field}>
                   <label className={styles.label}>
                     Phone <span className={styles.optional}>(optional)</span>
@@ -235,6 +222,35 @@ export default function AdPostForm() {
                   />
                 </div>
               </div>
+
+              <div className={styles.row}>
+                <div className={styles.field}>
+                  <label className={styles.label}>
+                    State <span className={styles.optional}>(optional)</span>
+                  </label>
+                  <input
+                    className={styles.input}
+                    name='state'
+                    value={form.state}
+                    onChange={handleChange}
+                    placeholder='e.g. VA'
+                  />
+                </div>
+
+                <div className={styles.field}>
+                  <label className={styles.label}>
+                    City <span className={styles.optional}>(optional)</span>
+                  </label>
+                  <input
+                    className={styles.input}
+                    name='city'
+                    value={form.city}
+                    onChange={handleChange}
+                    placeholder='e.g. Arlington'
+                  />
+                </div>
+              </div>
+
               <div className={styles.field}>
                 <label className={styles.label}>Email *</label>
                 <input
@@ -250,7 +266,6 @@ export default function AdPostForm() {
             </div>
           </div>
 
-          {/* Section 2 — Ad Info */}
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
               <span className={styles.sectionNum}>2</span>
@@ -269,7 +284,6 @@ export default function AdPostForm() {
             )}
 
             <div className={styles.fields}>
-              {/* Title */}
               <div className={styles.field}>
                 <label className={styles.label}>Title *</label>
                 <input
@@ -282,7 +296,6 @@ export default function AdPostForm() {
                 {errors.title && <p className={styles.error}>{errors.title}</p>}
               </div>
 
-              {/* Image upload */}
               <div className={styles.field}>
                 <label className={styles.label}>
                   Image <span className={styles.optional}>(optional)</span>
@@ -318,7 +331,6 @@ export default function AdPostForm() {
                 </label>
               </div>
 
-              {/* URL */}
               <div className={styles.field}>
                 <label className={styles.label}>
                   Link URL <span className={styles.optional}>(optional)</span>
@@ -330,52 +342,6 @@ export default function AdPostForm() {
                   onChange={handleChange}
                   placeholder='https://example.com'
                 />
-              </div>
-
-              <div className={styles.row}>
-                <div className={styles.field}>
-                  <label className={styles.label}>
-                    State <span className={styles.optional}>(optional)</span>
-                  </label>
-                  <select
-                    className={styles.input}
-                    name='state'
-                    value={form.state}
-                    onChange={handleChange}
-                  >
-                    <option value=''>Select a state</option>
-                    {states.map((state) => (
-                      <option key={state.isoCode} value={state.isoCode}>
-                        {state.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className={styles.field}>
-                  <label className={styles.label}>
-                    City <span className={styles.optional}>(optional)</span>
-                  </label>
-                  <select
-                    className={styles.input}
-                    name='city'
-                    value={form.city}
-                    onChange={handleChange}
-                    disabled={!form.state}
-                  >
-                    <option value=''>
-                      {form.state ? "Select a city" : "Select state first"}
-                    </option>
-                    {cities.map((city) => (
-                      <option
-                        key={`${city.stateCode}-${city.name}`}
-                        value={city.name}
-                      >
-                        {city.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
               </div>
 
               <div className={styles.field}>
