@@ -119,6 +119,13 @@
   text-decoration: underline;
 }
 
+.location {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--muted);
+  display: block;
+}
+
 .footer {
   padding: 14px 20px;
   border-top: 2px dashed var(--border);
@@ -211,15 +218,16 @@
 }
 
 .lightboxClose {
-  position: absolute;
+  position: fixed;
   top: 20px;
   right: 20px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  z-index: 1002;
+  background: var(--coral);
+  border: 3px solid #fff;
   border-radius: 50%;
-  width: 44px;
-  height: 44px;
-  font-size: 1.1rem;
+  width: 52px;
+  height: 52px;
+  font-size: 1.3rem;
   font-weight: 800;
   color: #fff;
   cursor: pointer;
@@ -227,20 +235,22 @@
   align-items: center;
   justify-content: center;
   transition: all 0.15s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .lightboxClose:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: #fff;
+  background: #c94530;
+  transform: scale(1.1);
 }
 
 .lightboxImage {
   max-width: 90vw;
-  max-height: 85vh;
+  max-height: 80vh;
   object-fit: contain;
   border-radius: var(--radius-lg);
   cursor: default;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+  margin-top: 60px;
 }
 
 @media (max-width: 900px) {

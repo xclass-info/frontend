@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import styles from "./AdPost.module.css";
+import { createPortal } from "react-dom";
 
 function formatUrl(url) {
   if (!url) return null;
@@ -30,7 +31,6 @@ export default function AdPost() {
     return () => unsub();
   }, []);
 
-  // Auto rotate every 6 seconds
   useEffect(() => {
     if (posts.length <= POSTS_PER_PAGE) return;
     const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
@@ -102,6 +102,13 @@ export default function AdPost() {
                     🔗 {p.url}
                   </a>
                 )}
+                {(p.city || p.state) && (
+                  <span className={styles.location}>
+                    📍 {p.city}
+                    {p.city && p.state ? ", " : ""}
+                    {p.state}
+                  </span>
+                )}
               </div>
 
               {/* Footer */}
@@ -138,23 +145,62 @@ export default function AdPost() {
         )}
       </div>
 
-      {/* Lightbox */}
-      {selectedImage && (
-        <div className={styles.lightbox} onClick={() => setSelectedImage(null)}>
-          <button
-            className={styles.lightboxClose}
+      {selectedImage &&
+        createPortal(
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.85)",
+              zIndex: 99999,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
             onClick={() => setSelectedImage(null)}
           >
-            ✕
-          </button>
-          <img
-            src={selectedImage}
-            alt='Full size'
-            className={styles.lightboxImage}
-            onClick={(e) => e.stopPropagation()}
-          />
-        </div>
-      )}
+            <button
+              style={{
+                position: "fixed",
+                top: "20px",
+                right: "20px",
+                zIndex: 100000,
+                background: "#ff6b4a",
+                border: "3px solid white",
+                borderRadius: "50%",
+                width: "56px",
+                height: "56px",
+                fontSize: "1.4rem",
+                fontWeight: "800",
+                color: "white",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedImage(null);
+              }}
+            >
+              ✕
+            </button>
+            <img
+              src={selectedImage}
+              alt='Full size'
+              style={{
+                maxWidth: "90vw",
+                maxHeight: "80vh",
+                objectFit: "contain",
+                borderRadius: "20px",
+                marginTop: "60px",
+                boxShadow: "0 25px 60px rgba(0,0,0,0.5)",
+              }}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>,
+          document.body,
+        )}
     </section>
   );
 }
