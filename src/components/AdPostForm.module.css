@@ -149,6 +149,9 @@
   background: var(--card);
   transition: border-color 0.2s;
   width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
 }
 
 .input:focus {
@@ -263,4 +266,8 @@
   .card {
     padding: 24px;
   }
+}
+
+select.input {
+  cursor: pointer;
 }
