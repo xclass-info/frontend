@@ -275,3 +275,17 @@
     height: 140px;
   }
 }
+
+.subject {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--coral);
+  display: block;
+}
+
+.classType {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--blue);
+  display: block;
+}

@@ -268,3 +268,10 @@
 select.input {
   cursor: pointer;
 }
+
+.classType {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--blue);
+  display: block;
+}

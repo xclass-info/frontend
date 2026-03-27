@@ -250,6 +250,7 @@ export default function AdPostForm() {
     message: "",
     title: "",
     subject: "",
+    classType: "",
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
@@ -316,6 +317,7 @@ export default function AdPostForm() {
         url: formatUrl(form.url),
         message: form.message.trim() || null,
         createdAt: new Date(),
+        classType: form.classType || null,
       });
       setSubmitted(true);
     } catch (err) {
@@ -359,6 +361,7 @@ export default function AdPostForm() {
                 message: "",
                 title: "",
                 subject: "",
+                classType: "",
               });
               setImageFile(null);
               setImagePreview("");
@@ -490,6 +493,24 @@ export default function AdPostForm() {
                       {s}
                     </option>
                   ))}
+                </select>
+              </div>
+
+              {/* Class Type */}
+              <div className={styles.field}>
+                <label className={styles.label}>
+                  Class Type <span className={styles.optional}>(optional)</span>
+                </label>
+                <select
+                  className={styles.input}
+                  name='classType'
+                  value={form.classType}
+                  onChange={handleChange}
+                >
+                  <option value=''>Select class type</option>
+                  <option value='In-Person'>In-Person</option>
+                  <option value='Online'>Online</option>
+                  <option value='Both'>Both</option>
                 </select>
               </div>
 

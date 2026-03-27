@@ -109,6 +109,12 @@ export default function AdPost() {
                     {p.state}
                   </span>
                 )}
+                {p.subject && (
+                  <span className={styles.subject}>📖 {p.subject}</span>
+                )}
+                {p.classType && (
+                  <span className={styles.classType}>🏫 {p.classType}</span>
+                )}
               </div>
 
               {/* Footer */}
