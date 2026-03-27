@@ -59,6 +59,176 @@ const US_STATES = [
   { code: "DC", name: "District of Columbia" },
 ];
 
+const SUBJECTS = [
+  // Elementary (K-5)
+  "Early Reading & Phonics",
+  "Basic Math",
+  "Elementary Writing",
+  "Elementary Science",
+  "Elementary Social Studies",
+  "Elementary Art",
+  "Elementary Music",
+  "Elementary PE",
+
+  // Middle School (6-8)
+  "Pre-Algebra",
+  "Algebra I",
+  "Geometry",
+  "Middle School Science",
+  "Middle School English",
+  "Middle School History",
+  "Middle School Geography",
+  "Middle School Spanish",
+  "Middle School French",
+  "Middle School Art",
+  "Middle School Music",
+
+  // High School Math
+  "Algebra II",
+  "Trigonometry",
+  "Pre-Calculus",
+  "Calculus",
+  "Statistics",
+  "AP Calculus AB",
+  "AP Calculus BC",
+  "AP Statistics",
+
+  // High School Science
+  "Biology",
+  "Chemistry",
+  "Physics",
+  "Earth Science",
+  "Environmental Science",
+  "Anatomy & Physiology",
+  "Marine Science",
+  "AP Biology",
+  "AP Chemistry",
+  "AP Physics 1",
+  "AP Physics 2",
+  "AP Physics C: Mechanics",
+  "AP Physics C: E&M",
+  "AP Environmental Science",
+
+  // High School English
+  "English 9",
+  "English 10",
+  "English 11",
+  "English 12",
+  "Grammar & Writing",
+  "Creative Writing",
+  "Literature",
+  "Speech & Debate",
+  "Journalism",
+  "AP English Language & Composition",
+  "AP English Literature & Composition",
+
+  // History & Social Studies
+  "World History",
+  "US History",
+  "Government & Politics",
+  "Economics",
+  "Psychology",
+  "Sociology",
+  "Philosophy",
+  "AP World History",
+  "AP US History",
+  "AP Government & Politics",
+  "AP Economics (Macro)",
+  "AP Economics (Micro)",
+  "AP Psychology",
+  "AP Human Geography",
+
+  // Computer Science
+  "Coding for Kids",
+  "Scratch Programming",
+  "Python",
+  "Java",
+  "JavaScript",
+  "Web Development",
+  "App Development",
+  "AI & Machine Learning",
+  "Data Science",
+  "Cybersecurity",
+  "AP Computer Science A",
+  "AP Computer Science Principles",
+
+  // Foreign Languages
+  "Spanish I",
+  "Spanish II",
+  "Spanish III",
+  "AP Spanish Language",
+  "AP Spanish Literature",
+  "French I",
+  "French II",
+  "French III",
+  "AP French Language",
+  "Chinese (Mandarin) I",
+  "Chinese (Mandarin) II",
+  "AP Chinese Language",
+  "German I",
+  "German II",
+  "AP German Language",
+  "Japanese I",
+  "Japanese II",
+  "AP Japanese Language",
+  "Korean I",
+  "Korean II",
+  "Latin I",
+  "Latin II",
+  "AP Latin",
+  "Italian I",
+  "Arabic I",
+
+  // Arts
+  "Visual Art",
+  "Drawing & Painting",
+  "Sculpture",
+  "Photography",
+  "Digital Art & Graphic Design",
+  "AP Art History",
+  "AP Studio Art",
+  "Music Theory",
+  "Band",
+  "Orchestra",
+  "Choir",
+  "AP Music Theory",
+  "Drama & Theater",
+  "Dance",
+
+  // Career & Technical Education
+  "Business",
+  "Accounting",
+  "Marketing",
+  "Entrepreneurship",
+  "Personal Finance",
+  "Health Science",
+  "Culinary Arts",
+  "Engineering & Design",
+  "Architecture",
+  "Auto Technology",
+
+  // Physical Education & Health
+  "Physical Education",
+  "Health",
+  "Nutrition",
+  "Sports Science",
+
+  // Test Prep
+  "SAT Prep",
+  "ACT Prep",
+  "PSAT Prep",
+  "AP Exam Prep",
+  "ISEE / SSAT Prep",
+
+  // Other
+  "Study Skills",
+  "Homework Help",
+  "Special Education",
+  "ESL / English as Second Language",
+  "College Counseling",
+  "College Essay Writing",
+];
+
 function formatUrl(url) {
   if (!url) return null;
   const trimmed = url.trim();
@@ -79,6 +249,7 @@ export default function AdPostForm() {
     url: "",
     message: "",
     title: "",
+    subject: "",
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
@@ -89,23 +260,13 @@ export default function AdPostForm() {
 
   function handleChange(e) {
     const { name, value } = e.target;
-
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    setErrors((prev) => ({
-      ...prev,
-      [name]: "",
-      content: "",
-    }));
+    setForm((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "", content: "" }));
   }
 
   function handleImageChange(e) {
     const file = e.target.files[0];
     if (!file) return;
-
     setImageFile(file);
     setImagePreview(URL.createObjectURL(file));
     setErrors((prev) => ({ ...prev, content: "" }));
@@ -113,38 +274,29 @@ export default function AdPostForm() {
 
   function validate() {
     const newErrors = {};
-
     if (!form.name.trim()) newErrors.name = "Required";
-
     if (!form.email.trim()) {
       newErrors.email = "Required";
     } else if (!/\S+@\S+\.\S+/.test(form.email)) {
       newErrors.email = "Invalid email";
     }
-
     if (!form.title.trim()) newErrors.title = "Required";
-
     if (!imageFile && !form.url.trim() && !form.message.trim()) {
       newErrors.content = "At least one of image, URL, or message is required";
     }
-
     return newErrors;
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
-
     const newErrors = validate();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-
     setLoading(true);
-
     try {
       let imageUrl = null;
-
       if (imageFile) {
         setUploadingImage(true);
         const imageRef = ref(storage, `posts/${Date.now()}_${imageFile.name}`);
@@ -152,9 +304,9 @@ export default function AdPostForm() {
         imageUrl = await getDownloadURL(imageRef);
         setUploadingImage(false);
       }
-
       await addDoc(collection(db, "adposts"), {
         title: form.title.trim(),
+        subject: form.subject || null,
         name: form.name.trim(),
         email: form.email.trim(),
         phone: form.phone.trim() || null,
@@ -165,7 +317,6 @@ export default function AdPostForm() {
         message: form.message.trim() || null,
         createdAt: new Date(),
       });
-
       setSubmitted(true);
     } catch (err) {
       console.error(err);
@@ -188,13 +339,11 @@ export default function AdPostForm() {
           >
             &times;
           </button>
-
           <div className={styles.successEmoji}>🎉</div>
           <h2 className={styles.successTitle}>Ad submitted!</h2>
           <p className={styles.successSub}>
             Your ad has been submitted and will appear on the homepage shortly.
           </p>
-
           <button
             type='button'
             className='btn-primary'
@@ -209,6 +358,7 @@ export default function AdPostForm() {
                 url: "",
                 message: "",
                 title: "",
+                subject: "",
               });
               setImageFile(null);
               setImagePreview("");
@@ -240,6 +390,7 @@ export default function AdPostForm() {
         </p>
 
         <form onSubmit={handleSubmit} className={styles.form}>
+          {/* Section 1 — Contact Info */}
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
               <span className={styles.sectionNum}>1</span>
@@ -248,7 +399,6 @@ export default function AdPostForm() {
                 <p className={styles.sectionDesc}>How others can reach you</p>
               </div>
             </div>
-
             <div className={styles.fields}>
               <div className={styles.row}>
                 <div className={styles.field}>
@@ -262,7 +412,6 @@ export default function AdPostForm() {
                   />
                   {errors.name && <p className={styles.error}>{errors.name}</p>}
                 </div>
-
                 <div className={styles.field}>
                   <label className={styles.label}>
                     Phone <span className={styles.optional}>(optional)</span>
@@ -277,7 +426,6 @@ export default function AdPostForm() {
                   />
                 </div>
               </div>
-
               <div className={styles.field}>
                 <label className={styles.label}>Email *</label>
                 <input
@@ -293,6 +441,7 @@ export default function AdPostForm() {
             </div>
           </div>
 
+          {/* Section 2 — Ad Info */}
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
               <span className={styles.sectionNum}>2</span>
@@ -311,6 +460,7 @@ export default function AdPostForm() {
             )}
 
             <div className={styles.fields}>
+              {/* Title */}
               <div className={styles.field}>
                 <label className={styles.label}>Title *</label>
                 <input
@@ -323,6 +473,27 @@ export default function AdPostForm() {
                 {errors.title && <p className={styles.error}>{errors.title}</p>}
               </div>
 
+              {/* Subject */}
+              <div className={styles.field}>
+                <label className={styles.label}>
+                  Subject <span className={styles.optional}>(optional)</span>
+                </label>
+                <select
+                  className={styles.input}
+                  name='subject'
+                  value={form.subject}
+                  onChange={handleChange}
+                >
+                  <option value=''>Select a subject</option>
+                  {SUBJECTS.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Image */}
               <div className={styles.field}>
                 <label className={styles.label}>
                   Image <span className={styles.optional}>(optional)</span>
@@ -358,6 +529,7 @@ export default function AdPostForm() {
                 </label>
               </div>
 
+              {/* URL */}
               <div className={styles.field}>
                 <label className={styles.label}>
                   Link URL <span className={styles.optional}>(optional)</span>
@@ -371,6 +543,7 @@ export default function AdPostForm() {
                 />
               </div>
 
+              {/* State & City */}
               <div className={styles.row}>
                 <div className={styles.field}>
                   <label className={styles.label}>
@@ -390,7 +563,6 @@ export default function AdPostForm() {
                     ))}
                   </select>
                 </div>
-
                 <div className={styles.field}>
                   <label className={styles.label}>
                     City <span className={styles.optional}>(optional)</span>
@@ -405,6 +577,7 @@ export default function AdPostForm() {
                 </div>
               </div>
 
+              {/* Message */}
               <div className={styles.field}>
                 <label className={styles.label}>
                   Message <span className={styles.optional}>(optional)</span>
