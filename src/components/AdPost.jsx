@@ -228,8 +228,11 @@ export default function AdPost() {
     <section className={styles.section}>
       <div className={styles.inner}>
         <div className={styles.top}>
+          {/* <div className='section-label'>
+            📌 Education Resources In our community
+          </div> */}
           <div className='section-label'>
-            📌 Resources, announcements and messages shared by our community
+            🌟 Explore Learning Opportunities Near You
           </div>
           {/* <h3>
             Resources, announcements and messages shared by our community. 💬
