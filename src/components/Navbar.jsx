@@ -10,6 +10,10 @@ export default function Navbar() {
     if (el) el.scrollIntoView({ behavior: "smooth" });
   }
 
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   return (
     <nav className={styles.nav}>
       {/* Logo */}
@@ -21,25 +25,30 @@ export default function Navbar() {
       {/* Desktop links */}
       <ul className={styles.links}>
         <li>
+          <a onClick={scrollToTop} style={{ cursor: "pointer" }}>
+            🏠 Home
+          </a>
+        </li>
+        {/* <li>
           <a onClick={() => scrollTo("how")} style={{ cursor: "pointer" }}>
             How it works
           </a>
-        </li>
-        <li>
+        </li> */}
+        {/* <li>
           <a onClick={() => scrollTo("subjects")} style={{ cursor: "pointer" }}>
             Subjects
           </a>
-        </li>
+        </li> */}
         <li>
           <a onClick={() => scrollTo("tutors")} style={{ cursor: "pointer" }}>
-            Tutors
+            👩‍🏫 Tutors
           </a>
         </li>
         <li>
           <Link to='/classes'>📚 Classes</Link>
         </li>
         <li>
-          <Link to='/adpost'>📌 Post Ad</Link>
+          <Link to='/adpost'>📌 Post Resources</Link>
         </li>
       </ul>
 
@@ -62,21 +71,26 @@ export default function Navbar() {
       {open && (
         <ul className={styles.mobileMenu} onClick={() => setOpen(false)}>
           <li>
+            <a onClick={scrollToTop} style={{ cursor: "pointer" }}>
+              🏠 Home
+            </a>
+          </li>
+          {/* <li>
             <a onClick={() => scrollTo("how")} style={{ cursor: "pointer" }}>
               How it works
             </a>
-          </li>
-          <li>
+          </li> */}
+          {/* <li>
             <a
               onClick={() => scrollTo("subjects")}
               style={{ cursor: "pointer" }}
             >
               Subjects
             </a>
-          </li>
+          </li> */}
           <li>
             <a onClick={() => scrollTo("tutors")} style={{ cursor: "pointer" }}>
-              Tutors
+              👩‍🏫 Tutors
             </a>
           </li>
           <li>

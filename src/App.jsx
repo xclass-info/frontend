@@ -40,8 +40,8 @@ function HomePage() {
       <Navbar />
       <AdPost />
       <Hero />
-      <HowItWorks />
-      <Subjects />
+      {/* <HowItWorks /> */}
+      {/* <Subjects /> */}
       <FeaturedTutors />
       <Testimonials />
       <ClassPosts />

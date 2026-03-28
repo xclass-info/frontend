@@ -228,10 +228,12 @@ export default function AdPost() {
     <section className={styles.section}>
       <div className={styles.inner}>
         <div className={styles.top}>
-          <div className='section-label'>📌 Community Ads</div>
-          <h3>
+          <div className='section-label'>
+            📌 Resources, announcements and messages shared by our community
+          </div>
+          {/* <h3>
             Resources, announcements and messages shared by our community. 💬
-          </h3>
+          </h3> */}
           {/* <p className='section-sub'>
             Resources, announcements and messages shared by our community.
           </p> */}
