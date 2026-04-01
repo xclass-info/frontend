@@ -140,7 +140,7 @@ export default function TeacherDashboard() {
                     className={styles.copyBtn}
                     onClick={() => {
                       navigator.clipboard.writeText(
-                        `${window.location.origin}/classroom/${cls.id}`,
+                        `${window.location.origin}/#/classroom/${cls.id}`,
                       );
                       alert("Link copied!");
                     }}
