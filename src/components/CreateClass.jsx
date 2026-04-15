@@ -34,7 +34,7 @@ export default function CreateClass() {
     if (!form.subject) newErrors.subject = "Required";
     return newErrors;
   }
-  
+
   async function handleSubmit(e) {
     e.preventDefault();
     const newErrors = validate();
@@ -46,32 +46,7 @@ export default function CreateClass() {
     setLoading(true);
     try {
       const user = auth.currentUser;
-
-      // 1. Generate Google Meet link via Flask
-      const meetRes = await fetch("https://xclass-meeting.herokuapp.com/api/meet/create-meeting", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-        body: JSON.stringify({
-          title: form.title,
-          date: form.date,
-          time: form.time,
-          duration: 60,
-          description: form.description,
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, // auto-detect user timezone
-        }),
-      });
-
-      const meet = await meetRes.json();
-
-      if (!meet.meet_link) {
-        throw new Error("Failed to generate meeting link");
-      }
-
-      // 2. Save to Firestore with Meet link included
-      await addDoc(collection(db, "classes"), {
+      const docRef = await addDoc(collection(db, "classes"), {
         title: form.title,
         description: form.description,
         date: form.date,
@@ -82,10 +57,7 @@ export default function CreateClass() {
         enrolledCount: 0,
         status: "active",
         createdAt: new Date(),
-        meeting_link: meet.meet_link,         // ← Google Meet link for students
-        meeting_event_id: meet.event_id,      // ← useful to update/delete later
       });
-
       navigate("/teacher/dashboard");
     } catch (err) {
       console.error(err);
@@ -94,7 +66,6 @@ export default function CreateClass() {
       setLoading(false);
     }
   }
-
 
   return (
     <div className={styles.page}>
