@@ -189,9 +189,25 @@ export default function ClassListing() {
                   )}
 
                   {/* Action button */}
-                  {isBooked ? (
+                {isBooked ? (
+                  <div>
                     <div className={styles.bookedBadge}>✅ You're booked!</div>
-                  ) : isFull ? (
+                    {cls.meeting_link ? (
+                      <a
+                        href={cls.meeting_link}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={styles.meetingLink}
+                      >
+                        🎥 Join Meeting
+                      </a>
+                    ) : (
+                      <p className={styles.meetingPending}>
+                        ⏳ Meeting link will be available soon
+                      </p>
+                    )}
+                  </div>
+                ) : isFull ? (
                     <div className={styles.fullBadge}>😔 Class is full</div>
                   ) : !isBooking ? (
                     <button

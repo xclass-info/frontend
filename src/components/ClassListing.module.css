@@ -266,3 +266,28 @@
     grid-template-columns: 1fr;
   }
 }
+
+.meetingLink {
+  display: block;
+  margin-top: 10px;
+  padding: 10px 16px;
+  background: #4a90e2;
+  color: white;
+  text-align: center;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.meetingLink:hover {
+  background: #357abd;
+}
+
+.meetingPending {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #888;
+  text-align: center;
+}
