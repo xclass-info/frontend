@@ -3,7 +3,7 @@ import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import HowItWorks from "./components/HowItWorks";
 import Subjects from "./components/Subjects";
-import FeaturedTutors from "./components/FeaturedTutors";
+import Tutors from "./components/Tutors";
 import Testimonials from "./components/Testimonials";
 import ClassPosts from "./components/ClassPosts";
 import Footer from "./components/Footer";
@@ -42,7 +42,7 @@ function HomePage() {
       <Hero />
       {/* <HowItWorks /> */}
       {/* <Subjects /> */}
-      <FeaturedTutors />
+      <Tutors />
       <Testimonials />
       <ClassPosts />
       <Footer />

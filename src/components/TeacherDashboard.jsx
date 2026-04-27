@@ -12,6 +12,9 @@ import {
 import { useNavigate, Link } from "react-router-dom";
 import styles from "./TeacherDashboard.module.css";
 
+import Availability from "./Availability";
+import BookingRequests from "./BookingRequests";
+
 export default function TeacherDashboard() {
   const navigate = useNavigate();
   const [teacher, setTeacher] = useState(null);
@@ -152,6 +155,16 @@ export default function TeacherDashboard() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Availability */}
+      <div className={styles.section}>
+        <Availability />
+      </div>
+
+      {/* Booking Requests */}
+      <div className={styles.section}>
+        <BookingRequests />
       </div>
     </div>
   );

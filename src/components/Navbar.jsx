@@ -29,16 +29,6 @@ export default function Navbar() {
             🏠 Home
           </a>
         </li>
-        {/* <li>
-          <a onClick={() => scrollTo("how")} style={{ cursor: "pointer" }}>
-            How it works
-          </a>
-        </li> */}
-        {/* <li>
-          <a onClick={() => scrollTo("subjects")} style={{ cursor: "pointer" }}>
-            Subjects
-          </a>
-        </li> */}
         <li>
           <a onClick={() => scrollTo("tutors")} style={{ cursor: "pointer" }}>
             👩‍🏫 Tutors
@@ -75,19 +65,6 @@ export default function Navbar() {
               🏠 Home
             </a>
           </li>
-          {/* <li>
-            <a onClick={() => scrollTo("how")} style={{ cursor: "pointer" }}>
-              How it works
-            </a>
-          </li> */}
-          {/* <li>
-            <a
-              onClick={() => scrollTo("subjects")}
-              style={{ cursor: "pointer" }}
-            >
-              Subjects
-            </a>
-          </li> */}
           <li>
             <a onClick={() => scrollTo("tutors")} style={{ cursor: "pointer" }}>
               👩‍🏫 Tutors
