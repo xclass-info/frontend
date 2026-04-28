@@ -50,7 +50,7 @@ export default function TeacherRegister() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        <button className={styles.closeBtn} onClick={() => navigate(-1)}>
+        <button className={styles.closeBtn} onClick={() => navigate("/")}>
           ✕
         </button>
         <h1 className={styles.title}>👩‍🏫 Teacher Register</h1>

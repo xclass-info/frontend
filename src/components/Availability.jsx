@@ -8,12 +8,17 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
+import { Calendar, momentLocalizer } from "react-big-calendar";
+import moment from "moment";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+
+const localizer = momentLocalizer(moment);
 
 export default function Availability() {
   const [slots, setSlots] = useState([]);
-  const [form, setForm] = useState({ date: "", time: "", duration: 60 });
+  const [events, setEvents] = useState([]);
+  const [selected, setSelected] = useState(null); // selected slot to confirm
   const [loading, setLoading] = useState(false);
-
   const teacherId = auth.currentUser?.uid;
 
   useEffect(() => {
@@ -21,32 +26,61 @@ export default function Availability() {
     const unsub = onSnapshot(
       collection(db, "teachers", teacherId, "availability"),
       (snap) => {
-        setSlots(
-          snap.docs
-            .map((d) => ({ id: d.id, ...d.data() }))
-            .sort(
-              (a, b) =>
-                new Date(`${a.date}T${a.time}`) -
-                new Date(`${b.date}T${b.time}`),
-            ),
+        const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        setSlots(data);
+
+        // Convert to calendar events
+        setEvents(
+          data.map((slot) => ({
+            id: slot.id,
+            title: slot.booked
+              ? "✅ Booked"
+              : `📅 Available (${slot.duration} min)`,
+            start: new Date(`${slot.date}T${slot.time}`),
+            end: moment(`${slot.date}T${slot.time}`)
+              .add(slot.duration, "minutes")
+              .toDate(),
+            booked: slot.booked,
+            slotData: slot,
+          })),
         );
       },
     );
     return () => unsub();
   }, [teacherId]);
 
-  async function addSlot() {
-    if (!form.date || !form.time) return alert("Please fill in date and time");
+  // When teacher clicks an empty slot on the calendar
+  function handleSelectSlot({ start }) {
+    const date = moment(start).format("YYYY-MM-DD");
+    const time = moment(start).format("HH:mm");
+    setSelected({ date, time, duration: 60 });
+  }
+
+  // When teacher clicks an existing event
+  function handleSelectEvent(event) {
+    if (!event.booked) {
+      if (
+        window.confirm(
+          `Remove slot on ${event.slotData.date} at ${event.slotData.time}?`,
+        )
+      ) {
+        deleteDoc(doc(db, "teachers", teacherId, "availability", event.id));
+      }
+    }
+  }
+
+  async function confirmAddSlot() {
+    if (!selected) return;
     setLoading(true);
     try {
       await addDoc(collection(db, "teachers", teacherId, "availability"), {
-        date: form.date,
-        time: form.time,
-        duration: Number(form.duration),
+        date: selected.date,
+        time: selected.time,
+        duration: Number(selected.duration),
         booked: false,
         createdAt: new Date(),
       });
-      setForm({ date: "", time: "", duration: 60 });
+      setSelected(null);
     } catch (err) {
       console.error(err);
     } finally {
@@ -54,108 +88,171 @@ export default function Availability() {
     }
   }
 
-  async function removeSlot(slotId) {
-    await deleteDoc(doc(db, "teachers", teacherId, "availability", slotId));
+  // Color code events
+  function eventStyleGetter(event) {
+    return {
+      style: {
+        backgroundColor: event.booked ? "#27ae60" : "#4a90e2",
+        borderRadius: 6,
+        border: "none",
+        color: "white",
+        fontSize: 13,
+      },
+    };
   }
 
   return (
     <div style={{ marginTop: 32 }}>
       <h3>🗓 My Availability</h3>
       <p style={{ color: "#888", fontSize: 14, marginBottom: 16 }}>
-        Add time slots when you're available for 1-on-1 sessions.
+        Click any time slot on the calendar to mark yourself as available. Click
+        an existing slot to remove it.
       </p>
 
-      {/* Add slot form */}
+      {/* Calendar */}
       <div
-        style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 24 }}
+        style={{
+          height: 600,
+          background: "white",
+          borderRadius: 12,
+          padding: 16,
+          boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
+        }}
       >
-        <input
-          type='date'
-          value={form.date}
-          onChange={(e) => setForm({ ...form, date: e.target.value })}
-          style={{ padding: 8, borderRadius: 6, border: "1px solid #ddd" }}
+        <Calendar
+          localizer={localizer}
+          events={events}
+          defaultView='week'
+          views={["month", "week", "day"]}
+          step={30}
+          timeslots={2}
+          selectable
+          onSelectSlot={handleSelectSlot}
+          onSelectEvent={handleSelectEvent}
+          eventPropGetter={eventStyleGetter}
+          style={{ height: "100%" }}
         />
-        <input
-          type='time'
-          value={form.time}
-          onChange={(e) => setForm({ ...form, time: e.target.value })}
-          style={{ padding: 8, borderRadius: 6, border: "1px solid #ddd" }}
-        />
-        <select
-          value={form.duration}
-          onChange={(e) => setForm({ ...form, duration: e.target.value })}
-          style={{ padding: 8, borderRadius: 6, border: "1px solid #ddd" }}
-        >
-          <option value={30}>30 min</option>
-          <option value={60}>60 min</option>
-          <option value={90}>90 min</option>
-        </select>
-        <button
-          onClick={addSlot}
-          disabled={loading}
-          style={{
-            padding: "8px 20px",
-            borderRadius: 6,
-            border: "none",
-            background: "#4a90e2",
-            color: "white",
-            cursor: "pointer",
-          }}
-        >
-          {loading ? "Adding..." : "+ Add Slot"}
-        </button>
       </div>
 
-      {/* Slots list */}
-      {slots.length === 0 ? (
-        <p style={{ color: "#aaa", fontSize: 14 }}>No availability set yet.</p>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {slots.map((slot) => (
-            <div
-              key={slot.id}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "10px 16px",
-                borderRadius: 8,
-                background: slot.booked ? "#f0fdf4" : "#f9fafb",
-                border: "1px solid #eee",
-              }}
-            >
-              <div>
-                <span style={{ fontWeight: 500 }}>📅 {slot.date}</span>
-                <span style={{ margin: "0 8px", color: "#888" }}>
-                  ⏰ {slot.time}
-                </span>
-                <span style={{ color: "#888" }}>({slot.duration} min)</span>
-                {slot.booked && (
-                  <span
-                    style={{ marginLeft: 8, color: "#27ae60", fontSize: 13 }}
-                  >
-                    ✅ Booked
-                  </span>
-                )}
-              </div>
-              {!slot.booked && (
-                <button
-                  onClick={() => removeSlot(slot.id)}
-                  style={{
-                    padding: "4px 12px",
-                    borderRadius: 6,
-                    border: "none",
-                    background: "#fee2e2",
-                    color: "#e74c3c",
-                    cursor: "pointer",
-                    fontSize: 13,
-                  }}
-                >
-                  Remove
-                </button>
-              )}
+      {/* Confirm modal */}
+      {selected && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 100,
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              borderRadius: 16,
+              padding: 32,
+              width: 360,
+            }}
+          >
+            <h3 style={{ marginBottom: 16 }}>Add Availability Slot</h3>
+
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ fontSize: 13, color: "#888" }}>Date</label>
+              <input
+                type='date'
+                value={selected.date}
+                onChange={(e) =>
+                  setSelected({ ...selected, date: e.target.value })
+                }
+                style={{
+                  display: "block",
+                  width: "100%",
+                  padding: 8,
+                  borderRadius: 6,
+                  border: "1px solid #ddd",
+                  marginTop: 4,
+                  boxSizing: "border-box",
+                }}
+              />
             </div>
-          ))}
+
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ fontSize: 13, color: "#888" }}>Time</label>
+              <input
+                type='time'
+                value={selected.time}
+                onChange={(e) =>
+                  setSelected({ ...selected, time: e.target.value })
+                }
+                style={{
+                  display: "block",
+                  width: "100%",
+                  padding: 8,
+                  borderRadius: 6,
+                  border: "1px solid #ddd",
+                  marginTop: 4,
+                  boxSizing: "border-box",
+                }}
+              />
+            </div>
+
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ fontSize: 13, color: "#888" }}>Duration</label>
+              <select
+                value={selected.duration}
+                onChange={(e) =>
+                  setSelected({ ...selected, duration: e.target.value })
+                }
+                style={{
+                  display: "block",
+                  width: "100%",
+                  padding: 8,
+                  borderRadius: 6,
+                  border: "1px solid #ddd",
+                  marginTop: 4,
+                  boxSizing: "border-box",
+                }}
+              >
+                <option value={30}>30 minutes</option>
+                <option value={60}>60 minutes</option>
+                <option value={90}>90 minutes</option>
+              </select>
+            </div>
+
+            <div style={{ display: "flex", gap: 8 }}>
+              <button
+                onClick={confirmAddSlot}
+                disabled={loading}
+                style={{
+                  flex: 1,
+                  padding: "10px",
+                  borderRadius: 8,
+                  border: "none",
+                  background: "#4a90e2",
+                  color: "white",
+                  cursor: "pointer",
+                  fontWeight: 500,
+                }}
+              >
+                {loading ? "Adding..." : "Add Slot ✓"}
+              </button>
+              <button
+                onClick={() => setSelected(null)}
+                style={{
+                  flex: 1,
+                  padding: "10px",
+                  borderRadius: 8,
+                  border: "none",
+                  background: "#f1f1f1",
+                  color: "#333",
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
