@@ -13,7 +13,7 @@ export default function CreateClass() {
     time: "",
     maxSeats: "",
     subject: "",
-    price: "",
+    price: "", // ← added
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -33,7 +33,7 @@ export default function CreateClass() {
     else if (isNaN(form.maxSeats) || Number(form.maxSeats) < 1)
       newErrors.maxSeats = "Must be at least 1";
     if (!form.subject) newErrors.subject = "Required";
-    if (!form.price) newErrors.price = "Required";
+    if (form.price === "") newErrors.price = "Required";
     else if (isNaN(form.price) || Number(form.price) < 0)
       newErrors.price = "Must be a valid price";
     return newErrors;
@@ -50,14 +50,14 @@ export default function CreateClass() {
     setLoading(true);
     try {
       const user = auth.currentUser;
-      const docRef = await addDoc(collection(db, "classes"), {
+      await addDoc(collection(db, "classes"), {
         title: form.title,
         description: form.description,
         date: form.date,
         time: form.time,
         maxSeats: Number(form.maxSeats),
         subject: form.subject,
-        price: Number(form.price),
+        price: Number(form.price), // ← added
         teacherId: user.uid,
         enrolledCount: 0,
         status: "active",
@@ -179,6 +179,7 @@ export default function CreateClass() {
             )}
           </div>
 
+          {/* Price ← added */}
           <div className={styles.field}>
             <label className={styles.label}>Price (USD)</label>
             <input
