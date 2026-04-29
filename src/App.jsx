@@ -43,8 +43,8 @@ function HomePage() {
       {/* <HowItWorks /> */}
       {/* <Subjects /> */}
       <Tutors />
-      <Testimonials />
       <ClassPosts />
+      <Testimonials />
       <Footer />
     </>
   );
