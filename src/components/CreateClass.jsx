@@ -13,6 +13,7 @@ export default function CreateClass() {
     time: "",
     maxSeats: "",
     subject: "",
+    price: "",
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -32,6 +33,9 @@ export default function CreateClass() {
     else if (isNaN(form.maxSeats) || Number(form.maxSeats) < 1)
       newErrors.maxSeats = "Must be at least 1";
     if (!form.subject) newErrors.subject = "Required";
+    if (!form.price) newErrors.price = "Required";
+    else if (isNaN(form.price) || Number(form.price) < 0)
+      newErrors.price = "Must be a valid price";
     return newErrors;
   }
 
@@ -53,6 +57,7 @@ export default function CreateClass() {
         time: form.time,
         maxSeats: Number(form.maxSeats),
         subject: form.subject,
+        price: Number(form.price),
         teacherId: user.uid,
         enrolledCount: 0,
         status: "active",
@@ -172,6 +177,21 @@ export default function CreateClass() {
             {errors.maxSeats && (
               <p className={styles.errorMsg}>{errors.maxSeats}</p>
             )}
+          </div>
+
+          <div className={styles.field}>
+            <label className={styles.label}>Price (USD)</label>
+            <input
+              className={`${styles.input} ${errors.price ? styles.inputError : ""}`}
+              name='price'
+              type='number'
+              min='0'
+              step='0.01'
+              value={form.price}
+              onChange={handleChange}
+              placeholder='e.g. 25.00 (enter 0 for free)'
+            />
+            {errors.price && <p className={styles.errorMsg}>{errors.price}</p>}
           </div>
 
           <button className={styles.btn} type='submit' disabled={loading}>

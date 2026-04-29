@@ -20,6 +20,12 @@ export default function Availability() {
   const [selected, setSelected] = useState(null); // selected slot to confirm
   const [loading, setLoading] = useState(false);
   const teacherId = auth.currentUser?.uid;
+  const [form, setForm] = useState({
+    date: "",
+    time: "",
+    duration: 60,
+    price: "",
+  });
 
   useEffect(() => {
     if (!teacherId) return;
@@ -35,7 +41,7 @@ export default function Availability() {
             id: slot.id,
             title: slot.booked
               ? "✅ Booked"
-              : `📅 Available (${slot.duration} min)`,
+              : `📅 Available (${slot.duration} min) $${slot.price || 0}`,
             start: new Date(`${slot.date}T${slot.time}`),
             end: moment(`${slot.date}T${slot.time}`)
               .add(slot.duration, "minutes")
@@ -77,6 +83,7 @@ export default function Availability() {
         date: selected.date,
         time: selected.time,
         duration: Number(selected.duration),
+        price: Number(form.price),
         booked: false,
         createdAt: new Date(),
       });
@@ -218,6 +225,27 @@ export default function Availability() {
                 <option value={60}>60 minutes</option>
                 <option value={90}>90 minutes</option>
               </select>
+            </div>
+
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ fontSize: 13, color: "#888" }}>Price (USD)</label>
+              <input
+                type='number'
+                min='0'
+                step='0.01'
+                placeholder='e.g. 45.00 (enter 0 for free)'
+                value={form.price}
+                onChange={(e) => setForm({ ...form, price: e.target.value })}
+                style={{
+                  display: "block",
+                  width: "100%",
+                  padding: 8,
+                  borderRadius: 6,
+                  border: "1px solid #ddd",
+                  marginTop: 4,
+                  boxSizing: "border-box",
+                }}
+              />
             </div>
 
             <div style={{ display: "flex", gap: 8 }}>
