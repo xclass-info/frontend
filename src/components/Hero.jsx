@@ -23,8 +23,16 @@ export default function Hero() {
             and courses — in any subject, at any level. Start free today!
           </p>
           <div className={styles.actions}>
-            <a href='#tutors' className='btn-primary'>
-              Find a Tutor →
+            <a
+              href='#tutors'
+              className='btn-primary'
+              onClick={() => {
+                const el = document.getElementById("tutors");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              Find a Tutor {"\u2192"}
             </a>
             <a href='#how' className='btn-ghost'>
               How it works

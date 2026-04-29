@@ -55,6 +55,7 @@ export default function App() {
     <HashRouter>
       <Routes>
         <Route path='/' element={<HomePage />} />
+        <Route path='/tutors' element={<Tutors />} />
         <Route path='/classes' element={<ClassListing />} />
         <Route path='/classroom/:classId' element={<Classroom />} />
         <Route path='/teacher/register' element={<TeacherRegister />} />
