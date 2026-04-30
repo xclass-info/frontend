@@ -206,3 +206,7 @@
   color: var(--muted);
   font-size: 1rem;
 }
+
+.page {
+  padding-top: 80px; /* ← add this */
+}

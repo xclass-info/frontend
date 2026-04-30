@@ -291,3 +291,7 @@
   color: #888;
   text-align: center;
 }
+
+.inner {
+  padding-top: 80px; /* ← add this */
+}

@@ -275,3 +275,7 @@ select.input {
   color: var(--blue);
   display: block;
 }
+
+.page {
+  padding-top: 100px; /* ← add this */
+}

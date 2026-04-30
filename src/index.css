@@ -28,6 +28,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-y: auto; /* ← add this */
 }
 
 body {
@@ -35,6 +36,7 @@ body {
   background: var(--bg);
   color: var(--text);
   overflow-x: hidden;
+  overflow-y: auto; /* ← add this */
   line-height: 1.6;
 }
 

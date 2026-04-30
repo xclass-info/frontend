@@ -13,6 +13,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import styles from "./ClassListing.module.css";
 import { SkeletonClassCard } from "./Skeleton";
+import Navbar from "./Navbar";
 
 export default function ClassListing() {
   const [classes, setClasses] = useState([]);
@@ -103,6 +104,7 @@ export default function ClassListing() {
 
   return (
     <div className={styles.page}>
+      <Navbar />
       <div className={styles.inner}>
         {/* Header */}
         <div className={styles.header}>

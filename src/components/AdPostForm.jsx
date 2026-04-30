@@ -4,6 +4,7 @@ import { collection, addDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import styles from "./AdPostForm.module.css";
+import Navbar from "./Navbar";
 
 const US_STATES = [
   { code: "AL", name: "Alabama" },
@@ -377,6 +378,7 @@ export default function AdPostForm() {
 
   return (
     <div className={styles.page}>
+      <Navbar />
       <div className={styles.card}>
         <button
           type='button'

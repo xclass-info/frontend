@@ -17,6 +17,7 @@ import Classroom from "./components/Classroom";
 import AdPostForm from "./components/AdPostForm";
 import AdPost from "./components/AdPost";
 import { HashRouter, Routes, Route } from "react-router-dom";
+import ScrollToTop from "./components/ScrollToTop";
 
 function HomePage() {
   useEffect(() => {
@@ -53,6 +54,7 @@ function HomePage() {
 export default function App() {
   return (
     <HashRouter>
+      <ScrollToTop />
       <Routes>
         <Route path='/' element={<HomePage />} />
         <Route path='/tutors' element={<Tutors />} />
