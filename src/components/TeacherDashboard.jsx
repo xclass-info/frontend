@@ -14,6 +14,7 @@ import styles from "./TeacherDashboard.module.css";
 
 import Availability from "./Availability";
 import BookingRequests from "./BookingRequests";
+import { SkeletonDashboardCard } from "./Skeleton";
 
 export default function TeacherDashboard() {
   const navigate = useNavigate();
@@ -55,10 +56,28 @@ export default function TeacherDashboard() {
     navigate("/teacher/login");
   }
 
+  // if (loading) {
+  //   return (
+  //     <div className={styles.loadingPage}>
+  //       <p>Loading dashboard...</p>
+  //     </div>
+  //   );
+  // }
+
+  // Replace your loading state:
   if (loading) {
     return (
-      <div className={styles.loadingPage}>
-        <p>Loading dashboard...</p>
+      <div className={styles.page}>
+        <div className={styles.header}>
+          <div className={styles.headerLeft}>
+            <h1 className={styles.logo}>💻 Xclass</h1>
+          </div>
+        </div>
+        <div className={styles.grid}>
+          {[1, 2, 3].map((i) => (
+            <SkeletonDashboardCard key={i} />
+          ))}
+        </div>
       </div>
     );
   }

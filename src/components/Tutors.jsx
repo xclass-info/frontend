@@ -4,6 +4,8 @@ import { db } from "../firebase";
 import { collection, onSnapshot, addDoc, getDocs } from "firebase/firestore";
 import styles from "./Tutors.module.css";
 
+import { SkeletonCard } from "./Skeleton";
+
 export default function Tutors() {
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -83,10 +85,31 @@ export default function Tutors() {
     }
   }
 
+  // if (loading) {
+  //   return (
+  //     <section id='tutors' className={styles.section}>
+  //       <p className={styles.loading}>Loading tutors...</p>
+  //     </section>
+  //   );
+  // }
+
+  // Replace your loading state:
   if (loading) {
     return (
       <section id='tutors' className={styles.section}>
-        <p className={styles.loading}>Loading tutors...</p>
+        <div className={styles.inner}>
+          <div className={styles.header}>
+            <h2 className={styles.title}>👩‍🏫 Meet Our Tutors</h2>
+            <p className={styles.sub}>
+              Expert tutors ready to help you learn anything.
+            </p>
+          </div>
+          <div className={styles.grid}>
+            {[1, 2, 3].map((i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
+        </div>
       </section>
     );
   }

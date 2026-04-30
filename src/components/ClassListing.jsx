@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import styles from "./ClassListing.module.css";
+import { SkeletonClassCard } from "./Skeleton";
 
 export default function ClassListing() {
   const [classes, setClasses] = useState([]);
@@ -82,10 +83,20 @@ export default function ClassListing() {
     }
   }
 
+  // Replace your loading state:
   if (loading) {
     return (
-      <div className={styles.loadingPage}>
-        <p>Loading classes...</p>
+      <div className={styles.page}>
+        <div className={styles.inner}>
+          <div className={styles.header}>
+            <h1 className={styles.title}>📚 Available Classes</h1>
+          </div>
+          <div className={styles.grid}>
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <SkeletonClassCard key={i} />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -189,25 +200,27 @@ export default function ClassListing() {
                   )}
 
                   {/* Action button */}
-                {isBooked ? (
-                  <div>
-                    <div className={styles.bookedBadge}>✅ You're booked!</div>
-                    {cls.meeting_link ? (
-                      <a
-                        href={cls.meeting_link}
-                        target="_blank"
-                        rel="noreferrer"
-                        className={styles.meetingLink}
-                      >
-                        🎥 Join Meeting
-                      </a>
-                    ) : (
-                      <p className={styles.meetingPending}>
-                        ⏳ Meeting link will be available soon
-                      </p>
-                    )}
-                  </div>
-                ) : isFull ? (
+                  {isBooked ? (
+                    <div>
+                      <div className={styles.bookedBadge}>
+                        ✅ You're booked!
+                      </div>
+                      {cls.meeting_link ? (
+                        <a
+                          href={cls.meeting_link}
+                          target='_blank'
+                          rel='noreferrer'
+                          className={styles.meetingLink}
+                        >
+                          🎥 Join Meeting
+                        </a>
+                      ) : (
+                        <p className={styles.meetingPending}>
+                          ⏳ Meeting link will be available soon
+                        </p>
+                      )}
+                    </div>
+                  ) : isFull ? (
                     <div className={styles.fullBadge}>😔 Class is full</div>
                   ) : !isBooking ? (
                     <button

@@ -1,0 +1,52 @@
+@keyframes shimmer {
+  0% {
+    background-position: -600px 0;
+  }
+  100% {
+    background-position: 600px 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 600px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 6px;
+}
+
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+}
+
+.avatar {
+  composes: shimmer;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin: 0 auto 16px;
+}
+
+.line {
+  composes: shimmer;
+  height: 14px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+}
+
+.badge {
+  composes: shimmer;
+  height: 24px;
+  width: 80px;
+  border-radius: 20px;
+}
+
+.btn {
+  composes: shimmer;
+  height: 40px;
+  width: 100%;
+  border-radius: 8px;
+  margin-top: 8px;
+}
