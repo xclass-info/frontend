@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import styles from "./ClassListing.module.css";
 import { SkeletonClassCard } from "./Skeleton";
 import Navbar from "./Navbar";
+import PaymentModal from "./PaymentModal";
 
 export default function ClassListing() {
   const [classes, setClasses] = useState([]);
@@ -23,6 +24,7 @@ export default function ClassListing() {
   const [booked, setBooked] = useState({});
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const [paymentData, setPaymentData] = useState(null);
 
   useEffect(() => {
     const q = query(collection(db, "classes"), where("status", "==", "active"));
@@ -54,9 +56,18 @@ export default function ClassListing() {
       return;
     }
 
+    if (cls.price > 0) {
+      // Show payment modal first
+      setPaymentData({ cls });
+    } else {
+      // Free class — book directly
+      await confirmBooking(cls);
+    }
+  }
+
+  async function confirmBooking(cls) {
     setSubmitting(true);
     try {
-      // Add booking to Firestore
       await addDoc(collection(db, "bookings"), {
         classId: cls.id,
         classTitle: cls.title,
@@ -65,9 +76,10 @@ export default function ClassListing() {
         date: cls.date,
         time: cls.time,
         bookedAt: new Date(),
+        paid: cls.price > 0,
+        amount: cls.price || 0,
       });
 
-      // Update enrolled count
       const classRef = doc(db, "classes", cls.id);
       await updateDoc(classRef, {
         enrolledCount: (cls.enrolledCount || 0) + 1,
@@ -75,6 +87,7 @@ export default function ClassListing() {
 
       setBooked({ ...booked, [cls.id]: true });
       setBookingId(null);
+      setPaymentData(null);
       setForm({ name: "", email: "" });
     } catch (err) {
       console.error(err);
@@ -238,6 +251,22 @@ export default function ClassListing() {
           </div>
         )}
       </div>
+      {/* ← Add this */}
+      {paymentData && (
+        <PaymentModal
+          amount={paymentData.cls.price}
+          bookingData={{
+            classId: paymentData.cls.id,
+            teacherId: paymentData.cls.teacherId,
+            studentName: form.name,
+            studentEmail: form.email,
+            type: "class",
+            description: paymentData.cls.title,
+          }}
+          onSuccess={() => confirmBooking(paymentData.cls)}
+          onClose={() => setPaymentData(null)}
+        />
+      )}
     </div>
   );
 }

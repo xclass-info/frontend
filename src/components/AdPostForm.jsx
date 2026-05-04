@@ -317,6 +317,7 @@ export default function AdPostForm() {
         image: imageUrl,
         url: formatUrl(form.url),
         message: form.message.trim() || null,
+        status: "pending", // ← add this
         createdAt: new Date(),
         classType: form.classType || null,
       });
