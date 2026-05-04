@@ -162,6 +162,9 @@ export default function ClassListing() {
                     <span>
                       👥 {cls.enrolledCount || 0} / {cls.maxSeats} enrolled
                     </span>
+                    <span>
+                      💰 {cls.price > 0 ? `$${cls.price}` : "Free"}
+                    </span>{" "}
                   </div>
 
                   {/* Booking form */}
@@ -242,7 +245,9 @@ export default function ClassListing() {
                       className={styles.bookBtn}
                       onClick={() => setBookingId(cls.id)}
                     >
-                      Reserve a Seat →
+                      {cls.price > 0
+                        ? `Reserve a Seat — $${cls.price}`
+                        : "Reserve a Seat (Free) →"}
                     </button>
                   ) : null}
                 </div>
