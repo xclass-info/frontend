@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, onSnapshot, addDoc, getDocs } from "firebase/firestore";
 import styles from "./Tutors.module.css";
-
 import { SkeletonCard } from "./Skeleton";
 
 export default function Tutors() {
@@ -31,7 +30,6 @@ export default function Tutors() {
     setBooked(false);
     setForm({ name: "", email: "" });
 
-    // Fetch available slots
     const snap = await getDocs(
       collection(db, "teachers", teacher.id, "availability"),
     );
@@ -85,15 +83,6 @@ export default function Tutors() {
     }
   }
 
-  // if (loading) {
-  //   return (
-  //     <section id='tutors' className={styles.section}>
-  //       <p className={styles.loading}>Loading tutors...</p>
-  //     </section>
-  //   );
-  // }
-
-  // Replace your loading state:
   if (loading) {
     return (
       <section id='tutors' className={styles.section}>
@@ -147,9 +136,126 @@ export default function Tutors() {
                   )}
                 </div>
 
+                {/* Name */}
                 <h3 className={styles.name}>{teacher.name}</h3>
-                <p className={styles.bio}>{teacher.bio}</p>
 
+                {/* Gender + Degree badges */}
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 6,
+                    flexWrap: "wrap",
+                    justifyContent: "center",
+                    marginBottom: 8,
+                  }}
+                >
+                  {teacher.gender && (
+                    <span
+                      style={{
+                        fontSize: 11,
+                        background: "#f0f4ff",
+                        color: "#4a90e2",
+                        padding: "2px 10px",
+                        borderRadius: 20,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {teacher.gender === "Male" ? "👨" : "👩"} {teacher.gender}
+                    </span>
+                  )}
+                  {teacher.degree && (
+                    <span
+                      style={{
+                        fontSize: 11,
+                        background: "#f0fdf4",
+                        color: "#16a34a",
+                        padding: "2px 10px",
+                        borderRadius: 20,
+                        fontWeight: 600,
+                      }}
+                    >
+                      🎓 {teacher.degree}
+                    </span>
+                  )}
+                </div>
+
+                {/* University */}
+                {teacher.university && (
+                  <p
+                    style={{
+                      fontSize: 13,
+                      color: "#888",
+                      marginBottom: 6,
+                      textAlign: "center",
+                    }}
+                  >
+                    🏛 {teacher.university}
+                  </p>
+                )}
+
+                {/* Expertise */}
+                {teacher.expertise && (
+                  <p
+                    style={{
+                      fontSize: 13,
+                      color: "#555",
+                      marginBottom: 6,
+                      textAlign: "center",
+                      fontWeight: 600,
+                    }}
+                  >
+                    💡 {teacher.expertise}
+                  </p>
+                )}
+
+                {/* Research Area */}
+                {teacher.researchArea && (
+                  <p
+                    style={{
+                      fontSize: 12,
+                      color: "#888",
+                      marginBottom: 6,
+                      textAlign: "center",
+                    }}
+                  >
+                    🔬 {teacher.researchArea}
+                  </p>
+                )}
+
+                {/* Languages */}
+                {teacher.languages && (
+                  <p
+                    style={{
+                      fontSize: 12,
+                      color: "#888",
+                      marginBottom: 6,
+                      textAlign: "center",
+                    }}
+                  >
+                    🌍 {teacher.languages}
+                  </p>
+                )}
+
+                {/* Years of experience */}
+                {teacher.yearsOfExperience && (
+                  <p
+                    style={{
+                      fontSize: 12,
+                      color: "#888",
+                      marginBottom: 8,
+                      textAlign: "center",
+                    }}
+                  >
+                    📆 {teacher.yearsOfExperience}{" "}
+                    {Number(teacher.yearsOfExperience) === 1 ? "year" : "years"}{" "}
+                    experience
+                  </p>
+                )}
+
+                {/* Bio */}
+                {teacher.bio && <p className={styles.bio}>{teacher.bio}</p>}
+
+                {/* Rating */}
                 <div className={styles.rating}>
                   <span className={styles.stars}>
                     {"★".repeat(Math.round(teacher.rating || 0))}
@@ -159,6 +265,24 @@ export default function Tutors() {
                     {teacher.rating ? teacher.rating.toFixed(1) : "New"}
                   </span>
                 </div>
+
+                {/* Website */}
+                {teacher.website && (
+                  <a
+                    href={teacher.website}
+                    target='_blank'
+                    rel='noreferrer'
+                    style={{
+                      fontSize: 13,
+                      color: "#4a90e2",
+                      marginBottom: 12,
+                      display: "block",
+                      textAlign: "center",
+                    }}
+                  >
+                    🔗 Visit Profile
+                  </a>
+                )}
 
                 <button
                   className={styles.bookBtn}
@@ -274,7 +398,8 @@ export default function Tutors() {
                         }}
                       >
                         📅 {slot.date} &nbsp; ⏰ {slot.time} &nbsp; (
-                        {slot.duration} min)
+                        {slot.duration} min) &nbsp;
+                        {slot.price > 0 ? `💰 $${slot.price}` : "🆓 Free"}
                       </div>
                     ))}
                   </div>

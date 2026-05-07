@@ -32,7 +32,7 @@ export default function Hero() {
               }}
               style={{ cursor: "pointer" }}
             >
-              Find a Tutor {"\u2192"}
+              Find a Teacher {"\u2192"}
             </a>
             <a href='#how' className='btn-ghost'>
               How it works

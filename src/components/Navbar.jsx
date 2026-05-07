@@ -46,7 +46,7 @@ export default function Navbar() {
         </li>
         <li>
           <a onClick={() => scrollTo("tutors")} style={{ cursor: "pointer" }}>
-            👩‍🏫 Tutors
+            👩‍🏫 Teacher
           </a>
         </li>
         <li>
@@ -60,7 +60,7 @@ export default function Navbar() {
       {/* Desktop right side buttons */}
       <div className={styles.navRight}>
         <Link to='/teacher/login' className={styles.teacherBtn}>
-          👩‍🏫 Tutor Login
+          👩‍🏫 Teacher Login
         </Link>
         <Link to='/register' className={styles.cta}>
           Get Started →
