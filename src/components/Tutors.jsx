@@ -359,6 +359,31 @@ export default function Tutors() {
               </div>
             </div>
 
+            {profileTeacher.bio && (
+              <div
+                style={{
+                  marginTop: 16,
+                  padding: 14,
+                  background: "#f9fafb",
+                  borderRadius: 8,
+                }}
+              >
+                <p style={{ fontSize: 12, color: "#aaa", margin: "0 0 8px" }}>
+                  Self Introduction
+                </p>
+                <p
+                  style={{
+                    fontSize: 14,
+                    color: "#555",
+                    margin: 0,
+                    lineHeight: 1.7,
+                  }}
+                >
+                  {profileTeacher.bio}
+                </p>
+              </div>
+            )}
+
             {/* Info rows */}
             <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: 16 }}>
               {profileTeacher.university && (
@@ -551,6 +576,26 @@ export default function Tutors() {
                     >
                       💡 Project Ideas
                     </p>
+                    {/* ← Add this */}
+                    {/* ← Add this */}
+                    <p
+                      style={{
+                        fontSize: 12,
+                        color: "#4a90e2",
+                        marginTop: 12,
+                        lineHeight: 1.6,
+                        fontStyle: "italic",
+                        background: "#eff6ff",
+                        padding: "10px 14px",
+                        borderRadius: 8,
+                        borderLeft: "3px solid #4a90e2",
+                      }}
+                    >
+                      Students are encouraged to propose their own ideas or
+                      collaborate with mentors to develop projects that align
+                      with their interests.
+                    </p>
+
                     <div
                       style={{
                         display: "flex",
@@ -594,31 +639,6 @@ export default function Tutors() {
                     </div>
                   </div>
                 )}
-
-              {profileTeacher.bio && (
-                <div
-                  style={{
-                    marginTop: 16,
-                    padding: 14,
-                    background: "#f9fafb",
-                    borderRadius: 8,
-                  }}
-                >
-                  <p style={{ fontSize: 12, color: "#aaa", margin: "0 0 8px" }}>
-                    About
-                  </p>
-                  <p
-                    style={{
-                      fontSize: 14,
-                      color: "#555",
-                      margin: 0,
-                      lineHeight: 1.7,
-                    }}
-                  >
-                    {profileTeacher.bio}
-                  </p>
-                </div>
-              )}
             </div>
 
             {/* Book button */}

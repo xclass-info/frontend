@@ -133,7 +133,7 @@ export default function TeacherDashboard() {
   // }
 
   async function saveProfile() {
-    if (!profile.gender) return alert("Please select your gender."); // ← add this
+    //if (!profile.gender) return alert("Please select your gender."); // ← add this
     // Validate required fields
     if (!profile.degree) return alert("Please select your degree.");
     if (!profile.university.trim())
