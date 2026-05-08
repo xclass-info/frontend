@@ -38,6 +38,8 @@ export default function TeacherDashboard() {
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileSaved, setProfileSaved] = useState(false);
   const [wordCount, setWordCount] = useState(0);
+  const [projects, setProjects] = useState([]); // ← add this
+  const [newProject, setNewProject] = useState({ title: "", description: "" });
 
   useEffect(() => {
     const unsubscribeAuth = auth.onAuthStateChanged(async (user) => {
@@ -50,6 +52,7 @@ export default function TeacherDashboard() {
       if (teacherDoc.exists()) {
         const data = teacherDoc.data();
         setTeacher(data);
+        setProjects(data.projects || []);
         // Load existing profile data
         setProfile({
           degree: data.degree || "",
@@ -80,6 +83,21 @@ export default function TeacherDashboard() {
 
     return () => unsubscribeAuth();
   }, []);
+
+  function addProject() {
+    if (!newProject.title.trim()) return alert("Please enter a project title.");
+    const project = {
+      id: crypto.randomUUID(),
+      title: newProject.title.trim(),
+      description: newProject.description.trim(),
+    };
+    setProjects((prev) => [...prev, project]);
+    setNewProject({ title: "", description: "" });
+  }
+
+  function removeProject(id) {
+    setProjects((prev) => prev.filter((p) => p.id !== id));
+  }
 
   async function handleLogout() {
     await signOut(auth);
@@ -134,6 +152,7 @@ export default function TeacherDashboard() {
       const user = auth.currentUser;
       await updateDoc(doc(db, "teachers", user.uid), {
         ...profile,
+        projects,
         updatedAt: new Date(),
       });
       setProfileSaved(true);
@@ -557,6 +576,148 @@ export default function TeacherDashboard() {
                   Maximum 300 words reached.
                 </p>
               )}
+            </div>
+
+            {/* Projects */}
+            <div style={{ marginBottom: 24 }}>
+              <h3 style={{ fontSize: 16, marginBottom: 4 }}>
+                💡 Project Ideas
+              </h3>
+              <p style={{ fontSize: 13, color: "#888", marginBottom: 16 }}>
+                Share project ideas students can work on with you.
+              </p>
+
+              {/* Existing projects */}
+              {projects.length > 0 && (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 12,
+                    marginBottom: 16,
+                  }}
+                >
+                  {projects.map((project) => (
+                    <div
+                      key={project.id}
+                      style={{
+                        padding: 16,
+                        borderRadius: 10,
+                        background: "#f9fafb",
+                        border: "1px solid #eee",
+                        position: "relative",
+                      }}
+                    >
+                      <button
+                        onClick={() => removeProject(project.id)}
+                        style={{
+                          position: "absolute",
+                          top: 10,
+                          right: 10,
+                          background: "none",
+                          border: "none",
+                          color: "#e74c3c",
+                          cursor: "pointer",
+                          fontSize: 16,
+                        }}
+                      >
+                        ✕
+                      </button>
+                      <h4
+                        style={{
+                          margin: "0 0 6px",
+                          fontSize: 15,
+                          paddingRight: 24,
+                        }}
+                      >
+                        {project.title}
+                      </h4>
+                      {project.description && (
+                        <p
+                          style={{
+                            margin: 0,
+                            fontSize: 13,
+                            color: "#666",
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          {project.description}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add new project */}
+              <div
+                style={{
+                  padding: 16,
+                  borderRadius: 10,
+                  border: "2px dashed #ddd",
+                  background: "white",
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: "#888",
+                    marginBottom: 10,
+                  }}
+                >
+                  + Add a project
+                </p>
+                <div style={fieldStyle}>
+                  <label style={labelStyle}>Project Title *</label>
+                  <input
+                    value={newProject.title}
+                    onChange={(e) =>
+                      setNewProject({ ...newProject, title: e.target.value })
+                    }
+                    placeholder='e.g. Build a chatbot with Python'
+                    style={inputStyle}
+                  />
+                </div>
+                <div style={fieldStyle}>
+                  <label style={labelStyle}>
+                    Description{" "}
+                    <span style={{ color: "#aaa", fontWeight: 400 }}>
+                      (optional)
+                    </span>
+                  </label>
+                  <textarea
+                    value={newProject.description}
+                    onChange={(e) =>
+                      setNewProject({
+                        ...newProject,
+                        description: e.target.value,
+                      })
+                    }
+                    placeholder='Describe what the student will build and learn...'
+                    rows={3}
+                    style={{
+                      ...inputStyle,
+                      resize: "vertical",
+                      lineHeight: 1.6,
+                    }}
+                  />
+                </div>
+                <button
+                  onClick={addProject}
+                  style={{
+                    padding: "8px 20px",
+                    borderRadius: 8,
+                    border: "none",
+                    background: "#4a90e2",
+                    color: "white",
+                    cursor: "pointer",
+                    fontWeight: 600,
+                  }}
+                >
+                  + Add Project
+                </button>
+              </div>
             </div>
 
             {/* Save button */}

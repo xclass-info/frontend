@@ -421,6 +421,22 @@ export default function Tutors() {
                 </div>
               )}
 
+              {/* Add this after the expertise line on the card */}
+              {profileTeacher.projects &&
+                profileTeacher.projects.length > 0 && (
+                  <p
+                    style={{
+                      fontSize: 12,
+                      color: "#888",
+                      marginBottom: 6,
+                      textAlign: "center",
+                    }}
+                  >
+                    💡 {profileTeacher.projects.length} project idea
+                    {profileTeacher.projects.length > 1 ? "s" : ""} available
+                  </p>
+                )}
+
               {profileTeacher.researchArea && (
                 <div
                   style={{
@@ -520,6 +536,64 @@ export default function Tutors() {
                   </div>
                 </div>
               )}
+
+              {/* Projects */}
+              {profileTeacher.projects &&
+                profileTeacher.projects.length > 0 && (
+                  <div style={{ marginTop: 16 }}>
+                    <p
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: "#333",
+                        marginBottom: 10,
+                      }}
+                    >
+                      💡 Project Ideas
+                    </p>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 10,
+                      }}
+                    >
+                      {profileTeacher.projects.map((project) => (
+                        <div
+                          key={project.id}
+                          style={{
+                            padding: 14,
+                            borderRadius: 10,
+                            background: "#f9fafb",
+                            border: "1px solid #eee",
+                          }}
+                        >
+                          <h4
+                            style={{
+                              margin: "0 0 4px",
+                              fontSize: 14,
+                              color: "#333",
+                            }}
+                          >
+                            {project.title}
+                          </h4>
+                          {project.description && (
+                            <p
+                              style={{
+                                margin: 0,
+                                fontSize: 13,
+                                color: "#666",
+                                lineHeight: 1.5,
+                              }}
+                            >
+                              {project.description}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
               {profileTeacher.bio && (
                 <div
