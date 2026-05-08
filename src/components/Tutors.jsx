@@ -15,6 +15,7 @@ export default function Tutors() {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [booked, setBooked] = useState(false);
+  const [profileTeacher, setProfileTeacher] = useState(null);
 
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "teachers"), (snapshot) => {
@@ -120,7 +121,12 @@ export default function Tutors() {
         ) : (
           <div className={styles.grid}>
             {teachers.map((teacher) => (
-              <div key={teacher.id} className={styles.card}>
+              <div
+                key={teacher.id}
+                className={styles.card}
+                onClick={() => setProfileTeacher(teacher)}
+                style={{ cursor: "pointer" }}
+              >
                 {/* Avatar */}
                 <div className={styles.avatarWrapper}>
                   {teacher.photoURL ? (
@@ -136,7 +142,6 @@ export default function Tutors() {
                   )}
                 </div>
 
-                {/* Name */}
                 <h3 className={styles.name}>{teacher.name}</h3>
 
                 {/* Gender + Degree badges */}
@@ -179,21 +184,6 @@ export default function Tutors() {
                   )}
                 </div>
 
-                {/* University */}
-                {teacher.university && (
-                  <p
-                    style={{
-                      fontSize: 13,
-                      color: "#888",
-                      marginBottom: 6,
-                      textAlign: "center",
-                    }}
-                  >
-                    🏛 {teacher.university}
-                  </p>
-                )}
-
-                {/* Expertise */}
                 {teacher.expertise && (
                   <p
                     style={{
@@ -208,54 +198,8 @@ export default function Tutors() {
                   </p>
                 )}
 
-                {/* Research Area */}
-                {teacher.researchArea && (
-                  <p
-                    style={{
-                      fontSize: 12,
-                      color: "#888",
-                      marginBottom: 6,
-                      textAlign: "center",
-                    }}
-                  >
-                    🔬 {teacher.researchArea}
-                  </p>
-                )}
-
-                {/* Languages */}
-                {teacher.languages && (
-                  <p
-                    style={{
-                      fontSize: 12,
-                      color: "#888",
-                      marginBottom: 6,
-                      textAlign: "center",
-                    }}
-                  >
-                    🌍 {teacher.languages}
-                  </p>
-                )}
-
-                {/* Years of experience */}
-                {teacher.yearsOfExperience && (
-                  <p
-                    style={{
-                      fontSize: 12,
-                      color: "#888",
-                      marginBottom: 8,
-                      textAlign: "center",
-                    }}
-                  >
-                    📆 {teacher.yearsOfExperience}{" "}
-                    {Number(teacher.yearsOfExperience) === 1 ? "year" : "years"}{" "}
-                    experience
-                  </p>
-                )}
-
-                {/* Bio */}
                 {teacher.bio && <p className={styles.bio}>{teacher.bio}</p>}
 
-                {/* Rating */}
                 <div className={styles.rating}>
                   <span className={styles.stars}>
                     {"★".repeat(Math.round(teacher.rating || 0))}
@@ -266,35 +210,367 @@ export default function Tutors() {
                   </span>
                 </div>
 
-                {/* Website */}
-                {teacher.website && (
-                  <a
-                    href={teacher.website}
-                    target='_blank'
-                    rel='noreferrer'
-                    style={{
-                      fontSize: 13,
-                      color: "#4a90e2",
-                      marginBottom: 12,
-                      display: "block",
-                      textAlign: "center",
-                    }}
-                  >
-                    🔗 Visit Profile
-                  </a>
-                )}
-
-                <button
-                  className={styles.bookBtn}
-                  onClick={() => openBooking(teacher)}
-                >
-                  📅 Book a Session
-                </button>
+                <p style={{ fontSize: 12, color: "#aaa", marginTop: 8 }}>
+                  Click to view full profile
+                </p>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* ── Teacher Profile Modal ── */}
+      {profileTeacher && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 100,
+            padding: 16,
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              borderRadius: 16,
+              padding: 32,
+              width: "100%",
+              maxWidth: 520,
+              maxHeight: "90vh",
+              overflowY: "auto",
+            }}
+          >
+            {/* Header */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 24,
+              }}
+            >
+              <h3 style={{ margin: 0 }}>👤 Teacher Profile</h3>
+              <button
+                onClick={() => setProfileTeacher(null)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: 20,
+                  cursor: "pointer",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Avatar + Name */}
+            <div style={{ textAlign: "center", marginBottom: 20 }}>
+              {profileTeacher.photoURL ? (
+                <img
+                  src={profileTeacher.photoURL}
+                  alt={profileTeacher.name}
+                  style={{
+                    width: 90,
+                    height: 90,
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    marginBottom: 12,
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: 90,
+                    height: 90,
+                    borderRadius: "50%",
+                    background: "linear-gradient(135deg, #667eea, #764ba2)",
+                    color: "white",
+                    fontSize: 32,
+                    fontWeight: 700,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    margin: "0 auto 12px",
+                  }}
+                >
+                  {profileTeacher.name?.charAt(0).toUpperCase() || "T"}
+                </div>
+              )}
+              <h2 style={{ margin: "0 0 8px", fontSize: 22 }}>
+                {profileTeacher.name}
+              </h2>
+
+              {/* Badges */}
+              <div
+                style={{
+                  display: "flex",
+                  gap: 6,
+                  flexWrap: "wrap",
+                  justifyContent: "center",
+                }}
+              >
+                {profileTeacher.gender && (
+                  <span
+                    style={{
+                      fontSize: 12,
+                      background: "#f0f4ff",
+                      color: "#4a90e2",
+                      padding: "4px 12px",
+                      borderRadius: 20,
+                      fontWeight: 600,
+                    }}
+                  >
+                    {profileTeacher.gender === "Male" ? "👨" : "👩"}{" "}
+                    {profileTeacher.gender}
+                  </span>
+                )}
+                {profileTeacher.degree && (
+                  <span
+                    style={{
+                      fontSize: 12,
+                      background: "#f0fdf4",
+                      color: "#16a34a",
+                      padding: "4px 12px",
+                      borderRadius: 20,
+                      fontWeight: 600,
+                    }}
+                  >
+                    🎓 {profileTeacher.degree}
+                  </span>
+                )}
+                {profileTeacher.rating > 0 && (
+                  <span
+                    style={{
+                      fontSize: 12,
+                      background: "#fffbeb",
+                      color: "#d97706",
+                      padding: "4px 12px",
+                      borderRadius: 20,
+                      fontWeight: 600,
+                    }}
+                  >
+                    ⭐ {profileTeacher.rating.toFixed(1)}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Info rows */}
+            <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: 16 }}>
+              {profileTeacher.university && (
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 12,
+                    marginBottom: 12,
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <span style={{ fontSize: 18 }}>🏛</span>
+                  <div>
+                    <p
+                      style={{ fontSize: 12, color: "#aaa", margin: "0 0 2px" }}
+                    >
+                      University / Institution
+                    </p>
+                    <p
+                      style={{
+                        fontSize: 14,
+                        color: "#333",
+                        margin: 0,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {profileTeacher.university}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {profileTeacher.expertise && (
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 12,
+                    marginBottom: 12,
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <span style={{ fontSize: 18 }}>💡</span>
+                  <div>
+                    <p
+                      style={{ fontSize: 12, color: "#aaa", margin: "0 0 2px" }}
+                    >
+                      Area of Expertise
+                    </p>
+                    <p
+                      style={{
+                        fontSize: 14,
+                        color: "#333",
+                        margin: 0,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {profileTeacher.expertise}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {profileTeacher.researchArea && (
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 12,
+                    marginBottom: 12,
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <span style={{ fontSize: 18 }}>🔬</span>
+                  <div>
+                    <p
+                      style={{ fontSize: 12, color: "#aaa", margin: "0 0 2px" }}
+                    >
+                      Research Area
+                    </p>
+                    <p style={{ fontSize: 14, color: "#333", margin: 0 }}>
+                      {profileTeacher.researchArea}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {profileTeacher.yearsOfExperience && (
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 12,
+                    marginBottom: 12,
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <span style={{ fontSize: 18 }}>📆</span>
+                  <div>
+                    <p
+                      style={{ fontSize: 12, color: "#aaa", margin: "0 0 2px" }}
+                    >
+                      Teaching Experience
+                    </p>
+                    <p style={{ fontSize: 14, color: "#333", margin: 0 }}>
+                      {profileTeacher.yearsOfExperience}{" "}
+                      {Number(profileTeacher.yearsOfExperience) === 1
+                        ? "year"
+                        : "years"}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {profileTeacher.languages && (
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 12,
+                    marginBottom: 12,
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <span style={{ fontSize: 18 }}>🌍</span>
+                  <div>
+                    <p
+                      style={{ fontSize: 12, color: "#aaa", margin: "0 0 2px" }}
+                    >
+                      Languages Spoken
+                    </p>
+                    <p style={{ fontSize: 14, color: "#333", margin: 0 }}>
+                      {profileTeacher.languages}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {profileTeacher.website && (
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 12,
+                    marginBottom: 12,
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <span style={{ fontSize: 18 }}>🔗</span>
+                  <div>
+                    <p
+                      style={{ fontSize: 12, color: "#aaa", margin: "0 0 2px" }}
+                    >
+                      Website / LinkedIn
+                    </p>
+                    <a
+                      href={profileTeacher.website}
+                      target='_blank'
+                      rel='noreferrer'
+                      style={{ fontSize: 14, color: "#4a90e2" }}
+                    >
+                      {profileTeacher.website}
+                    </a>
+                  </div>
+                </div>
+              )}
+
+              {profileTeacher.bio && (
+                <div
+                  style={{
+                    marginTop: 16,
+                    padding: 14,
+                    background: "#f9fafb",
+                    borderRadius: 8,
+                  }}
+                >
+                  <p style={{ fontSize: 12, color: "#aaa", margin: "0 0 8px" }}>
+                    About
+                  </p>
+                  <p
+                    style={{
+                      fontSize: 14,
+                      color: "#555",
+                      margin: 0,
+                      lineHeight: 1.7,
+                    }}
+                  >
+                    {profileTeacher.bio}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Book button */}
+            <button
+              onClick={() => {
+                setProfileTeacher(null);
+                openBooking(profileTeacher);
+              }}
+              style={{
+                width: "100%",
+                marginTop: 24,
+                padding: "14px",
+                borderRadius: 10,
+                border: "none",
+                background: "#4a90e2",
+                color: "white",
+                fontSize: 16,
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              📅 Book a Session with {profileTeacher.name}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── Booking Modal ── */}
       {selectedTeacher && (
