@@ -14,7 +14,6 @@ import TeacherDashboard from "./components/TeacherDashboard";
 import CreateClass from "./components/CreateClass";
 import ClassListing from "./components/ClassListing";
 import Classroom from "./components/Classroom";
-import AdPostForm from "./components/AdPostForm";
 import AdPost from "./components/AdPost";
 import { HashRouter, Routes, Route } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
@@ -65,7 +64,6 @@ export default function App() {
         <Route path='/teacher/login' element={<TeacherLogin />} />
         <Route path='/teacher/dashboard' element={<TeacherDashboard />} />
         <Route path='/teacher/create-class' element={<CreateClass />} />
-        <Route path='/adpost' element={<AdPostForm />} />
         <Route path='/admin' element={<AdminDashboard />} />
       </Routes>
     </HashRouter>
