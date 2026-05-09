@@ -58,7 +58,7 @@ export default function TeacherLogin() {
     setResetLoading(true);
     try {
       await sendPasswordResetEmail(auth, form.email, {
-        url: "https://xclass.info/#/teacher/login", // ← redirect here after reset
+        url: "https://happyresearch.org/#/teacher/login", // ← redirect here after reset
         handleCodeInApp: false,
       });
       setResetSent(true);
