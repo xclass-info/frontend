@@ -392,7 +392,8 @@ export default function AdPostForm() {
 
         <h1 className={styles.title}>📌 Post an Ad</h1>
         <p className={styles.sub}>
-          Share a resource, announcement, or message with the xclass community.
+          Share a resource, announcement, or message with the HappyResearch
+          community.
         </p>
 
         <form onSubmit={handleSubmit} className={styles.form}>

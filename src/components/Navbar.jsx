@@ -33,8 +33,8 @@ export default function Navbar() {
     <nav className={styles.nav}>
       {/* Logo */}
       <Link to='/' className={styles.logo}>
-        x<span className={styles.logoClass}>class</span>
-        <span className={styles.logoInfo}>.info</span>
+        happy<span className={styles.logoClass}>Research</span>
+        {/* <span className={styles.logoInfo}>.org</span> */}
       </Link>
 
       {/* Desktop links */}

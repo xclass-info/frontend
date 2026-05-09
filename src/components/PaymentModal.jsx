@@ -106,7 +106,7 @@ export default function PaymentModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount,
-          description: bookingData.description || "xclass session",
+          description: bookingData.description || "HappyResearch session",
           ...bookingData,
         }),
       });

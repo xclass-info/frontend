@@ -96,7 +96,7 @@ export default function AdminDashboard() {
         >
           <h2 style={{ marginBottom: 4 }}>🔐 Admin Login</h2>
           <p style={{ color: "#888", fontSize: 14, marginBottom: 24 }}>
-            xclass admin only
+            HappyResearch admin only
           </p>
           {error && (
             <p style={{ color: "red", fontSize: 13, marginBottom: 12 }}>

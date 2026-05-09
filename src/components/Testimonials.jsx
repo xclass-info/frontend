@@ -12,7 +12,7 @@ const TESTIMONIALS = [
   },
   {
     quote:
-      "xclass matched me with an AI tutor who actually knew what they were teaching. I went from zero Python knowledge to building my own ML model in 8 weeks. Absolutely worth it!",
+      "HappyResearch matched me with an AI tutor who actually knew what they were teaching. I went from zero Python knowledge to building my own ML model in 8 weeks. Absolutely worth it!",
     name: "Michael T.",
     info: "College Student · Python & AI",
     initials: "MT",
@@ -21,7 +21,7 @@ const TESTIMONIALS = [
   },
   {
     quote:
-      "My daughter's confidence has skyrocketed. Her tutor doesn't just teach — she inspires. We tried other platforms but xclass is in a different league.",
+      "My daughter's confidence has skyrocketed. Her tutor doesn't just teach — she inspires. We tried other platforms but HappyResearch is in a different league.",
     name: "Lisa K.",
     info: "Parent · 7th Grade Math",
     initials: "LK",
@@ -40,7 +40,7 @@ export default function Testimonials() {
         <h2>What our students say 🌟</h2>
         <p className='section-sub' style={{ margin: "0 auto" }}>
           Join thousands of happy learners who found their perfect tutor on
-          xclass.
+          HappyResearch.
         </p>
       </div>
       <div className={styles.grid}>

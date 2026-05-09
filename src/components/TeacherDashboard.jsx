@@ -170,7 +170,7 @@ export default function TeacherDashboard() {
       <div className={styles.page}>
         <div className={styles.header}>
           <div className={styles.headerLeft}>
-            <h1 className={styles.logo}>💻 Xclass</h1>
+            <h1 className={styles.logo}>🔬 happyResearch</h1>
           </div>
         </div>
         <div className={styles.grid}>
@@ -208,7 +208,7 @@ export default function TeacherDashboard() {
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
-          <h1 className={styles.logo}>💻 Xclass</h1>
+          <h1 className={styles.logo}>💻 HappyResearch</h1>
           <p className={styles.welcome}>
             Welcome back, <strong>{teacher?.name}</strong> 👋
           </p>

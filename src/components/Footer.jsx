@@ -35,7 +35,7 @@ export default function Footer() {
       </div>
 
       <div className={styles.bottom}>
-        <p>© 2026 xclass.info — All rights reserved</p>
+        <p>© 2026 HappyResearch — All rights reserved</p>
         <div className={styles.bottomLinks}>
           <a href='#'>Privacy Policy</a>
           <a href='#'>Terms of Service</a>

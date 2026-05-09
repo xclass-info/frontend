@@ -39,7 +39,7 @@ export default function Classroom() {
           Authorization: `Bearer ${DAILY_API_KEY}`,
         },
         body: JSON.stringify({
-          name: `xclass-${classId.slice(-8)}-${Date.now()}`,
+          name: `HappyResearch-${classId.slice(-8)}-${Date.now()}`,
           properties: {
             enable_chat: true,
             enable_screenshare: true,
@@ -80,12 +80,22 @@ export default function Classroom() {
         <iframe
           src={meetingLink}
           style={{ width: "100%", height: "100%", border: "none" }}
-          allow="camera; microphone; fullscreen; display-capture; autoplay"
+          allow='camera; microphone; fullscreen; display-capture; autoplay'
           allowFullScreen
         />
         <button
           onClick={() => setJoined(false)}
-          style={{ position: "absolute", top: 12, left: 12, padding: "6px 16px", borderRadius: 20, border: "none", background: "rgba(0,0,0,0.6)", color: "white", cursor: "pointer" }}
+          style={{
+            position: "absolute",
+            top: 12,
+            left: 12,
+            padding: "6px 16px",
+            borderRadius: 20,
+            border: "none",
+            background: "rgba(0,0,0,0.6)",
+            color: "white",
+            cursor: "pointer",
+          }}
         >
           ← Leave
         </button>
@@ -101,9 +111,18 @@ export default function Classroom() {
 
         {/* Instructor controls */}
         {isInstructor && (
-          <div style={{ marginBottom: 20, padding: 16, background: "rgba(255,255,255,0.05)", borderRadius: 8 }}>
+          <div
+            style={{
+              marginBottom: 20,
+              padding: 16,
+              background: "rgba(255,255,255,0.05)",
+              borderRadius: 8,
+            }}
+          >
             <p style={{ fontSize: 13, marginBottom: 8, opacity: 0.7 }}>
-              {meetingLink ? "Room is ready for students." : "No meeting room yet."}
+              {meetingLink
+                ? "Room is ready for students."
+                : "No meeting room yet."}
             </p>
             <button
               className={styles.joinBtn}
@@ -111,7 +130,11 @@ export default function Classroom() {
               disabled={creating}
               style={{ width: "100%", marginBottom: 0, background: "#555" }}
             >
-              {creating ? "Creating..." : meetingLink ? "Regenerate Room" : "Generate Meeting Room"}
+              {creating
+                ? "Creating..."
+                : meetingLink
+                  ? "Regenerate Room"
+                  : "Generate Meeting Room"}
             </button>
           </div>
         )}
@@ -120,7 +143,9 @@ export default function Classroom() {
         {meetingLink ? (
           <>
             <p className={styles.joinSub}>
-              {isInstructor ? "Start your class below." : "Your class is ready!"}
+              {isInstructor
+                ? "Start your class below."
+                : "Your class is ready!"}
             </p>
             <button className={styles.joinBtn} onClick={() => setJoined(true)}>
               {isInstructor ? "Start Class →" : "Join Now →"}
