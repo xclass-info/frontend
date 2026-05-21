@@ -52,6 +52,9 @@ export default function Navbar() {
         <li>
           <Link to='/classes'>📚 Classes</Link>
         </li>
+        <li>
+          <Link to='/adpost'>📌 Post Resources</Link>
+        </li>
       </ul>
 
       {/* Desktop right side buttons */}
@@ -85,7 +88,9 @@ export default function Navbar() {
           <li>
             <Link to='/classes'>📚 Classes</Link>
           </li>
-
+          <li>
+            <Link to='/adpost'>📌 Post Ad</Link>
+          </li>
           <li>
             <Link to='/teacher/login'>👩‍🏫 Tutor Login</Link>
           </li>

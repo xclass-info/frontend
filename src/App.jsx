@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
+import HowItWorks from "./components/HowItWorks";
+import Subjects from "./components/Subjects";
 import Tutors from "./components/Tutors";
 import Testimonials from "./components/Testimonials";
 import ClassPosts from "./components/ClassPosts";
@@ -12,6 +14,7 @@ import TeacherDashboard from "./components/TeacherDashboard";
 import CreateClass from "./components/CreateClass";
 import ClassListing from "./components/ClassListing";
 import Classroom from "./components/Classroom";
+import AdPostForm from "./components/AdPostForm";
 import AdPost from "./components/AdPost";
 import { HashRouter, Routes, Route } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
@@ -39,6 +42,8 @@ function HomePage() {
       <Navbar />
       <AdPost />
       <Hero />
+      {/* <HowItWorks /> */}
+      {/* <Subjects /> */}
       <Tutors />
       <ClassPosts />
       <Testimonials />
@@ -60,6 +65,7 @@ export default function App() {
         <Route path='/teacher/login' element={<TeacherLogin />} />
         <Route path='/teacher/dashboard' element={<TeacherDashboard />} />
         <Route path='/teacher/create-class' element={<CreateClass />} />
+        <Route path='/adpost' element={<AdPostForm />} />
         <Route path='/admin' element={<AdminDashboard />} />
       </Routes>
     </HashRouter>

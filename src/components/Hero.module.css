@@ -1,0 +1,324 @@
+.hero {
+  min-height: 100vh;
+  padding: 120px 6% 80px;
+  background: var(--surface);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.blob1 {
+  position: absolute;
+  top: 10%;
+  right: -5%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(52, 211, 153, 0.15), transparent);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.blob2 {
+  position: absolute;
+  bottom: 10%;
+  left: -5%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(74, 143, 226, 0.15), transparent);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.blob3 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(155, 107, 255, 0.1), transparent);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 80px;
+  width: 100%;
+}
+
+.content {
+  flex: 1;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card);
+  border: 2.5px solid var(--border);
+  border-radius: 50px;
+  padding: 8px 18px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--coral);
+  margin-bottom: 24px;
+  box-shadow: 4px 4px 0 var(--border);
+}
+
+.tagDot {
+  width: 8px;
+  height: 8px;
+  background: var(--coral);
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+
+.h1 {
+  font-family: "Fredoka One", cursive;
+  font-size: clamp(2.2rem, 4vw, 3.5rem);
+  line-height: 1.15;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+.sub {
+  font-size: 1.05rem;
+  color: var(--muted);
+  font-weight: 600;
+  line-height: 1.75;
+  margin-bottom: 36px;
+  max-width: 520px;
+}
+
+.actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+
+.stats {
+  display: flex;
+  gap: 32px;
+}
+
+.statNum {
+  font-family: "Fredoka One", cursive;
+  font-size: 1.6rem;
+  color: var(--coral);
+}
+
+.statLabel {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.visual {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.terminal {
+  background: var(--card);
+  border: 2.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 6px 6px 0 var(--border);
+}
+
+.termBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 2.5px solid var(--border);
+  background: var(--surface);
+}
+
+.termBody {
+  padding: 20px;
+}
+
+.aiPill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--card);
+  border: 2.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  box-shadow: 6px 6px 0 var(--border);
+}
+
+.aiPill strong {
+  font-family: "Fredoka One", cursive;
+  font-size: 0.95rem;
+  color: var(--text);
+  display: block;
+}
+
+.aiPill p {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 600;
+  margin: 0;
+}
+
+.aiIcon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+/* Tutor card styles */
+.tutorAvatar {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--coral), var(--blue));
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.tutorName {
+  font-family: "Fredoka One", cursive;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.tutorSubject {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--coral);
+}
+
+.tutorBadge {
+  margin-left: auto;
+  background: rgba(52, 211, 153, 0.12);
+  color: var(--coral);
+  border: 2px solid rgba(52, 211, 153, 0.3);
+  border-radius: 50px;
+  padding: 4px 12px;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.tutorStats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 12px 0;
+  border-bottom: 2px dashed var(--border);
+}
+
+.tutorStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.tutorStatNum {
+  font-family: "Fredoka One", cursive;
+  font-size: 1.2rem;
+  color: var(--coral);
+}
+
+.tutorStatLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.tutorTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.tutorTag {
+  background: rgba(52, 211, 153, 0.08);
+  color: var(--coral);
+  border: 2px solid rgba(52, 211, 153, 0.2);
+  border-radius: 50px;
+  padding: 3px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.bookBtn {
+  width: 100%;
+  background: var(--coral);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 12px;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.bookBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #059669;
+}
+
+.liveDot {
+  width: 10px;
+  height: 10px;
+  background: #10b981;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.8);
+  }
+}
+
+@media (max-width: 900px) {
+  .visual {
+    display: none;
+  }
+  .h1 {
+    font-size: 2.4rem;
+  }
+  .stats {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero {
+    padding: 100px 4% 60px;
+  }
+  .stats {
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .actions {
+    flex-direction: column;
+  }
+}

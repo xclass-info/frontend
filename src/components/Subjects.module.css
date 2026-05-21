@@ -1,0 +1,87 @@
+.section {
+  padding: 96px 6%;
+  background: var(--surface);
+  position: relative;
+}
+
+.inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.top {
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.top .section-sub {
+  margin: 0 auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.card {
+  background: var(--card);
+  border: 2.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 6px 6px 0 var(--border);
+}
+
+.iconBox {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  transition: transform 0.2s;
+}
+
+.card:hover .iconBox {
+  transform: scale(1.1);
+}
+
+.name {
+  font-family: "Fredoka One", cursive;
+  font-size: 1.05rem;
+  font-weight: 400;
+  color: var(--text);
+}
+
+.count {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .section {
+    padding: 72px 4%;
+  }
+}

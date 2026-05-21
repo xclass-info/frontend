@@ -1,0 +1,60 @@
+.screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
+}
+
+.hide {
+  opacity: 0;
+  transform: translateY(-20px);
+  pointer-events: none;
+}
+
+.logo {
+  font-family: "Fredoka One", cursive;
+  font-size: 2rem;
+  color: var(--coral);
+  letter-spacing: 0.02em;
+}
+
+.dots {
+  display: flex;
+  gap: 10px;
+}
+
+.dots span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--coral);
+  animation: bounce 0.8s ease-in-out infinite alternate;
+}
+
+.dots span:nth-child(2) {
+  animation-delay: 0.2s;
+  background: var(--orange);
+}
+.dots span:nth-child(3) {
+  animation-delay: 0.4s;
+  background: var(--pink);
+}
+
+@keyframes bounce {
+  from {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  to {
+    transform: translateY(-12px);
+    opacity: 1;
+  }
+}
