@@ -19,6 +19,35 @@ import AdPost from "./components/AdPost";
 import { HashRouter, Routes, Route } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
 import AdminDashboard from "./components/AdminDashboard";
+import TeacherProfile from "./components/TeacherProfile";
+
+// function HomePage() {
+//   useEffect(() => {
+//     const observer = new IntersectionObserver(
+//       (entries) => {
+//         entries.forEach((entry) => {
+//           if (entry.isIntersecting) {
+//             entry.target.classList.add("visible");
+//           }
+//         });
+//       },
+//       { threshold: 0.15 },
+//     );
+//     document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+//     return () => observer.disconnect();
+//   }, []);
+
+//   return (
+//     <>
+//       <LoadingScreen />
+//       <Navbar />
+//       {/* <Hero /> */}
+//       <Tutors />
+//       <Testimonials />
+//       <Footer />
+//     </>
+//   );
+// }
 
 function HomePage() {
   useEffect(() => {
@@ -40,12 +69,9 @@ function HomePage() {
     <>
       <LoadingScreen />
       <Navbar />
-      <AdPost />
-      <Hero />
-      {/* <HowItWorks /> */}
-      {/* <Subjects /> */}
+      {/* <Hero /> */}
       <Tutors />
-      <ClassPosts />
+      <AdPost />
       <Testimonials />
       <Footer />
     </>
@@ -67,6 +93,7 @@ export default function App() {
         <Route path='/teacher/create-class' element={<CreateClass />} />
         <Route path='/adpost' element={<AdPostForm />} />
         <Route path='/admin' element={<AdminDashboard />} />
+        <Route path='/teacher/:teacherId' element={<TeacherProfile />} />
       </Routes>
     </HashRouter>
   );

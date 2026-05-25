@@ -46,24 +46,24 @@ export default function Navbar() {
         </li>
         <li>
           <a onClick={() => scrollTo("tutors")} style={{ cursor: "pointer" }}>
-            👩‍🏫 Teacher
+            👩‍🏫 Research Tutors
           </a>
         </li>
         <li>
-          <Link to='/classes'>📚 Classes</Link>
+          <Link to='/classes'>📚 Research Training</Link>
         </li>
-        <li>
+        {/* <li>
           <Link to='/adpost'>📌 Post Resources</Link>
-        </li>
+        </li> */}
       </ul>
 
       {/* Desktop right side buttons */}
       <div className={styles.navRight}>
         <Link to='/teacher/login' className={styles.teacherBtn}>
-          👩‍🏫 Teacher Login
+          👩‍🏫 Research Tutor Login
         </Link>
         <Link to='/register' className={styles.cta}>
-          Get Started →
+          Student Login →
         </Link>
       </div>
 
@@ -88,14 +88,14 @@ export default function Navbar() {
           <li>
             <Link to='/classes'>📚 Classes</Link>
           </li>
-          <li>
+          {/* <li>
             <Link to='/adpost'>📌 Post Ad</Link>
+          </li> */}
+          <li>
+            <Link to='/teacher/login'>👩‍🏫 Research Tutor Login</Link>
           </li>
           <li>
-            <Link to='/teacher/login'>👩‍🏫 Tutor Login</Link>
-          </li>
-          <li>
-            <Link to='/register'>Get Started →</Link>
+            <Link to='/register'>Student Login →</Link>
           </li>
         </ul>
       )}

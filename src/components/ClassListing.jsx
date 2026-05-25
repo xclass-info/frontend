@@ -103,7 +103,7 @@ export default function ClassListing() {
       <div className={styles.page}>
         <div className={styles.inner}>
           <div className={styles.header}>
-            <h1 className={styles.title}>📚 Available Classes</h1>
+            <h1 className={styles.title}>📚 Training Classes</h1>
           </div>
           <div className={styles.grid}>
             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -121,7 +121,7 @@ export default function ClassListing() {
       <div className={styles.inner}>
         {/* Header */}
         <div className={styles.header}>
-          <h1 className={styles.title}>📚 Available Classes</h1>
+          <h1 className={styles.title}>📚 Training Classes</h1>
           <p className={styles.sub}>
             Browse and book a seat in one of our live online classes
           </p>
