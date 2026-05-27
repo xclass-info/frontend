@@ -16,6 +16,11 @@ import styles from "./TeacherDashboard.module.css";
 import Availability from "./Availability";
 import BookingRequests from "./BookingRequests";
 import { SkeletonDashboardCard } from "./Skeleton";
+import ResearchForm from "./ResearchForm";
+
+import InternshipForm from "./InternshipForm";
+
+// Add to tabs:
 
 export default function TeacherDashboard() {
   const navigate = useNavigate();
@@ -222,7 +227,6 @@ export default function TeacherDashboard() {
           </button>
         </div>
       </div>
-
       {/* Stats */}
       <div className={styles.stats}>
         <div className={styles.statCard}>
@@ -242,7 +246,6 @@ export default function TeacherDashboard() {
           <span className={styles.statLabel}>Total Students</span>
         </div>
       </div>
-
       {/* Tabs */}
       <div
         style={{
@@ -258,6 +261,8 @@ export default function TeacherDashboard() {
           { id: "availability", label: "🗓 Availability" },
           { id: "bookings", label: "📬 Bookings" },
           { id: "profile", label: "👤 Profile" },
+          { id: "research", label: "🔬 Research" },
+          { id: "internship", label: "🧪 Internship" },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -282,7 +287,17 @@ export default function TeacherDashboard() {
           </button>
         ))}
       </div>
+      {activeTab === "research" && (
+        <div className={styles.section}>
+          <ResearchForm />
+        </div>
+      )}
 
+      {activeTab === "internship" && (
+        <div className={styles.section}>
+          <InternshipForm />
+        </div>
+      )}
       {/* ── Classes Tab ── */}
       {activeTab === "classes" && (
         <div className={styles.section}>
@@ -340,21 +355,18 @@ export default function TeacherDashboard() {
           )}
         </div>
       )}
-
       {/* ── Availability Tab ── */}
       {activeTab === "availability" && (
         <div className={styles.section}>
           <Availability />
         </div>
       )}
-
       {/* ── Bookings Tab ── */}
       {activeTab === "bookings" && (
         <div className={styles.section}>
           <BookingRequests />
         </div>
       )}
-
       {/* ── Profile Tab ── */}
       {activeTab === "profile" && (
         <div className={styles.section}>
@@ -560,7 +572,7 @@ export default function TeacherDashboard() {
                     color: wordCount > 280 ? "#e74c3c" : "#aaa",
                   }}
                 >
-                  {wordCount} / 300 words
+                  {wordCount} / 500 words
                 </span>
               </div>
               <textarea
@@ -568,7 +580,7 @@ export default function TeacherDashboard() {
                 value={profile.bio}
                 onChange={handleProfileChange}
                 placeholder='Tell students about yourself — your background, teaching style, achievements, and why you love teaching...'
-                rows={6}
+                rows={20}
                 style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }}
               />
               {wordCount >= 300 && (

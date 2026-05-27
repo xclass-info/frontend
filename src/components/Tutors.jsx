@@ -15,7 +15,7 @@ export default function Tutors() {
     const unsub = onSnapshot(collection(db, "teachers"), (snapshot) => {
       const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
       console.log("Teachers loaded:", data);
-      setTeachers(data);
+      setTeachers(data.filter((t) => !t.disabled));
       setLoading(false);
     });
     return () => unsub();
@@ -80,7 +80,13 @@ export default function Tutors() {
                   )}
                 </div>
 
-                <h3 className={styles.name}>{teacher.name}</h3>
+                <h1 style={{ margin: "0 0 8px", fontSize: 26 }}>
+                  {
+                    teacher.name?.startsWith("Prof.")
+                      ? teacher.name?.split(" ").slice(0, 2).join(" ") // Prof. FirstName
+                      : `Dr. ${teacher.name?.split(" ").pop()}` // Dr. LastName
+                  }
+                </h1>
 
                 <div
                   style={{
@@ -120,6 +126,20 @@ export default function Tutors() {
                     </span>
                   )}
                 </div>
+                {teacher.major && (
+                  <span
+                    style={{
+                      fontSize: 11,
+                      background: "#fdf4ff",
+                      color: "#9333ea",
+                      padding: "2px 10px",
+                      borderRadius: 20,
+                      fontWeight: 600,
+                    }}
+                  >
+                    🔬 {teacher.major}
+                  </span>
+                )}
 
                 {teacher.expertise && (
                   <p
@@ -150,16 +170,6 @@ export default function Tutors() {
                     {teacher.projects.length > 1 ? "s" : ""} available
                   </p>
                 )}
-
-                <div className={styles.rating}>
-                  <span className={styles.stars}>
-                    {"★".repeat(Math.round(teacher.rating || 0))}
-                    {"☆".repeat(5 - Math.round(teacher.rating || 0))}
-                  </span>
-                  <span className={styles.ratingNum}>
-                    {teacher.rating ? teacher.rating.toFixed(1) : "New"}
-                  </span>
-                </div>
 
                 <p style={{ fontSize: 12, color: "#aaa", marginTop: 8 }}>
                   Click to view full profile →

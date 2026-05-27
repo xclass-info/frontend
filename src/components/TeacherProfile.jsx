@@ -152,6 +152,8 @@ export default function TeacherProfile() {
         </button>
 
         {/* Hero section */}
+
+        {/* Hero section */}
         <div
           style={{
             background: "white",
@@ -160,45 +162,49 @@ export default function TeacherProfile() {
             marginBottom: 24,
             boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
             display: "flex",
-            gap: 24,
+            gap: 32,
             alignItems: "center",
             flexWrap: "wrap",
           }}
         >
-          {/* Avatar */}
-          {teacher.photoURL ? (
-            <img
-              src={teacher.photoURL}
-              alt={teacher.name}
-              style={{
-                width: 100,
-                height: 100,
-                borderRadius: "50%",
-                objectFit: "cover",
-              }}
-            />
-          ) : (
-            <div
-              style={{
-                width: 100,
-                height: 100,
-                borderRadius: "50%",
-                background: "linear-gradient(135deg, #667eea, #764ba2)",
-                color: "white",
-                fontSize: 36,
-                fontWeight: 700,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-              }}
-            >
-              {teacher.name?.charAt(0).toUpperCase() || "T"}
-            </div>
-          )}
-
-          <div style={{ flex: 1 }}>
-            <h1 style={{ margin: "0 0 8px", fontSize: 26 }}>{teacher.name}</h1>
+          {/* Left — Avatar */}
+          <div style={{ flex: "0 0 30%" }}>
+            {teacher.photoURL ? (
+              <img
+                src={teacher.photoURL}
+                alt={teacher.name}
+                style={{ width: "100%", borderRadius: 16, objectFit: "cover" }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: "100%",
+                  aspectRatio: "1/1",
+                  borderRadius: 16,
+                  background: "linear-gradient(135deg, #667eea, #764ba2)",
+                  color: "white",
+                  fontSize: 80,
+                  fontWeight: 700,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {teacher.name
+                  ?.split(" ")
+                  .slice(-1)[0]
+                  ?.charAt(0)
+                  .toUpperCase() || "T"}
+              </div>
+            )}
+          </div>
+          {/* Right — Info */}
+          <div style={{ flex: 1, minWidth: 260 }}>
+            <h1 style={{ margin: "0 0 16px", fontSize: 32 }}>
+              {teacher.name?.startsWith("Prof.")
+                ? teacher.name?.split(" ").slice(0, 2).join(" ")
+                : `Dr. ${teacher.name?.split(" ").pop()}`}
+            </h1>
 
             {/* Badges */}
             <div
@@ -206,7 +212,7 @@ export default function TeacherProfile() {
                 display: "flex",
                 gap: 8,
                 flexWrap: "wrap",
-                marginBottom: 12,
+                marginBottom: 16,
               }}
             >
               {teacher.gender && (
@@ -237,18 +243,18 @@ export default function TeacherProfile() {
                   🎓 {teacher.degree}
                 </span>
               )}
-              {teacher.rating > 0 && (
+              {teacher.major && (
                 <span
                   style={{
                     fontSize: 12,
-                    background: "#fffbeb",
-                    color: "#d97706",
+                    background: "#fdf4ff",
+                    color: "#9333ea",
                     padding: "4px 12px",
                     borderRadius: 20,
                     fontWeight: 600,
                   }}
                 >
-                  ⭐ {teacher.rating?.toFixed(1)}
+                  🔬 {teacher.major}
                 </span>
               )}
               {teacher.yearsOfExperience && (
@@ -270,7 +276,7 @@ export default function TeacherProfile() {
             {teacher.expertise && (
               <p
                 style={{
-                  margin: 0,
+                  margin: "0 0 24px",
                   fontSize: 15,
                   color: "#555",
                   fontWeight: 600,
@@ -279,25 +285,24 @@ export default function TeacherProfile() {
                 💡 {teacher.expertise}
               </p>
             )}
-          </div>
 
-          {/* Book button */}
-          <button
-            onClick={() => setShowBooking(true)}
-            style={{
-              padding: "12px 28px",
-              borderRadius: 12,
-              border: "none",
-              background: "#4a90e2",
-              color: "white",
-              fontSize: 15,
-              fontWeight: 700,
-              cursor: "pointer",
-              flexShrink: 0,
-            }}
-          >
-            📅 Book a Session
-          </button>
+            {/* Book button at bottom */}
+            <button
+              onClick={() => setShowBooking(true)}
+              style={{
+                padding: "14px 40px",
+                borderRadius: 12,
+                border: "none",
+                background: "#4a90e2",
+                color: "white",
+                fontSize: 16,
+                fontWeight: 700,
+                cursor: "pointer",
+              }}
+            >
+              📅 Book a Session
+            </button>
+          </div>
         </div>
 
         {/* Info cards grid */}
@@ -366,21 +371,6 @@ export default function TeacherProfile() {
                   <p style={{ fontSize: 14, color: "#333", margin: 0 }}>
                     {teacher.languages}
                   </p>
-                </div>
-              )}
-              {teacher.website && (
-                <div>
-                  <p style={{ fontSize: 12, color: "#aaa", margin: "0 0 2px" }}>
-                    Website / LinkedIn
-                  </p>
-                  <a
-                    href={teacher.website}
-                    target='_blank'
-                    rel='noreferrer'
-                    style={{ fontSize: 14, color: "#4a90e2" }}
-                  >
-                    🔗 Visit Profile
-                  </a>
                 </div>
               )}
             </div>
