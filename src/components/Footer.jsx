@@ -8,28 +8,60 @@ export default function Footer() {
         {/* Logo & description */}
         <div className={styles.brand}>
           <Link to='/' className={styles.logo}>
-            x<span className={styles.logoClass}>class</span>
-            <span className={styles.logoInfo}>.info</span>
+            happy<span className={styles.logoClass}>Research</span>
           </Link>
           <p className={styles.tagline}>
-            The best online tutoring platform for students of all ages.
+            Explore fascinating research ideas across science, technology, and
+            beyond — spark your curiosity and take your first step into the
+            world of real research.
           </p>
+          {/* Contact info */}
+          <div style={{ marginTop: 16 }}>
+            <a
+              href='mailto:happyresearchinfo@gmail.com'
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                color: "#aaa",
+                fontSize: 14,
+                textDecoration: "none",
+                marginBottom: 8,
+              }}
+            >
+              📧 happyresearchinfo@gmail.com
+            </a>
+            <a
+              href='tel:+15716929109'
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                color: "#aaa",
+                fontSize: 14,
+                textDecoration: "none",
+              }}
+            >
+              📞 (571) 692-9109
+            </a>
+          </div>
         </div>
 
         {/* Links */}
         <div className={styles.cols}>
           <div className={styles.col}>
             <h4>Platform</h4>
-            <a href='#tutors'>Find tutors</a>
-            <a href='#subjects'>Browse subjects</a>
-            <Link to='/classes'>Live classes</Link>
-            <Link to='/teacher/login'>Tutor login</Link>
+            <Link to='/research'>Research</Link>
+            <Link to='/internship'>Internships</Link>
+            <Link to='/teacher/login'>Mentor Login</Link>
+            <Link to='/admin'>Admin</Link>
           </div>
           <div className={styles.col}>
             <h4>Company</h4>
-            <a href='#how'>How it works</a>
+            <Link to='/contact'>Contact Us</Link>
             <a href='#testimonials'>Reviews</a>
-            <a href='#contact'>Contact</a>
+            <a href='#'>Privacy Policy</a>
+            <a href='#'>Terms of Service</a>
           </div>
         </div>
       </div>

@@ -34,7 +34,7 @@ export default function ResearchSection() {
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <h2 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: 8 }}>
-            🔬 Latest Research
+            🔬 Research Opportunities
           </h2>
           <p style={{ color: "#666" }}>
             Explore fascinating research ideas across science, technology, and

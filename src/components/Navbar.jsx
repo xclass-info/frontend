@@ -44,13 +44,14 @@ export default function Navbar() {
             🏠 Home
           </a>
         </li>
-
         <li>
-          <Link to='/research?type=publication'>🔬 Research</Link>
+          <Link to='/internship'>🧪 Internship</Link>
         </li>
 
         <li>
-          <Link to='/internship'>🧪 Internship</Link>
+          <Link to='/research?type=publication'>
+            🔬 Publication Track Research
+          </Link>
         </li>
 
         <li>
@@ -86,13 +87,12 @@ export default function Navbar() {
               🏠 Home
             </a>
           </li>
-
           <li>
-            <Link to='/research?type=publication'>🔬 Research</Link>
+            <Link to='/internship'>🧪 Internship</Link>
           </li>
 
           <li>
-            <Link to='/internship'>🧪 Internship</Link>
+            <Link to='/research?type=publication'>🔬 Research</Link>
           </li>
 
           <li>
