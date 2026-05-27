@@ -13,6 +13,7 @@ import {
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { Link } from "react-router-dom";
 
 const ADMIN_EMAIL = "xclassinfo@gmail.com";
 
@@ -211,6 +212,7 @@ export default function AdminDashboard() {
   });
 
   // ── Login screen ──
+
   if (!user) {
     return (
       <div
@@ -229,8 +231,25 @@ export default function AdminDashboard() {
             padding: 32,
             width: 360,
             boxShadow: "0 2px 12px rgba(0,0,0,0.1)",
+            position: "relative",
           }}
         >
+          {/* X button */}
+          <a
+            href='/#/'
+            style={{
+              position: "absolute",
+              top: 16,
+              right: 16,
+              color: "#888",
+              fontSize: 22,
+              textDecoration: "none",
+              lineHeight: 1,
+            }}
+          >
+            ✕
+          </a>
+
           <h2 style={{ marginBottom: 4 }}>🔐 Admin Login</h2>
           <p style={{ color: "#888", fontSize: 14, marginBottom: 24 }}>
             xclass admin only
@@ -1329,7 +1348,7 @@ export default function AdminDashboard() {
                       onChange={(e) =>
                         setEditItem({ ...editItem, [key]: e.target.value })
                       }
-                      rows={3}
+                      rows={key === "bio" ? 10 : 5}
                       style={{
                         width: "100%",
                         padding: 8,
@@ -1476,7 +1495,7 @@ export default function AdminDashboard() {
                         };
                         setEditItem({ ...editItem, projects: updated });
                       }}
-                      rows={2}
+                      rows={5}
                       style={{
                         width: "100%",
                         padding: 8,
@@ -1768,7 +1787,7 @@ export default function AdminDashboard() {
                       onChange={(e) =>
                         setAddForm({ ...addForm, [key]: e.target.value })
                       }
-                      rows={3}
+                      rows={key === "bio" ? 10 : 3}
                       style={{
                         width: "100%",
                         padding: 8,
@@ -1915,7 +1934,7 @@ export default function AdminDashboard() {
                         };
                         setAddForm({ ...addForm, projects: updated });
                       }}
-                      rows={2}
+                      rows={5}
                       style={{
                         width: "100%",
                         padding: 8,
