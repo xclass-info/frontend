@@ -26,9 +26,9 @@ export default function Tutors() {
       <section id='tutors' className={styles.section}>
         <div className={styles.inner}>
           <div className={styles.header}>
-            <h2 className={styles.title}>👩‍🏫 Meet Our Tutors</h2>
+            <h2 className={styles.title}>👩‍🏫 Meet Our Mentors</h2>
             <p className={styles.sub}>
-              Expert tutors ready to help you learn anything.
+              Expert mentors ready to help you learn anything.
             </p>
           </div>
           <div className={styles.grid}>
@@ -45,7 +45,7 @@ export default function Tutors() {
     <section id='tutors' className={styles.section}>
       <div className={styles.inner}>
         <div className={styles.header}>
-          <h2 className={styles.title}>👩‍🏫 Meet Our Research Tutors</h2>
+          <h2 className={styles.title}>👩‍🏫 Meet Our Research Mentors</h2>
           <p className={styles.sub}>
             Join world-class researchers and explore cutting-edge research
             topics that match your passion, curiosity, and future ambitions.

@@ -44,8 +44,8 @@ export default function FeaturedTutors() {
     <section id='tutors' className={styles.section}>
       <div className={styles.inner}>
         <div className={`${styles.top} reveal`}>
-          <div className='section-label'>🌟 Featured Tutors</div>
-          <h2>Meet our top tutors 🌟</h2>
+          <div className='section-label'>🌟 Featured Mentors</div>
+          <h2>Meet our top mentors 🌟</h2>
           <p className='section-sub'>
             Handpicked experts with proven track records and glowing reviews.
           </p>

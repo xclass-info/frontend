@@ -49,25 +49,23 @@ export default function Navbar() {
         </li>
 
         <li>
-          <Link to='/research?type=publication'>
-            🔬 Publication Track Research
-          </Link>
+          <Link to='/research?type=publication'>🔬 Research</Link>
         </li>
 
         <li>
           <a onClick={() => scrollTo("tutors")} style={{ cursor: "pointer" }}>
-            👩‍🏫 Research Mentor
+            👩‍🏫 Mentor
           </a>
         </li>
         <li>
-          <Link to='/contact'>📬 Contact Us</Link>
+          <Link to='/contact'>📬 Contact</Link>
         </li>
       </ul>
 
       {/* Desktop right side buttons */}
       <div className={styles.navRight}>
         <Link to='/teacher/login' className={styles.teacherBtn}>
-          👩‍🏫 Research Mentor Login
+          👩‍🏫 Mentor Login
         </Link>
         {/* <Link to='/register' className={styles.cta}>
           Student Login →
@@ -97,14 +95,14 @@ export default function Navbar() {
 
           <li>
             <a onClick={() => scrollTo("tutors")} style={{ cursor: "pointer" }}>
-              👩‍🏫 Research Mentor
+              👩‍🏫 Mentor
             </a>
           </li>
           <li>
-            <Link to='/contact'>📬 Contact Us</Link>
+            <Link to='/contact'>📬 Contact</Link>
           </li>
           <li>
-            <Link to='/teacher/login'>👩‍🏫 Research Mentor Login</Link>
+            <Link to='/teacher/login'>👩‍🏫 Mentor Login</Link>
           </li>
           {/* <li>
             <Link to='/register'>Student Login →</Link>

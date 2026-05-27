@@ -41,7 +41,7 @@ export default function Hero() {
           <div className={styles.stats}>
             {[
               ["10K+", "Students"],
-              ["500+", "Tutors"],
+              ["500+", "Mentors"],
               ["50+", "Subjects"],
               ["4.9★", "Avg rating"],
             ].map(([num, label]) => (
