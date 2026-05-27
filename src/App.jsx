@@ -31,6 +31,7 @@ import { seedInternships } from "./components/seedInternships";
 
 import { seedTeachers } from "./components/seedTeachers";
 import ContactUs from "./components/ContactUs";
+import AboutUs from "./components/AboutUs";
 
 function HomePage() {
   useEffect(() => {
@@ -58,7 +59,7 @@ function HomePage() {
       <Testimonials />
       <Footer />
 
-      <button
+      {/* <button
         onClick={seedResearch}
         style={{
           position: "fixed",
@@ -110,7 +111,7 @@ function HomePage() {
         }}
       >
         Seed Teachers
-      </button>
+      </button> */}
     </>
   );
 }
@@ -121,7 +122,7 @@ export default function App() {
       <ScrollToTop />
       <Routes>
         <Route path='/' element={<HomePage />} />
-        <Route path='/tutors' element={<Tutors />} />
+        <Route path='/tutors' element={<Tutors standalone={true} />} />
         <Route path='/teacher/register' element={<TeacherRegister />} />
         <Route path='/teacher/login' element={<TeacherLogin />} />
         <Route path='/teacher/dashboard' element={<TeacherDashboard />} />
@@ -129,6 +130,7 @@ export default function App() {
         <Route path='/teacher/:teacherId' element={<TeacherProfile />} />
         <Route path='/research' element={<ResearchListing />} />
         <Route path='/internship' element={<InternshipListing />} />;
+        <Route path='/about' element={<AboutUs />} />
         <Route path='/contact' element={<ContactUs />} />
       </Routes>
     </HashRouter>

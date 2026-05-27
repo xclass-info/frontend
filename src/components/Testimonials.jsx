@@ -67,7 +67,7 @@ export default function Testimonials() {
         </div>
         <h2>What our students say 🌟</h2>
         <p className='section-sub' style={{ margin: "0 auto" }}>
-          Join thousands of happy learners who found their perfect tutor on
+          Join thousands of happy learners who found their perfect mentors on
           HappyResearch.
         </p>
       </div>

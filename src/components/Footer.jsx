@@ -59,7 +59,17 @@ export default function Footer() {
           <div className={styles.col}>
             <h4>Company</h4>
             <Link to='/contact'>Contact Us</Link>
-            <a href='#testimonials'>Reviews</a>
+            <Link
+              to='/'
+              onClick={() =>
+                setTimeout(() => {
+                  const el = document.getElementById("testimonials");
+                  if (el) el.scrollIntoView({ behavior: "smooth" });
+                }, 300)
+              }
+            >
+              Reviews
+            </Link>
             <a href='#'>Privacy Policy</a>
             <a href='#'>Terms of Service</a>
           </div>

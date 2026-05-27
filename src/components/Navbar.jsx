@@ -52,10 +52,16 @@ export default function Navbar() {
           <Link to='/research?type=publication'>🔬 Research</Link>
         </li>
 
-        <li>
+        {/* <li>
           <a onClick={() => scrollTo("tutors")} style={{ cursor: "pointer" }}>
             👩‍🏫 Mentor
           </a>
+        </li> */}
+        <li>
+          <Link to='/tutors'>👩‍🏫 Mentor</Link>
+        </li>
+        <li>
+          <Link to='/about'>💡 About Us</Link>
         </li>
         <li>
           <Link to='/contact'>📬 Contact</Link>
@@ -97,6 +103,9 @@ export default function Navbar() {
             <a onClick={() => scrollTo("tutors")} style={{ cursor: "pointer" }}>
               👩‍🏫 Mentor
             </a>
+          </li>
+          <li>
+            <Link to='/about'>💡 About Us</Link>
           </li>
           <li>
             <Link to='/contact'>📬 Contact</Link>
