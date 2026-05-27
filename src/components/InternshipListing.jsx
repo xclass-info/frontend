@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import Navbar from "./Navbar";
 import { SkeletonClassCard } from "./Skeleton";
+import Footer from "./Footer";
 
 export default function InternshipListing() {
   const [internships, setInternships] = useState([]);
@@ -691,6 +692,7 @@ export default function InternshipListing() {
           </div>
         </div>
       )}
+      <Footer />
     </div>
   );
 }

@@ -10,6 +10,7 @@ import {
   addDoc,
 } from "firebase/firestore";
 import Navbar from "./Navbar";
+import Footer from "./Footer";
 
 export default function TeacherProfile() {
   const { teacherId } = useParams();
@@ -709,6 +710,7 @@ export default function TeacherProfile() {
           </div>
         </div>
       )}
+      <Footer />
     </div>
   );
 }

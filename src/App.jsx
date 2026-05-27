@@ -30,6 +30,7 @@ import InternshipSection from "./components/InternshipSection";
 import { seedInternships } from "./components/seedInternships";
 
 import { seedTeachers } from "./components/seedTeachers";
+import ContactUs from "./components/ContactUs";
 
 function HomePage() {
   useEffect(() => {
@@ -128,6 +129,7 @@ export default function App() {
         <Route path='/teacher/:teacherId' element={<TeacherProfile />} />
         <Route path='/research' element={<ResearchListing />} />
         <Route path='/internship' element={<InternshipListing />} />;
+        <Route path='/contact' element={<ContactUs />} />
       </Routes>
     </HashRouter>
   );

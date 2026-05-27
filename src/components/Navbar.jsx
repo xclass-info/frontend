@@ -58,6 +58,9 @@ export default function Navbar() {
             👩‍🏫 Research Mentor
           </a>
         </li>
+        <li>
+          <Link to='/contact'>📬 Contact Us</Link>
+        </li>
       </ul>
 
       {/* Desktop right side buttons */}
@@ -96,6 +99,9 @@ export default function Navbar() {
             <a onClick={() => scrollTo("tutors")} style={{ cursor: "pointer" }}>
               👩‍🏫 Research Mentor
             </a>
+          </li>
+          <li>
+            <Link to='/contact'>📬 Contact Us</Link>
           </li>
           <li>
             <Link to='/teacher/login'>👩‍🏫 Research Mentor Login</Link>

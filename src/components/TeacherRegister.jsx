@@ -4,6 +4,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate, Link } from "react-router-dom";
 import styles from "./TeacherAuth.module.css";
+import Footer from "./Footer";
 
 export default function TeacherRegister() {
   const navigate = useNavigate();
@@ -48,73 +49,78 @@ export default function TeacherRegister() {
   }
 
   return (
-    <div className={styles.page}>
-      <div className={styles.card}>
-        <button className={styles.closeBtn} onClick={() => navigate("/")}>
-          ✕
-        </button>
-        <h1 className={styles.title}>👩‍🏫 Teacher Register</h1>
-        <p className={styles.sub}>Create your HappyResearch teacher account</p>
-
-        {error && <p className={styles.error}>{error}</p>}
-
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.field}>
-            <label className={styles.label}>Full Name</label>
-            <input
-              className={styles.input}
-              name='name'
-              value={form.name}
-              onChange={handleChange}
-              placeholder='Jane Smith'
-              required
-            />
-          </div>
-          <div className={styles.field}>
-            <label className={styles.label}>Email</label>
-            <input
-              className={styles.input}
-              name='email'
-              type='email'
-              value={form.email}
-              onChange={handleChange}
-              placeholder='jane@email.com'
-              required
-            />
-          </div>
-          <div className={styles.field}>
-            <label className={styles.label}>Password</label>
-            <input
-              className={styles.input}
-              name='password'
-              type='password'
-              value={form.password}
-              onChange={handleChange}
-              placeholder='••••••••'
-              required
-            />
-          </div>
-          <div className={styles.field}>
-            <label className={styles.label}>Confirm Password</label>
-            <input
-              className={styles.input}
-              name='confirmPassword'
-              type='password'
-              value={form.confirmPassword}
-              onChange={handleChange}
-              placeholder='••••••••'
-              required
-            />
-          </div>
-          <button className={styles.btn} type='submit' disabled={loading}>
-            {loading ? "Creating account..." : "Register →"}
+    <>
+      <div className={styles.page}>
+        <div className={styles.card}>
+          <button className={styles.closeBtn} onClick={() => navigate("/")}>
+            ✕
           </button>
-        </form>
+          <h1 className={styles.title}>👩‍🏫 Teacher Register</h1>
+          <p className={styles.sub}>
+            Create your HappyResearch teacher account
+          </p>
 
-        <p className={styles.switch}>
-          Already have an account? <Link to='/teacher/login'>Login here</Link>
-        </p>
+          {error && <p className={styles.error}>{error}</p>}
+
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.field}>
+              <label className={styles.label}>Full Name</label>
+              <input
+                className={styles.input}
+                name='name'
+                value={form.name}
+                onChange={handleChange}
+                placeholder='Jane Smith'
+                required
+              />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label}>Email</label>
+              <input
+                className={styles.input}
+                name='email'
+                type='email'
+                value={form.email}
+                onChange={handleChange}
+                placeholder='jane@email.com'
+                required
+              />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label}>Password</label>
+              <input
+                className={styles.input}
+                name='password'
+                type='password'
+                value={form.password}
+                onChange={handleChange}
+                placeholder='••••••••'
+                required
+              />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label}>Confirm Password</label>
+              <input
+                className={styles.input}
+                name='confirmPassword'
+                type='password'
+                value={form.confirmPassword}
+                onChange={handleChange}
+                placeholder='••••••••'
+                required
+              />
+            </div>
+            <button className={styles.btn} type='submit' disabled={loading}>
+              {loading ? "Creating account..." : "Register →"}
+            </button>
+          </form>
+
+          <p className={styles.switch}>
+            Already have an account? <Link to='/teacher/login'>Login here</Link>
+          </p>
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 }

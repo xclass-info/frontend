@@ -5,6 +5,7 @@ import { collection, query, where, onSnapshot } from "firebase/firestore";
 import Navbar from "./Navbar";
 import { SkeletonClassCard } from "./Skeleton";
 import { useLocation } from "react-router-dom";
+import Footer from "./Footer";
 
 export default function ResearchListing() {
   const location = useLocation();
@@ -373,6 +374,7 @@ export default function ResearchListing() {
           </div>
         </div>
       )}
+      <Footer />
     </div>
   );
 }
