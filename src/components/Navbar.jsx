@@ -83,11 +83,13 @@ export default function Navbar() {
               🏠 Home
             </a>
           </li>
+
           <li>
-            <Link to='/research?type=exploration'>🧪 Exploration Track</Link>
+            <Link to='/research?type=publication'>🔬 Research</Link>
           </li>
+
           <li>
-            <Link to='/research?type=publication'>📄 Publication Track</Link>
+            <Link to='/internship'>🧪 Internship</Link>
           </li>
 
           <li>
