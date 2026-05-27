@@ -30,14 +30,15 @@ export default function ResearchSection() {
   if (loading || research.length === 0) return null;
 
   return (
-    <section style={{ padding: "80px 24px", background: "white" }}>
+    <section style={{ padding: "120px 24px 80px 24px", background: "white" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <h2 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: 8 }}>
             🔬 Latest Research
           </h2>
           <p style={{ color: "#666" }}>
-            Cutting-edge research from our tutors.
+            Explore fascinating research ideas across science, technology, and
+            beyond — spark your curiosity, discover your passion.
           </p>
         </div>
 

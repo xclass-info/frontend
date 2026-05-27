@@ -147,6 +147,7 @@ export default function AdminDashboard() {
     setImageUploading(true);
     try {
       const { id, ...data } = editItem;
+      console.log("Saving:", id, data); // ← add this
       if (imageFile && editType === "teachers") {
         const url = await uploadMentorImage(imageFile, id);
         data.photoURL = url;

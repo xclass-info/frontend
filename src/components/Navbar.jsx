@@ -63,11 +63,11 @@ export default function Navbar() {
       {/* Desktop right side buttons */}
       <div className={styles.navRight}>
         <Link to='/teacher/login' className={styles.teacherBtn}>
-          👩‍🏫 Research mentor Login
+          👩‍🏫 Research Mentor Login
         </Link>
-        <Link to='/register' className={styles.cta}>
+        {/* <Link to='/register' className={styles.cta}>
           Student Login →
-        </Link>
+        </Link> */}
       </div>
 
       {/* Hamburger button */}
@@ -100,9 +100,9 @@ export default function Navbar() {
           <li>
             <Link to='/teacher/login'>👩‍🏫 Research Mentor Login</Link>
           </li>
-          <li>
+          {/* <li>
             <Link to='/register'>Student Login →</Link>
-          </li>
+          </li> */}
         </ul>
       )}
     </nav>
