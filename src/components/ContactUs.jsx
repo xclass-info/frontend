@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import emailjs from "@emailjs/browser";
 
 export default function ContactUs() {
   const [form, setForm] = useState({
@@ -10,17 +11,41 @@ export default function ContactUs() {
     message: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setError("");
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    // Open email client with prefilled content
-    const mailtoLink = `mailto:happyresearchinfo@gmail.com?subject=${encodeURIComponent(form.subject)}&body=${encodeURIComponent(`Name: ${form.name}\nEmail: ${form.email}\n\n${form.message}`)}`;
-    window.location.href = mailtoLink;
-    setSubmitted(true);
+    setLoading(true);
+    setError("");
+    try {
+      await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        {
+          from_name: form.name,
+          from_email: form.email,
+          subject: form.subject,
+          message: form.message,
+          to_email: "happyprogramming.us@gmail.com",
+        },
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+      );
+      setSubmitted(true);
+      setForm({ name: "", email: "", subject: "", message: "" });
+    } catch (err) {
+      console.error(err);
+      setError(
+        "Failed to send message. Please try again or email us directly.",
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -38,6 +63,7 @@ export default function ContactUs() {
           </p>
         </div>
 
+        {/* Contact info */}
         <div
           style={{
             background: "white",
@@ -48,7 +74,6 @@ export default function ContactUs() {
           }}
         >
           <h3 style={{ margin: "0 0 20px", fontSize: 16 }}>📋 Get in Touch</h3>
-
           <div
             style={{
               display: "flex",
@@ -70,14 +95,13 @@ export default function ContactUs() {
                 Email
               </p>
               <a
-                href='mailto:happyrprogramming.us@gmail.com'
+                href='mailto:happyprogramming.us@gmail.com'
                 style={{ fontSize: 15, color: "#4a90e2", fontWeight: 600 }}
               >
-                happyrprogramming.us@gmail.com
+                happyprogramming.us@gmail.com
               </a>
             </div>
           </div>
-
           <div
             style={{
               display: "flex",
@@ -106,7 +130,6 @@ export default function ContactUs() {
               </a>
             </div>
           </div>
-
           <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
             <span style={{ fontSize: 24 }}>🌐</span>
             <div>
@@ -130,6 +153,7 @@ export default function ContactUs() {
           </div>
         </div>
 
+        {/* Contact form */}
         <div
           style={{
             background: "white",
@@ -167,6 +191,21 @@ export default function ContactUs() {
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
+              {error && (
+                <p
+                  style={{
+                    color: "#e74c3c",
+                    fontSize: 13,
+                    marginBottom: 16,
+                    background: "#fee2e2",
+                    padding: "10px 14px",
+                    borderRadius: 8,
+                  }}
+                >
+                  {error}
+                </p>
+              )}
+
               <div style={{ marginBottom: 16 }}>
                 <label
                   style={{
@@ -288,6 +327,7 @@ export default function ContactUs() {
 
               <button
                 type='submit'
+                disabled={loading}
                 style={{
                   width: "100%",
                   padding: 14,
@@ -298,9 +338,10 @@ export default function ContactUs() {
                   fontSize: 16,
                   fontWeight: 600,
                   cursor: "pointer",
+                  opacity: loading ? 0.7 : 1,
                 }}
               >
-                Send Message 📬
+                {loading ? "Sending..." : "Send Message 📬"}
               </button>
             </form>
           )}
