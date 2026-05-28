@@ -151,6 +151,96 @@ export default function ContactUs() {
               </a>
             </div>
           </div>
+
+          {/* WeChat QR Code */}
+          <div
+            style={{
+              marginTop: 16,
+              paddingTop: 16,
+              borderTop: "1px solid #f0f0f0",
+            }}
+          >
+            <p
+              style={{
+                fontSize: 13,
+                color: "#555",
+                fontWeight: 600,
+                marginBottom: 12,
+              }}
+            >
+              💚 Scan to chat on WeChat
+            </p>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <img
+                src='/wechat-qr.jpg'
+                alt='WeChat QR Code'
+                style={{
+                  width: 120,
+                  height: 120,
+                  borderRadius: 8,
+                  border: "1px solid #eee",
+                }}
+              />
+              <div>
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: "#888",
+                    margin: 0,
+                    lineHeight: 1.6,
+                  }}
+                >
+                  Scan this QR code with WeChat to add us and start a
+                  conversation directly.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* WhatsApp QR Code */}
+          <div
+            style={{
+              marginTop: 24,
+              paddingTop: 24,
+              borderTop: "1px solid #f0f0f0",
+            }}
+          >
+            <p
+              style={{
+                fontSize: 13,
+                color: "#555",
+                fontWeight: 600,
+                marginBottom: 12,
+              }}
+            >
+              💬 Scan to chat on WhatsApp
+            </p>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <img
+                src='/whatsapp-qr.jpg'
+                alt='WhatsApp QR Code'
+                style={{
+                  width: 160,
+                  height: 160,
+                  borderRadius: 8,
+                  border: "1px solid #eee",
+                }}
+              />
+              <div>
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: "#888",
+                    margin: 0,
+                    lineHeight: 1.6,
+                  }}
+                >
+                  Scan this QR code with your phone camera to start a WhatsApp
+                  conversation with us directly.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Contact form */}
