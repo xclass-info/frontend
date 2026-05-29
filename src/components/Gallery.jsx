@@ -26,6 +26,77 @@ const photosByYear = {
   ],
 };
 
+const photos = [
+  { url: "/gallery/3.jpg", caption: "Lab session" },
+  { url: "/gallery/4.jpg", caption: "Lab session" },
+  { url: "/gallery/5.jpg", caption: "Lab session" },
+  { url: "/gallery/6.jpg", caption: "Lab session" },
+  { url: "/gallery/7.jpg", caption: "Lab session" },
+  { url: "/gallery/8.jpg", caption: "Lab session" },
+  { url: "/gallery/9.jpg", caption: "Lab session" },
+  { url: "/gallery/10.jpg", caption: "Lab session" },
+  { url: "/gallery/11.jpg", caption: "Lab session" },
+  { url: "/gallery/12.jpg", caption: "Lab session" },
+  { url: "/gallery/13.jpg", caption: "Lab session" },
+  { url: "/gallery/14.jpg", caption: "Lab session" },
+  { url: "/gallery/15.jpg", caption: "Lab session" },
+  { url: "/gallery/16.jpg", caption: "Lab session" },
+  { url: "/gallery/17.jpg", caption: "Lab session" },
+  { url: "/gallery/18.jpg", caption: "Lab session" },
+  { url: "/gallery/20.jpg", caption: "Lab session" },
+  { url: "/gallery/21.jpg", caption: "Lab session" },
+  { url: "/gallery/24.jpg", caption: "Lab session" },
+  { url: "/gallery/25.jpg", caption: "Lab session" },
+  { url: "/gallery/28.jpg", caption: "Lab session" },
+  { url: "/gallery/29.jpg", caption: "Lab session" },
+  { url: "/gallery/31.jpg", caption: "Lab session" },
+  { url: "/gallery/33.jpg", caption: "Lab session" },
+  { url: "/gallery/35.jpg", caption: "Lab session" },
+  { url: "/gallery/36.jpg", caption: "Lab session" },
+  { url: "/gallery/37.jpg", caption: "Lab session" },
+  { url: "/gallery/38.jpg", caption: "Lab session" },
+  { url: "/gallery/39.jpg", caption: "Lab session" },
+  { url: "/gallery/40.jpg", caption: "Lab session" },
+  { url: "/gallery/41.jpg", caption: "Lab session" },
+  { url: "/gallery/42.jpg", caption: "Lab session" },
+  { url: "/gallery/43.jpg", caption: "Lab session" },
+  { url: "/gallery/44.jpg", caption: "Lab session" },
+  { url: "/gallery/46.jpg", caption: "Lab session" },
+  { url: "/gallery/47.jpg", caption: "Lab session" },
+  { url: "/gallery/48.jpg", caption: "Lab session" },
+  { url: "/gallery/49.jpg", caption: "Lab session" },
+  { url: "/gallery/50.jpg", caption: "Lab session" },
+  { url: "/gallery/51.jpg", caption: "Lab session" },
+  { url: "/gallery/52.jpg", caption: "Lab session" },
+  { url: "/gallery/54.jpg", caption: "Lab session" },
+  { url: "/gallery/55.jpg", caption: "Lab session" },
+  { url: "/gallery/56.jpg", caption: "Lab session" },
+  { url: "/gallery/57.jpg", caption: "Lab session" },
+  { url: "/gallery/58.jpg", caption: "Lab session" },
+  { url: "/gallery/60.jpg", caption: "Lab session" },
+  { url: "/gallery/61.jpg", caption: "Lab session" },
+  { url: "/gallery/62.jpg", caption: "Lab session" },
+  { url: "/gallery/64.jpg", caption: "Lab session" },
+  { url: "/gallery/65.jpg", caption: "Lab session" },
+  { url: "/gallery/66.jpg", caption: "Lab session" },
+  { url: "/gallery/67.jpg", caption: "Lab session" },
+  { url: "/gallery/68.jpg", caption: "Lab session" },
+  { url: "/gallery/69.jpg", caption: "Lab session" },
+  { url: "/gallery/70.jpg", caption: "Lab session" },
+  { url: "/gallery/71.jpg", caption: "Lab session" },
+  { url: "/gallery/75.jpg", caption: "Lab session" },
+  { url: "/gallery/76.jpg", caption: "Lab session" },
+  { url: "/gallery/78.jpg", caption: "Lab session" },
+  { url: "/gallery/79.jpg", caption: "Lab session" },
+  { url: "/gallery/70.jpg", caption: "Lab session" },
+  { url: "/gallery/85.jpg", caption: "Lab session" },
+  { url: "/gallery/86.png", caption: "Lab session" },
+  { url: "/gallery/88.png", caption: "Lab session" },
+  { url: "/gallery/89.png", caption: "Lab session" },
+  { url: "/gallery/90.jpg", caption: "Lab session" },
+  { url: "/gallery/91.png", caption: "Lab session" },
+];
+
 const videos = [
   {
     url: "https://www.youtube.com/embed/G1IM1_tz-qQ",
@@ -34,6 +105,194 @@ const videos = [
 ];
 
 function PhotoCarousel({ photos, onPhotoClick }) {
+  const [current, setCurrent] = useState(0);
+  const intervalRef = useRef(null);
+  const perPage = 6; // ← 2 rows × 3 columns
+  const totalPages = Math.ceil(photos.length / perPage);
+
+  useEffect(() => {
+    intervalRef.current = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % totalPages);
+    }, 5000);
+    return () => clearInterval(intervalRef.current);
+  }, [totalPages]);
+
+  function goTo(index) {
+    setCurrent(index);
+    clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % totalPages);
+    }, 5000);
+  }
+
+  function prev() {
+    goTo((current - 1 + totalPages) % totalPages);
+  }
+
+  function next() {
+    goTo((current + 1) % totalPages);
+  }
+
+  if (photos.length === 0) return null;
+
+  return (
+    <div>
+      {/* Sliding container */}
+      <div style={{ overflow: "hidden", borderRadius: 16 }}>
+        <div
+          style={{
+            display: "flex",
+            transition: "transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+            transform: `translateX(-${current * 100}%)`,
+          }}
+        >
+          {Array.from({ length: totalPages }).map((_, pageIndex) => (
+            <div
+              key={pageIndex}
+              style={{
+                minWidth: "100%",
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gridTemplateRows: "repeat(2, 1fr)", // ← 2 rows
+                gap: 16,
+                padding: "4px",
+              }}
+            >
+              {photos
+                .slice(pageIndex * perPage, pageIndex * perPage + perPage)
+                .map((photo, index) => (
+                  <div
+                    key={index}
+                    onClick={() => onPhotoClick(photo)}
+                    style={{
+                      position: "relative",
+                      cursor: "pointer",
+                      borderRadius: 12,
+                      overflow: "hidden",
+                      boxShadow: "0 2px 12px rgba(0,0,0,0.1)",
+                      transition: "transform 0.3s",
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.transform = "translateY(-4px)")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.transform = "translateY(0)")
+                    }
+                  >
+                    <img
+                      src={photo.url}
+                      alt={photo.caption}
+                      style={{
+                        width: "100%",
+                        height: 240,
+                        objectFit: "cover",
+                        display: "block",
+                      }}
+                    />
+                    {photo.caption && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          background:
+                            "linear-gradient(transparent, rgba(0,0,0,0.6))",
+                          padding: "24px 12px 10px",
+                          color: "white",
+                          fontSize: 13,
+                        }}
+                      >
+                        {photo.caption}
+                      </div>
+                    )}
+                  </div>
+                ))}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 16,
+          marginTop: 16,
+        }}
+      >
+        <button
+          onClick={prev}
+          style={{
+            background: "#f0f4ff",
+            border: "none",
+            borderRadius: "50%",
+            width: 40,
+            height: 40,
+            fontSize: 20,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#4a90e2",
+            fontWeight: 700,
+          }}
+        >
+          ‹
+        </button>
+
+        <div style={{ display: "flex", gap: 6 }}>
+          {Array.from({ length: totalPages }).map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goTo(index)}
+              style={{
+                width: index === current ? 20 : 8,
+                height: 8,
+                borderRadius: 4,
+                border: "none",
+                background: index === current ? "#4a90e2" : "#ddd",
+                cursor: "pointer",
+                transition: "all 0.3s",
+                padding: 0,
+              }}
+            />
+          ))}
+        </div>
+
+        <button
+          onClick={next}
+          style={{
+            background: "#f0f4ff",
+            border: "none",
+            borderRadius: "50%",
+            width: 40,
+            height: 40,
+            fontSize: 20,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#4a90e2",
+            fontWeight: 700,
+          }}
+        >
+          ›
+        </button>
+
+        <span style={{ fontSize: 13, color: "#aaa" }}>
+          {current * perPage + 1}–
+          {Math.min(current * perPage + perPage, photos.length)} of{" "}
+          {photos.length}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function PhotoCarousel2({ photos, onPhotoClick }) {
   const [current, setCurrent] = useState(0);
   const intervalRef = useRef(null);
   const perPage = 3;
@@ -274,62 +533,22 @@ export default function Gallery() {
         </div>
 
         {/* Photos Tab */}
+
         {tab === "photos" && (
           <div>
-            {Object.entries(photosByYear)
-              .sort(([a], [b]) => b - a)
-              .map(([year, photos]) => (
-                <div key={year} style={{ marginBottom: 48 }}>
-                  {/* Year header */}
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 16,
-                      marginBottom: 20,
-                    }}
-                  >
-                    <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>
-                      🗂️ {year}
-                    </h2>
-                    <div
-                      style={{
-                        flex: 1,
-                        height: 2,
-                        background: "#eee",
-                        borderRadius: 2,
-                      }}
-                    />
-                    <span style={{ fontSize: 13, color: "#aaa" }}>
-                      {photos.length} photo{photos.length !== 1 ? "s" : ""}
-                    </span>
-                  </div>
-
-                  {photos.length === 0 ? (
-                    <div
-                      style={{
-                        textAlign: "center",
-                        padding: 40,
-                        color: "#aaa",
-                        background: "white",
-                        borderRadius: 12,
-                        border: "1px dashed #ddd",
-                      }}
-                    >
-                      <p style={{ fontSize: 14, margin: 0 }}>
-                        No photos for {year} yet.
-                      </p>
-                    </div>
-                  ) : (
-                    <PhotoCarousel
-                      photos={photos}
-                      onPhotoClick={(photo) =>
-                        setSelected({ type: "photo", ...photo })
-                      }
-                    />
-                  )}
-                </div>
-              ))}
+            {photos.length === 0 ? (
+              <div style={{ textAlign: "center", padding: 80, color: "#aaa" }}>
+                <p style={{ fontSize: 48, marginBottom: 12 }}>📷</p>
+                <p style={{ fontSize: 16 }}>No photos yet. Check back soon!</p>
+              </div>
+            ) : (
+              <PhotoCarousel
+                photos={photos}
+                onPhotoClick={(photo) =>
+                  setSelected({ type: "photo", ...photo })
+                }
+              />
+            )}
           </div>
         )}
 
