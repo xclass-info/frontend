@@ -41,15 +41,15 @@ export default function Navbar() {
       <ul className={styles.links}>
         <li>
           <a onClick={scrollToTop} style={{ cursor: "pointer" }}>
-            🏠 Home
+            Home
           </a>
         </li>
         <li>
-          <Link to='/internship'>🧪 Internship</Link>
+          <Link to='/internship'>Internship</Link>
         </li>
 
         <li>
-          <Link to='/research?type=publication'>🔬 Research</Link>
+          <Link to='/research?type=publication'>Research</Link>
         </li>
 
         {/* <li>
@@ -58,23 +58,23 @@ export default function Navbar() {
           </a>
         </li> */}
         <li>
-          <Link to='/tutors'>👩‍🏫 Mentor</Link>
+          <Link to='/tutors'>Mentor</Link>
         </li>
         <li>
-          <Link to='/gallery'>🖼️ Gallery</Link>
+          <Link to='/gallery'>Gallery</Link>
         </li>
         <li>
-          <Link to='/about'>💡 About Us</Link>
+          <Link to='/about'>About Us</Link>
         </li>
         <li>
-          <Link to='/contact'>📬 Contact</Link>
+          <Link to='/contact'>Contact</Link>
         </li>
       </ul>
 
       {/* Desktop right side buttons */}
       <div className={styles.navRight}>
         <Link to='/teacher/login' className={styles.teacherBtn}>
-          👩‍🏫 Mentor Login
+          Mentor Login
         </Link>
         {/* <Link to='/register' className={styles.cta}>
           Student Login →
@@ -91,7 +91,7 @@ export default function Navbar() {
         <ul className={styles.mobileMenu} onClick={() => setOpen(false)}>
           <li>
             <a onClick={scrollToTop} style={{ cursor: "pointer" }}>
-              🏠 Home
+              Home
             </a>
           </li>
           <li>
@@ -104,20 +104,20 @@ export default function Navbar() {
 
           <li>
             <a onClick={() => scrollTo("tutors")} style={{ cursor: "pointer" }}>
-              👩‍🏫 Mentor
+              Mentor
             </a>
           </li>
           <li>
-            <Link to='/gallery'>🖼️ Gallery</Link>
+            <Link to='/gallery'>Gallery</Link>
           </li>
           <li>
-            <Link to='/about'>💡 About Us</Link>
+            <Link to='/about'>About Us</Link>
           </li>
           <li>
-            <Link to='/contact'>📬 Contact</Link>
+            <Link to='/contact'>Contact</Link>
           </li>
           <li>
-            <Link to='/teacher/login'>👩‍🏫 Mentor Login</Link>
+            <Link to='/teacher/login'>Mentor Login</Link>
           </li>
           {/* <li>
             <Link to='/register'>Student Login →</Link>

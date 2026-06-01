@@ -53,7 +53,7 @@ export default function Tutors({ standalone = false }) {
       <section id='tutors' className={styles.section}>
         <div className={styles.inner}>
           <div className={styles.header}>
-            <h2 className={styles.title}>👩‍🏫 Meet Our Research Mentors</h2>
+            <h2 className={styles.title}>Meet Our Research Mentors</h2>
             <p className={styles.sub}>
               Join world-class researchers and explore cutting-edge research
               topics that match your passion, curiosity, and future ambitions.
@@ -110,7 +110,7 @@ export default function Tutors({ standalone = false }) {
                         style={{
                           fontSize: 11,
                           background: "#f0f4ff",
-                          color: "#4a90e2",
+                          color: "#00274c",
                           padding: "2px 10px",
                           borderRadius: 20,
                           fontWeight: 600,

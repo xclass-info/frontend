@@ -105,8 +105,8 @@ export default function AboutUs() {
               lineHeight: 1.9,
               marginBottom: 16,
               fontStyle: "italic",
-              color: "#4a90e2",
-              borderLeft: "3px solid #4a90e2",
+              color: "#00274c",
+              borderLeft: "3px solid #00274c",
               paddingLeft: 16,
             }}
           >
@@ -407,7 +407,7 @@ export default function AboutUs() {
             style={{
               padding: "12px 32px",
               borderRadius: 32,
-              background: "#4a90e2",
+              background: "#00274c",
               color: "white",
               textDecoration: "none",
               fontWeight: 600,
@@ -421,7 +421,7 @@ export default function AboutUs() {
             style={{
               padding: "12px 32px",
               borderRadius: 32,
-              background: "#4a90e2",
+              background: "#00274c",
               color: "white",
               textDecoration: "none",
               fontWeight: 600,
@@ -435,14 +435,14 @@ export default function AboutUs() {
             style={{
               padding: "12px 32px",
               borderRadius: 32,
-              background: "#4a90e2",
+              background: "#00274c",
               color: "white",
               textDecoration: "none",
               fontWeight: 600,
               fontSize: 15,
             }}
           >
-            👩‍🏫 Browse Mentors
+            Browse Mentors
           </a>
           <a
             href='/#/contact'
@@ -457,7 +457,7 @@ export default function AboutUs() {
               border: "1px solid #ddd",
             }}
           >
-            📬 Contact Us
+            Contact Us
           </a>
         </div>
       </div>

@@ -195,7 +195,7 @@ export default function ResearchListing() {
                     👩‍🏫 {r.teacherName}
                   </span>
                   <span
-                    style={{ fontSize: 12, color: "#4a90e2", fontWeight: 600 }}
+                    style={{ fontSize: 12, color: "#00274c", fontWeight: 600 }}
                   >
                     Read more →
                   </span>
@@ -264,7 +264,7 @@ export default function ResearchListing() {
                 marginBottom: 12,
                 background:
                   selected.type === "publication" ? "#eff6ff" : "#f0fdf4",
-                color: selected.type === "publication" ? "#4a90e2" : "#16a34a",
+                color: selected.type === "publication" ? "#00274c" : "#16a34a",
               }}
             >
               {selected.type === "publication"

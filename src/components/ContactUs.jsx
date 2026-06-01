@@ -56,7 +56,7 @@ export default function ContactUs() {
       >
         <div style={{ textAlign: "center", marginBottom: 40 }}>
           <h1 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: 8 }}>
-            📬 Contact Us
+            Contact Us
           </h1>
           <p style={{ color: "#666" }}>
             Have questions? We'd love to hear from you!
@@ -96,7 +96,7 @@ export default function ContactUs() {
               </p>
               <a
                 href='mailto:happyprogramming.us@gmail.com'
-                style={{ fontSize: 15, color: "#4a90e2", fontWeight: 600 }}
+                style={{ fontSize: 15, color: "#00274c", fontWeight: 600 }}
               >
                 happyprogramming.us@gmail.com
               </a>
@@ -124,7 +124,7 @@ export default function ContactUs() {
               </p>
               <a
                 href='tel:+15716929109'
-                style={{ fontSize: 15, color: "#4a90e2", fontWeight: 600 }}
+                style={{ fontSize: 15, color: "#00274c", fontWeight: 600 }}
               >
                 (571) 692-9109
               </a>
@@ -145,7 +145,7 @@ export default function ContactUs() {
               </p>
               <a
                 href='https://happyresearch.org'
-                style={{ fontSize: 15, color: "#4a90e2", fontWeight: 600 }}
+                style={{ fontSize: 15, color: "#00274c", fontWeight: 600 }}
               >
                 happyresearch.org
               </a>
@@ -270,7 +270,7 @@ export default function ContactUs() {
                   padding: "10px 24px",
                   borderRadius: 8,
                   border: "none",
-                  background: "#4a90e2",
+                  background: "#00274c",
                   color: "white",
                   cursor: "pointer",
                   fontWeight: 600,
@@ -423,7 +423,7 @@ export default function ContactUs() {
                   padding: 14,
                   borderRadius: 10,
                   border: "none",
-                  background: "#4a90e2",
+                  background: "#00274c",
                   color: "white",
                   fontSize: 16,
                   fontWeight: 600,

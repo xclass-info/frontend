@@ -132,7 +132,7 @@ export default function TeacherLogin() {
                 style={{
                   background: "none",
                   border: "none",
-                  color: "#4a90e2",
+                  color: "#00274c",
                   cursor: "pointer",
                   fontSize: 13,
                 }}
@@ -152,7 +152,7 @@ export default function TeacherLogin() {
           </p>
         </div>
       </div>
-      <Footer />;
+      <Footer />
     </>
   );
 }

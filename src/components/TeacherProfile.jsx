@@ -115,7 +115,7 @@ export default function TeacherProfile() {
               padding: "10px 24px",
               borderRadius: 8,
               border: "none",
-              background: "#4a90e2",
+              background: "#00274c",
               color: "white",
               cursor: "pointer",
             }}
@@ -140,7 +140,7 @@ export default function TeacherProfile() {
           style={{
             background: "none",
             border: "none",
-            color: "#4a90e2",
+            color: "#00274c",
             cursor: "pointer",
             fontSize: 14,
             marginBottom: 24,
@@ -221,7 +221,7 @@ export default function TeacherProfile() {
                   style={{
                     fontSize: 12,
                     background: "#f0f4ff",
-                    color: "#4a90e2",
+                    color: "#00274c",
                     padding: "4px 12px",
                     borderRadius: 20,
                     fontWeight: 600,
@@ -294,7 +294,7 @@ export default function TeacherProfile() {
                 padding: "14px 40px",
                 borderRadius: 12,
                 border: "none",
-                background: "#4a90e2",
+                background: "#00274c",
                 color: "white",
                 fontSize: 16,
                 fontWeight: 700,
@@ -459,14 +459,14 @@ export default function TeacherProfile() {
             <p
               style={{
                 fontSize: 12,
-                color: "#4a90e2",
+                color: "#00274c",
                 margin: 0,
                 lineHeight: 1.6,
                 fontStyle: "italic",
                 background: "#eff6ff",
                 padding: "10px 14px",
                 borderRadius: 8,
-                borderLeft: "3px solid #4a90e2",
+                borderLeft: "3px solid #00274c",
               }}
             >
               Students are encouraged to propose their own ideas or collaborate
@@ -509,7 +509,7 @@ export default function TeacherProfile() {
                   style={{
                     padding: "12px 16px",
                     borderRadius: 10,
-                    border: `2px solid ${selectedSlot?.id === slot.id ? "#4a90e2" : "#eee"}`,
+                    border: `2px solid ${selectedSlot?.id === slot.id ? "#00274c" : "#eee"}`,
                     background:
                       selectedSlot?.id === slot.id ? "#eff6ff" : "white",
                     cursor: "pointer",
@@ -574,7 +574,7 @@ export default function TeacherProfile() {
                     padding: "10px 24px",
                     borderRadius: 8,
                     border: "none",
-                    background: "#4a90e2",
+                    background: "#00274c",
                     color: "white",
                     cursor: "pointer",
                   }}
@@ -627,7 +627,7 @@ export default function TeacherProfile() {
                         style={{
                           padding: "10px 16px",
                           borderRadius: 8,
-                          border: `2px solid ${selectedSlot?.id === slot.id ? "#4a90e2" : "#eee"}`,
+                          border: `2px solid ${selectedSlot?.id === slot.id ? "#00274c" : "#eee"}`,
                           background:
                             selectedSlot?.id === slot.id ? "#eff6ff" : "white",
                           cursor: "pointer",
@@ -696,7 +696,7 @@ export default function TeacherProfile() {
                     padding: "12px",
                     borderRadius: 8,
                     border: "none",
-                    background: "#4a90e2",
+                    background: "#00274c",
                     color: "white",
                     fontSize: 16,
                     cursor: "pointer",

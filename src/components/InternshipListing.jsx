@@ -119,7 +119,7 @@ export default function InternshipListing() {
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <h1 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: 8 }}>
-            🧪 Internships
+            Internships
           </h1>
           <p style={{ color: "#666", fontSize: "1rem" }}>
             Explore research internship opportunities from our mentors.
@@ -144,7 +144,7 @@ export default function InternshipListing() {
                 padding: "8px 20px",
                 borderRadius: 20,
                 border: "none",
-                background: filterMode === mode ? "#4a90e2" : "#e0e0e0",
+                background: filterMode === mode ? "#00274c" : "#e0e0e0",
                 color: filterMode === mode ? "white" : "#555",
                 cursor: "pointer",
                 fontWeight: 600,
@@ -215,7 +215,7 @@ export default function InternshipListing() {
                 <p
                   style={{
                     fontSize: 12,
-                    color: "#4a90e2",
+                    color: "#00274c",
                     fontWeight: 600,
                     marginBottom: 8,
                   }}
@@ -255,7 +255,7 @@ export default function InternshipListing() {
                     </p>
                   </div>
                   <span
-                    style={{ fontSize: 12, color: "#4a90e2", fontWeight: 600 }}
+                    style={{ fontSize: 12, color: "#00274c", fontWeight: 600 }}
                   >
                     {intern.spots} spots left
                   </span>
@@ -327,7 +327,7 @@ export default function InternshipListing() {
                     padding: "10px 24px",
                     borderRadius: 8,
                     border: "none",
-                    background: "#4a90e2",
+                    background: "#00274c",
                     color: "white",
                     cursor: "pointer",
                   }}
@@ -442,7 +442,7 @@ export default function InternshipListing() {
                       padding: 12,
                       borderRadius: 8,
                       border: "none",
-                      background: "#4a90e2",
+                      background: "#00274c",
                       color: "white",
                       fontSize: 15,
                       fontWeight: 600,
@@ -497,7 +497,7 @@ export default function InternshipListing() {
                     style={{
                       fontSize: 12,
                       background: "#eff6ff",
-                      color: "#4a90e2",
+                      color: "#00274c",
                       padding: "4px 12px",
                       borderRadius: 20,
                       fontWeight: 600,
@@ -538,7 +538,7 @@ export default function InternshipListing() {
                 <p
                   style={{
                     fontSize: 13,
-                    color: "#4a90e2",
+                    color: "#00274c",
                     fontWeight: 600,
                     marginBottom: 20,
                   }}
@@ -678,7 +678,7 @@ export default function InternshipListing() {
                     padding: 14,
                     borderRadius: 10,
                     border: "none",
-                    background: "#4a90e2",
+                    background: "#00274c",
                     color: "white",
                     fontSize: 16,
                     fontWeight: 600,

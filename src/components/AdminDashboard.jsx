@@ -296,7 +296,7 @@ export default function AdminDashboard() {
                 padding: 12,
                 borderRadius: 8,
                 border: "none",
-                background: "#4a90e2",
+                background: "#00274c",
                 color: "white",
                 fontSize: 15,
                 cursor: "pointer",
@@ -351,7 +351,7 @@ export default function AdminDashboard() {
               padding: "8px 20px",
               borderRadius: 20,
               border: "none",
-              background: tab === t.id ? "#4a90e2" : "#e0e0e0",
+              background: tab === t.id ? "#00274c" : "#e0e0e0",
               color: tab === t.id ? "white" : "#555",
               cursor: "pointer",
               fontWeight: 600,
@@ -374,7 +374,7 @@ export default function AdminDashboard() {
                   padding: "8px 20px",
                   borderRadius: 20,
                   border: "none",
-                  background: adTab === t ? "#4a90e2" : "#e0e0e0",
+                  background: adTab === t ? "#00274c" : "#e0e0e0",
                   color: adTab === t ? "white" : "#555",
                   cursor: "pointer",
                   fontWeight: 600,
@@ -501,7 +501,7 @@ export default function AdminDashboard() {
                 setAddType("research");
                 setAddForm({ title: "", idea: "", impact: "", details: "" });
               }}
-              style={btnStyle("#4a90e2")}
+              style={btnStyle("#00274c")}
             >
               + Add Research
             </button>
@@ -565,7 +565,7 @@ export default function AdminDashboard() {
                         setEditItem({ ...r });
                         setEditType("research");
                       }}
-                      style={btnStyle("#4a90e2")}
+                      style={btnStyle("#00274c")}
                     >
                       ✏️ Edit
                     </button>
@@ -621,7 +621,7 @@ export default function AdminDashboard() {
                   deadline: "",
                 });
               }}
-              style={btnStyle("#4a90e2")}
+              style={btnStyle("#00274c")}
             >
               + Add Internship
             </button>
@@ -668,7 +668,7 @@ export default function AdminDashboard() {
                   <p
                     style={{
                       fontSize: 12,
-                      color: "#4a90e2",
+                      color: "#00274c",
                       fontWeight: 600,
                       marginBottom: 6,
                     }}
@@ -697,7 +697,7 @@ export default function AdminDashboard() {
                         setEditItem({ ...intern });
                         setEditType("internships");
                       }}
-                      style={btnStyle("#4a90e2")}
+                      style={btnStyle("#00274c")}
                     >
                       ✏️ Edit
                     </button>
@@ -757,7 +757,7 @@ export default function AdminDashboard() {
                 setImageFile(null);
                 setImagePreview(null);
               }}
-              style={btnStyle("#4a90e2")}
+              style={btnStyle("#00274c")}
             >
               + Add Mentor
             </button>
@@ -890,7 +890,7 @@ export default function AdminDashboard() {
                     )} */}
                     <div>
                       <h3 style={{ margin: 0, fontSize: 15 }}>{mentor.name}</h3>
-                      <p style={{ margin: 0, fontSize: 12, color: "#4a90e2" }}>
+                      <p style={{ margin: 0, fontSize: 12, color: "#00274c" }}>
                         {mentor.expertise}
                       </p>
                     </div>
@@ -909,7 +909,7 @@ export default function AdminDashboard() {
                         setImageFile(null);
                         setImagePreview(null);
                       }}
-                      style={btnStyle("#4a90e2")}
+                      style={btnStyle("#00274c")}
                     >
                       ✏️ Edit
                     </button>
@@ -1018,7 +1018,7 @@ export default function AdminDashboard() {
                 rel='noreferrer'
                 style={{
                   fontSize: 14,
-                  color: "#4a90e2",
+                  color: "#00274c",
                   display: "block",
                   marginBottom: 16,
                 }}
@@ -1180,7 +1180,7 @@ export default function AdminDashboard() {
                   style={{
                     cursor: "pointer",
                     fontSize: 13,
-                    color: "#4a90e2",
+                    color: "#00274c",
                     fontWeight: 600,
                   }}
                 >
@@ -1409,7 +1409,7 @@ export default function AdminDashboard() {
                         ],
                       })
                     }
-                    style={{ ...btnStyle("#4a90e2"), fontSize: 12 }}
+                    style={{ ...btnStyle("#00274c"), fontSize: 12 }}
                   >
                     + Add Project
                   </button>
@@ -1632,7 +1632,7 @@ export default function AdminDashboard() {
                   style={{
                     cursor: "pointer",
                     fontSize: 13,
-                    color: "#4a90e2",
+                    color: "#00274c",
                     fontWeight: 600,
                   }}
                 >
@@ -1848,7 +1848,7 @@ export default function AdminDashboard() {
                         ],
                       })
                     }
-                    style={{ ...btnStyle("#4a90e2"), fontSize: 12 }}
+                    style={{ ...btnStyle("#00274c"), fontSize: 12 }}
                   >
                     + Add Project
                   </button>

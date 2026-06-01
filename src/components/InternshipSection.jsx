@@ -34,7 +34,7 @@ export default function InternshipSection() {
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <h2 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: 8 }}>
-            🧪 Open Internships
+            Open Internships
           </h2>
           <p style={{ color: "#666" }}>
             Research internship opportunities from our mentors.
@@ -87,7 +87,7 @@ export default function InternshipSection() {
                   style={{
                     fontSize: 11,
                     background: "#eff6ff",
-                    color: "#4a90e2",
+                    color: "#00274c",
                     padding: "2px 10px",
                     borderRadius: 20,
                     fontWeight: 600,
@@ -122,7 +122,7 @@ export default function InternshipSection() {
               <p
                 style={{
                   fontSize: 12,
-                  color: "#4a90e2",
+                  color: "#00274c",
                   fontWeight: 600,
                   marginBottom: 8,
                 }}
@@ -164,7 +164,7 @@ export default function InternshipSection() {
             style={{
               padding: "12px 32px",
               borderRadius: 32,
-              background: "#4a90e2",
+              background: "#00274c",
               color: "white",
               textDecoration: "none",
               fontWeight: 600,

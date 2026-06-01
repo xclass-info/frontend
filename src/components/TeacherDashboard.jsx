@@ -274,10 +274,10 @@ export default function TeacherDashboard() {
                 cursor: "pointer",
                 fontSize: 14,
                 fontWeight: 600,
-                color: activeTab === tab.id ? "#4a90e2" : "#888",
+                color: activeTab === tab.id ? "#00274c" : "#888",
                 borderBottom:
                   activeTab === tab.id
-                    ? "2px solid #4a90e2"
+                    ? "2px solid #00274c"
                     : "2px solid transparent",
                 marginBottom: -2,
                 transition: "all 0.15s",
@@ -725,7 +725,7 @@ export default function TeacherDashboard() {
                       padding: "8px 20px",
                       borderRadius: 8,
                       border: "none",
-                      background: "#4a90e2",
+                      background: "#00274c",
                       color: "white",
                       cursor: "pointer",
                       fontWeight: 600,
@@ -744,7 +744,7 @@ export default function TeacherDashboard() {
                   padding: "12px 32px",
                   borderRadius: 8,
                   border: "none",
-                  background: profileSaved ? "#27ae60" : "#4a90e2",
+                  background: profileSaved ? "#27ae60" : "#00274c",
                   color: "white",
                   fontSize: 15,
                   fontWeight: 600,

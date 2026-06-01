@@ -103,7 +103,7 @@ export default function ResearchSection() {
             style={{
               padding: "12px 32px",
               borderRadius: 32,
-              background: "#4a90e2",
+              background: "#00274c",
               color: "white",
               textDecoration: "none",
               fontWeight: 600,

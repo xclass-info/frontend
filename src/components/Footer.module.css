@@ -1,7 +1,8 @@
 .footer {
-  background: var(--text);
+  background: #00274c;
   color: rgba(255, 255, 255, 0.6);
   padding: 64px 6% 32px;
+  border-top: 3px solid #ffcb05;
 }
 
 .inner {
@@ -28,7 +29,7 @@
 }
 
 .logoClass {
-  color: var(--coral);
+  color: #ffcb05;
 }
 
 .logoInfo {
@@ -57,7 +58,7 @@
 .col h4 {
   font-family: "Fredoka One", cursive;
   font-size: 1rem;
-  color: #fff;
+  color: #ffcb05;
   font-weight: 400;
   margin-bottom: 4px;
 }
@@ -71,14 +72,14 @@
 }
 
 .col a:hover {
-  color: var(--coral);
+  color: #ffcb05;
 }
 
 .bottom {
   max-width: 1200px;
   margin: 0 auto;
   padding-top: 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 203, 5, 0.2);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -100,7 +101,7 @@
 }
 
 .bottomLinks a:hover {
-  color: var(--coral);
+  color: #ffcb05;
 }
 
 @media (max-width: 768px) {
