@@ -139,7 +139,21 @@ export default function ProgramDetail() {
     if (!program) return;
 
     const keywords = {
-      "ai-cs": ["computer", "ai", "machine learning", "software", "llm"],
+      "ai-cs": [
+        "computer",
+        "ai",
+        "machine learning",
+        "data",
+        "software",
+        "computing",
+        "algorithm",
+        "neural",
+        "deep learning",
+        "statistics",
+        "llm",
+        "vision",
+        "language model",
+      ],
       "public-health": [
         "health",
         "medical",
@@ -322,6 +336,34 @@ export default function ProgramDetail() {
                   padding: 24,
                   border: "2px solid #e2e8f0",
                   borderTop: `4px solid ${program.color}`,
+                  position: "relative",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "#ffcb05";
+                  e.currentTarget.style.boxShadow =
+                    "0 8px 24px rgba(0,39,76,0.12)";
+                  e.currentTarget.querySelector(".hover-panel").style.opacity =
+                    "1";
+                  e.currentTarget.querySelector(
+                    ".hover-panel",
+                  ).style.transform = "translateY(0)";
+                  e.currentTarget.querySelector(
+                    ".hover-panel",
+                  ).style.pointerEvents = "auto";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "#e2e8f0";
+                  e.currentTarget.style.boxShadow = "none";
+                  e.currentTarget.querySelector(".hover-panel").style.opacity =
+                    "0";
+                  e.currentTarget.querySelector(
+                    ".hover-panel",
+                  ).style.transform = "translateY(8px)";
+                  e.currentTarget.querySelector(
+                    ".hover-panel",
+                  ).style.pointerEvents = "none";
                 }}
               >
                 <div style={{ fontSize: 28, marginBottom: 10 }}>{h.icon}</div>
@@ -345,6 +387,106 @@ export default function ProgramDetail() {
                 >
                   {h.desc}
                 </p>
+
+                {/* Hover panel */}
+                <div
+                  className='hover-panel'
+                  style={{
+                    position: "absolute",
+                    top: "calc(100% + 8px)",
+                    left: 0,
+                    right: 0,
+                    background: "#00274c",
+                    borderRadius: 12,
+                    padding: 16,
+                    zIndex: 10,
+                    opacity: 0,
+                    transform: "translateY(8px)",
+                    transition: "all 0.25s ease",
+                    pointerEvents: "none",
+                    boxShadow: "0 8px 24px rgba(0,39,76,0.2)",
+                    borderTop: "3px solid #ffcb05",
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: 11,
+                      color: "#ffcb05",
+                      fontWeight: 700,
+                      marginBottom: 10,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                    }}
+                  >
+                    Related Research
+                  </p>
+                  {research
+                    .filter(
+                      (r) =>
+                        r.title
+                          ?.toLowerCase()
+                          .includes(h.title.toLowerCase()) ||
+                        r.idea?.toLowerCase().includes(h.title.toLowerCase()) ||
+                        r.title
+                          ?.toLowerCase()
+                          .includes(h.title.split(" ")[0].toLowerCase()),
+                    )
+                    .slice(0, 3)
+                    .map((r) => (
+                      <div
+                        key={r.id}
+                        style={{
+                          marginBottom: 8,
+                          paddingBottom: 8,
+                          borderBottom: "1px solid rgba(255,255,255,0.1)",
+                        }}
+                      >
+                        <p
+                          style={{
+                            fontSize: 12,
+                            color: "white",
+                            fontWeight: 600,
+                            margin: "0 0 2px",
+                            lineHeight: 1.4,
+                          }}
+                        >
+                          {r.title}
+                        </p>
+                        <p
+                          style={{
+                            fontSize: 11,
+                            color: "rgba(255,255,255,0.6)",
+                            margin: 0,
+                            lineHeight: 1.4,
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                          }}
+                        >
+                          {r.idea}
+                        </p>
+                      </div>
+                    ))}
+                  {research.filter(
+                    (r) =>
+                      r.title?.toLowerCase().includes(h.title.toLowerCase()) ||
+                      r.idea?.toLowerCase().includes(h.title.toLowerCase()) ||
+                      r.title
+                        ?.toLowerCase()
+                        .includes(h.title.split(" ")[0].toLowerCase()),
+                  ).length === 0 && (
+                    <p
+                      style={{
+                        fontSize: 12,
+                        color: "rgba(255,255,255,0.5)",
+                        margin: 0,
+                      }}
+                    >
+                      Explore our research page for related topics →
+                    </p>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -473,7 +615,7 @@ export default function ProgramDetail() {
                     style={{
                       fontSize: 12,
                       color: "#64748b",
-                      margin: "0 0 4px",
+                      margin: "0 0 6px",
                     }}
                   >
                     {mentor.university}
@@ -569,7 +711,7 @@ export default function ProgramDetail() {
                   <p
                     style={{
                       fontSize: 12,
-                      color: "#4a90e2",
+                      color: "#00274c",
                       fontWeight: 600,
                       marginBottom: 8,
                     }}
