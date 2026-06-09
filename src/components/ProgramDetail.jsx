@@ -7,6 +7,35 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 
 const programData = {
+  neuroscience: {
+    emoji: "🧠",
+    title: "Neuroscience",
+    description:
+      "Neuroscience explores the most complex structure in the known universe — the human brain. Our mentors work on cutting-edge research in cognitive science, neural circuits, brain-computer interfaces and mental health disorders.",
+    color: "#6b21a8",
+    highlights: [
+      {
+        icon: "🧬",
+        title: "Cognitive Science",
+        desc: "Study how the brain processes information, learns and forms memories.",
+      },
+      {
+        icon: "⚡",
+        title: "Neural Circuits",
+        desc: "Map and understand the networks of neurons that control behavior.",
+      },
+      {
+        icon: "🖥️",
+        title: "Brain-Computer Interface",
+        desc: "Develop technology that connects the human brain directly to computers.",
+      },
+      {
+        icon: "💊",
+        title: "Mental Health Research",
+        desc: "Investigate the biological basis of mental health disorders and new treatments.",
+      },
+    ],
+  },
   "ai-cs": {
     emoji: "🤖",
     title: "AI & Computer Science",
@@ -139,6 +168,18 @@ export default function ProgramDetail() {
     if (!program) return;
 
     const keywords = {
+      neuroscience: [
+        "neuro",
+        "brain",
+        "cognitive",
+        "mental",
+        "psychology",
+        "neural",
+        "behavior",
+        "mind",
+        "psychiatry",
+        "EEG",
+      ],
       "ai-cs": [
         "computer",
         "ai",

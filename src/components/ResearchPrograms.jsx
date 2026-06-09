@@ -3,6 +3,22 @@ import { useNavigate } from "react-router-dom";
 
 const programs = [
   {
+    id: "neuroscience",
+    emoji: "🧠",
+    title: "Neuroscience",
+    description:
+      "Explore the mysteries of the brain and nervous system — from neural circuits and cognitive function to mental health disorders and brain-computer interfaces.",
+    topics: [
+      "Cognitive Science",
+      "Neural Circuits",
+      "Brain-Computer Interface",
+      "Mental Health",
+      "Neuroimaging",
+    ],
+    color: "#6b21a8",
+    accent: "#e9d5ff",
+  },
+  {
     id: "ai-cs",
     emoji: "🤖",
     title: "AI & Computer Science",
@@ -53,7 +69,7 @@ const programs = [
   {
     id: "ee-robotics",
     emoji: "⚡",
-    title: "Electrical Engineering & Robotics",
+    title: "EE & Robotics",
     description:
       "Design intelligent systems, autonomous robots, smart devices and next-generation hardware for real-world impact.",
     topics: [
@@ -73,7 +89,8 @@ export default function ResearchPrograms() {
 
   return (
     <section style={{ padding: "80px 24px", background: "white" }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+        {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <div
             style={{
@@ -116,11 +133,12 @@ export default function ResearchPrograms() {
           </p>
         </div>
 
+        {/* One row — 5 columns */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-            gap: 24,
+            gridTemplateColumns: "repeat(5, 1fr)",
+            gap: 16,
           }}
         >
           {programs.map((program) => (
@@ -130,7 +148,7 @@ export default function ResearchPrograms() {
               style={{
                 background: "white",
                 borderRadius: 16,
-                padding: 28,
+                padding: 20,
                 border: `2px solid #e2e8f0`,
                 cursor: "pointer",
                 transition: "all 0.2s",
@@ -160,47 +178,52 @@ export default function ResearchPrograms() {
                 }}
               />
 
-              <div style={{ fontSize: 40, marginBottom: 16, marginTop: 8 }}>
+              {/* Emoji */}
+              <div style={{ fontSize: 36, marginBottom: 12, marginTop: 8 }}>
                 {program.emoji}
               </div>
+
+              {/* Title */}
               <h3
                 style={{
-                  fontSize: 17,
+                  fontSize: 16,
                   fontWeight: 700,
                   color: "#00274c",
-                  marginBottom: 10,
+                  marginBottom: 8,
                 }}
               >
                 {program.title}
               </h3>
+
+              {/* Description */}
               <p
                 style={{
                   fontSize: 13,
                   color: "#64748b",
-                  lineHeight: 1.6,
-                  marginBottom: 16,
+                  lineHeight: 1.5,
+                  marginBottom: 12,
                 }}
               >
                 {program.description}
               </p>
 
-              {/* Topic tags */}
+              {/* Topic tags — first 3 only */}
               <div
                 style={{
                   display: "flex",
                   flexWrap: "wrap",
-                  gap: 6,
-                  marginBottom: 20,
+                  gap: 4,
+                  marginBottom: 12,
                 }}
               >
-                {program.topics.map((topic) => (
+                {program.topics.slice(0, 3).map((topic) => (
                   <span
                     key={topic}
                     style={{
                       fontSize: 11,
                       background: "#f5f5f0",
                       color: "#00274c",
-                      padding: "3px 10px",
+                      padding: "2px 8px",
                       borderRadius: 20,
                       fontWeight: 600,
                     }}
@@ -210,17 +233,18 @@ export default function ResearchPrograms() {
                 ))}
               </div>
 
+              {/* Explore link */}
               <div
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 6,
+                  gap: 4,
                   color: "#00274c",
                   fontWeight: 700,
                   fontSize: 13,
                 }}
               >
-                Explore Program <span style={{ color: "#ffcb05" }}>→</span>
+                Explore <span style={{ color: "#ffcb05" }}>→</span>
               </div>
             </div>
           ))}
