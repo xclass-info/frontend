@@ -43,7 +43,7 @@ export default function Footer() {
           </p>
           <div style={{ marginTop: 16 }}>
             <a
-              href='mailto:happyresearchinfo@gmail.com'
+              href='mailto:happyprogramming.us@gmail.com'
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -54,7 +54,7 @@ export default function Footer() {
                 marginBottom: 8,
               }}
             >
-              📧 happyresearchinfo@gmail.com
+              📧 happyprogramming.us@gmail.com
             </a>
             <a
               href='tel:+15716929109'
