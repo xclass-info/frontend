@@ -89,11 +89,11 @@ export default function Tutors({ standalone = false }) {
                   </div>
 
                   <h1 style={{ margin: "0 0 8px", fontSize: 26 }}>
-                    {
-                      teacher.name?.startsWith("Prof.")
-                        ? teacher.name?.split(" ").slice(0, 2).join(" ") // Prof. FirstName
-                        : `Dr. ${teacher.name?.split(" ").pop()}` // Dr. LastName
-                    }
+                    {teacher.name?.startsWith("Prof.")
+                      ? teacher.name?.split(" ").slice(0, 2).join(" ")
+                      : teacher.name?.startsWith("Dr.")
+                        ? `Dr. ${teacher.name?.split(" ").pop()}`
+                        : `Dr. ${teacher.name?.split(" ").pop()}`}
                   </h1>
 
                   <div

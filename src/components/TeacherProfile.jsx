@@ -204,7 +204,9 @@ export default function TeacherProfile() {
             <h1 style={{ margin: "0 0 16px", fontSize: 32 }}>
               {teacher.name?.startsWith("Prof.")
                 ? teacher.name?.split(" ").slice(0, 2).join(" ")
-                : `Dr. ${teacher.name?.split(" ").pop()}`}
+                : teacher.name?.startsWith("Dr.")
+                  ? `Dr. ${teacher.name?.split(" ").pop()}`
+                  : `Dr. ${teacher.name?.split(" ").pop()}`}
             </h1>
 
             {/* Badges */}

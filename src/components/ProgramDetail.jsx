@@ -609,7 +609,9 @@ export default function ProgramDetail() {
                   >
                     {mentor.name?.startsWith("Prof.")
                       ? mentor.name?.split(" ").slice(0, 2).join(" ")
-                      : `Dr. ${mentor.name?.split(" ").pop()}`}
+                      : mentor.name?.startsWith("Dr.")
+                        ? `Dr. ${mentor.name?.split(" ").pop()}`
+                        : `Dr. ${mentor.name?.split(" ").pop()}`}
                   </h3>
                   <p
                     style={{
