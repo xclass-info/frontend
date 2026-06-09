@@ -139,6 +139,8 @@ export default function ResearchPrograms() {
             display: "grid",
             gridTemplateColumns: "repeat(5, 1fr)",
             gap: 16,
+            overflowX: "auto",
+            paddingBottom: 8,
           }}
         >
           {programs.map((program) => (
@@ -154,6 +156,7 @@ export default function ResearchPrograms() {
                 transition: "all 0.2s",
                 position: "relative",
                 overflow: "hidden",
+                minWidth: 200, // ← prevents cards from getting too narrow on mobile
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "translateY(-6px)";
