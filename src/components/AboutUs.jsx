@@ -133,9 +133,9 @@ export default function AboutUs() {
             }}
           >
             HappyResearch brings together passionate mentors — professors,
-            researchers, and PhD students — who genuinely care about guiding the
-            next generation. Here, students can freely explore and apply to
-            research projects that match their interests and dreams.
+            researchers, and PhD — who genuinely care about guiding the next
+            generation. Here, students can freely explore and apply to research
+            projects that match their interests and dreams.
           </p>
           <p
             style={{
