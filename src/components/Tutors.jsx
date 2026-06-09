@@ -23,6 +23,27 @@ export default function Tutors({ standalone = false }) {
     return () => unsub();
   }, []);
 
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, "teachers"), (snapshot) => {
+      const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const filtered = data.filter((t) => !t.disabled);
+
+      // Sort: put Prof. Wu first, then rest
+
+      filtered.sort((a, b) => {
+        if (a.name?.toLowerCase().includes("wu")) return -1;
+        if (b.name?.toLowerCase().includes("wu")) return 1;
+        if (a.name?.toLowerCase().includes("pan")) return 1;
+        if (b.name?.toLowerCase().includes("pan")) return -1;
+        return 0;
+      });
+
+      setTeachers(filtered);
+      setLoading(false);
+    });
+    return () => unsub();
+  }, []);
+
   if (loading) {
     return (
       <>

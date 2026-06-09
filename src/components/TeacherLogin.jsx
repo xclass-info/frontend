@@ -3,6 +3,8 @@ import { auth } from "../firebase";
 import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
+  sendEmailVerification,
+  signOut,
 } from "firebase/auth";
 import { useNavigate, Link } from "react-router-dom";
 import styles from "./TeacherAuth.module.css";
@@ -15,41 +17,54 @@ export default function TeacherLogin() {
   const [loading, setLoading] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSent, setResendSent] = useState(false);
+  const [showResend, setShowResend] = useState(false);
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError("");
+    setShowResend(false);
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, form.email, form.password);
+      const { user } = await signInWithEmailAndPassword(
+        auth,
+        form.email,
+        form.password,
+      );
+
+      // Check if email is verified
+      if (!user.emailVerified) {
+        await signOut(auth);
+        setError(
+          "Please verify your email before logging in. Check your inbox for the verification link.",
+        );
+        setShowResend(true);
+        return;
+      }
+
       navigate("/teacher/dashboard");
     } catch (err) {
-      setError("Invalid email or password");
+      if (
+        err.code === "auth/invalid-credential" ||
+        err.code === "auth/wrong-password"
+      ) {
+        setError("Invalid email or password.");
+      } else if (err.code === "auth/user-not-found") {
+        setError("No account found with this email.");
+      } else if (err.code === "auth/too-many-requests") {
+        setError("Too many failed attempts. Please try again later.");
+      } else {
+        setError("Invalid email or password");
+      }
     } finally {
       setLoading(false);
     }
   }
-
-  // async function handleForgotPassword() {
-  //   if (!form.email.trim()) {
-  //     setError("Please enter your email address first");
-  //     return;
-  //   }
-  //   setResetLoading(true);
-  //   try {
-  //     await sendPasswordResetEmail(auth, form.email);
-  //     setResetSent(true);
-  //     setError("");
-  //   } catch (err) {
-  //     setError("Could not send reset email. Please check your email address.");
-  //   } finally {
-  //     setResetLoading(false);
-  //   }
-  // }
 
   async function handleForgotPassword() {
     if (!form.email.trim()) {
@@ -59,16 +74,44 @@ export default function TeacherLogin() {
     setResetLoading(true);
     try {
       await sendPasswordResetEmail(auth, form.email, {
-        url: "https://happyresearch.org/#/teacher/login", // ← redirect here after reset
+        url: "https://happyresearch.org/#/teacher/login",
         handleCodeInApp: false,
       });
       setResetSent(true);
       setError("");
     } catch (err) {
-      console.error("Reset error:", err.code, err.message); // ← add this
+      console.error("Reset error:", err.code, err.message);
       setError("Could not send reset email. Please check your email address.");
     } finally {
       setResetLoading(false);
+    }
+  }
+
+  async function handleResendVerification() {
+    if (!form.email || !form.password) {
+      setError("Please enter your email and password first.");
+      return;
+    }
+    setResendLoading(true);
+    try {
+      const { user } = await signInWithEmailAndPassword(
+        auth,
+        form.email,
+        form.password,
+      );
+      await sendEmailVerification(user, {
+        url: "https://happyresearch.org/#/teacher/login",
+        handleCodeInApp: false,
+      });
+      await signOut(auth);
+      setResendSent(true);
+      setError("");
+    } catch (err) {
+      setError(
+        "Could not resend verification email. Please check your credentials.",
+      );
+    } finally {
+      setResendLoading(false);
     }
   }
 
@@ -79,10 +122,46 @@ export default function TeacherLogin() {
           <button className={styles.closeBtn} onClick={() => navigate("/")}>
             ✕
           </button>
-          <h1 className={styles.title}>👩‍🏫 Teacher Login</h1>
+          <h1 className={styles.title}>👩‍🏫 Mentor Login</h1>
           <p className={styles.sub}>Welcome back to HappyResearch</p>
 
           {error && <p className={styles.error}>{error}</p>}
+
+          {/* Resend verification button */}
+          {showResend && !resendSent && (
+            <button
+              type='button'
+              onClick={handleResendVerification}
+              disabled={resendLoading}
+              style={{
+                width: "100%",
+                padding: "10px",
+                borderRadius: 8,
+                border: "1px solid #00274c",
+                background: "transparent",
+                color: "#00274c",
+                cursor: "pointer",
+                fontSize: 13,
+                fontWeight: 600,
+                marginBottom: 12,
+              }}
+            >
+              {resendLoading ? "Sending..." : "📧 Resend Verification Email"}
+            </button>
+          )}
+
+          {resendSent && (
+            <p
+              style={{
+                color: "#27ae60",
+                fontSize: 14,
+                marginBottom: 12,
+                textAlign: "center",
+              }}
+            >
+              ✅ Verification email sent! Check your inbox.
+            </p>
+          )}
 
           {resetSent && (
             <p
