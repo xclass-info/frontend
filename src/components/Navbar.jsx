@@ -44,9 +44,9 @@ export default function Navbar() {
             Home
           </a>
         </li>
-        <li>
+        {/* <li>
           <Link to='/internship'>Internship</Link>
-        </li>
+        </li> */}
 
         <li>
           <Link to='/research?type=publication'>Research</Link>
@@ -94,9 +94,9 @@ export default function Navbar() {
               Home
             </a>
           </li>
-          <li>
+          {/* <li>
             <Link to='/internship'>🧪 Internship</Link>
-          </li>
+          </li> */}
 
           <li>
             <Link to='/research?type=publication'>🔬 Research</Link>
