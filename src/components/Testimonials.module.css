@@ -1,6 +1,6 @@
 .section {
   padding: 96px 6%;
-  background: var(--surface);
+  background: #f5f5f0;
   position: relative;
   z-index: 1;
 }
@@ -20,47 +20,73 @@
 }
 
 .card {
-  background: var(--card);
-  border: 2.5px solid var(--border);
-  border-radius: var(--radius-lg);
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
   padding: 28px;
   transition: all 0.2s;
 }
-.card:hover { transform: translateY(-4px) rotate(0.3deg); box-shadow: 5px 5px 0 var(--border); }
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 39, 76, 0.1);
+  border-color: #ffcb05;
+}
 
 .featured {
-  border-color: var(--coral);
-  background: linear-gradient(160deg, #fff 60%, rgba(255,107,74,0.03));
+  border-color: #ffcb05;
+  border-width: 2.5px;
+  background: linear-gradient(160deg, #fff 60%, rgba(255, 203, 5, 0.04));
 }
 
 .stars {
-  color: var(--yellow);
+  color: #ffcb05;
   letter-spacing: 2px;
   font-size: 1rem;
   margin-bottom: 14px;
-  filter: drop-shadow(0 1px 2px rgba(255,210,63,0.3));
+  filter: drop-shadow(0 1px 2px rgba(255, 203, 5, 0.4));
 }
 
 .card blockquote {
   font-size: 0.9rem;
-  color: var(--text);
+  color: #1a2e35;
   line-height: 1.75;
   margin-bottom: 22px;
   font-style: italic;
   font-weight: 600;
 }
 
-.author { display: flex; align-items: center; gap: 12px; }
-
-.avatar {
-  width: 42px; height: 42px;
-  border-radius: 50%;
-  border: 2.5px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Fredoka One', cursive;
-  font-weight: 400; font-size: 0.9rem;
-  color: #fff; flex-shrink: 0;
+.author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.name  { font-weight: 800; font-size: 0.9rem; display: block; }
-.info  { font-size: 0.78rem; color: var(--muted); font-weight: 600; }
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2.5px solid #ffcb05;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Fredoka One", cursive;
+  font-weight: 400;
+  font-size: 0.9rem;
+  color: #fff;
+  flex-shrink: 0;
+  background: #00274c;
+}
+
+.name {
+  font-weight: 800;
+  font-size: 0.9rem;
+  display: block;
+  color: #00274c;
+}
+
+.info {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-weight: 600;
+}
