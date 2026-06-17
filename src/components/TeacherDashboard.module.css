@@ -1,16 +1,16 @@
-.loadingPage {
+cat > src/components/TeacherDashboard.module.css << "EOF" .loadingPage {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--surface);
+  background: #f5f5f0;
   font-weight: 700;
-  color: var(--muted);
+  color: #64748b;
 }
 
 .page {
   min-height: 100vh;
-  background: var(--surface);
+  background: #f5f5f0;
   padding: 32px 6%;
 }
 
@@ -26,12 +26,12 @@
 .headerLeft .logo {
   font-family: "Fredoka One", cursive;
   font-size: 1.5rem;
-  color: var(--coral);
+  color: #00274c;
   margin-bottom: 4px;
 }
 
 .welcome {
-  color: var(--muted);
+  color: #64748b;
   font-size: 0.95rem;
   font-weight: 600;
 }
@@ -43,8 +43,8 @@
 }
 
 .createBtn {
-  background: var(--coral);
-  color: #fff;
+  background: #ffcb05;
+  color: #00274c;
   padding: 10px 22px;
   border-radius: 50px;
   font-size: 0.875rem;
@@ -57,14 +57,15 @@
 }
 
 .createBtn:hover {
+  background: #e6b800;
   transform: translateY(-2px);
-  box-shadow: 0 6px 0 #c94530;
+  box-shadow: 0 6px 0 #c9a800;
 }
 
 .logoutBtn {
   background: transparent;
-  color: var(--muted);
-  border: 2.5px solid var(--border);
+  color: #64748b;
+  border: 2.5px solid #e2e8f0;
   padding: 10px 22px;
   border-radius: 50px;
   font-size: 0.875rem;
@@ -75,8 +76,8 @@
 }
 
 .logoutBtn:hover {
-  border-color: var(--coral);
-  color: var(--coral);
+  border-color: #00274c;
+  color: #00274c;
 }
 
 .stats {
@@ -88,9 +89,10 @@
 }
 
 .statCard {
-  background: var(--card);
-  border: 2.5px solid var(--border);
-  border-radius: var(--radius-lg);
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-top: 4px solid #ffcb05;
+  border-radius: 12px;
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -101,13 +103,13 @@
 .statNum {
   font-family: "Fredoka One", cursive;
   font-size: 2rem;
-  color: var(--coral);
+  color: #00274c;
 }
 
 .statLabel {
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--muted);
+  color: #64748b;
   text-align: center;
 }
 
@@ -118,21 +120,21 @@
 .sectionTitle {
   font-family: "Fredoka One", cursive;
   font-size: 1.4rem;
-  color: var(--text);
+  color: #00274c;
   margin-bottom: 24px;
 }
 
 .empty {
-  background: var(--card);
-  border: 2.5px dashed var(--border);
-  border-radius: var(--radius-lg);
+  background: #ffffff;
+  border: 2.5px dashed #e2e8f0;
+  border-radius: 12px;
   padding: 60px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20px;
-  color: var(--muted);
+  color: #64748b;
   font-weight: 700;
   font-size: 1.1rem;
 }
@@ -144,9 +146,10 @@
 }
 
 .card {
-  background: var(--card);
-  border: 2.5px solid var(--border);
-  border-radius: var(--radius-lg);
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  border-top: 4px solid #00274c;
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -163,7 +166,7 @@
 .cardTitle {
   font-family: "Fredoka One", cursive;
   font-size: 1.1rem;
-  color: var(--text);
+  color: #00274c;
 }
 
 .badge {
@@ -177,20 +180,20 @@
 }
 
 .active {
-  color: var(--mint);
-  border-color: rgba(45, 203, 133, 0.5);
-  background: rgba(45, 203, 133, 0.1);
+  color: #166534;
+  border-color: rgba(22, 101, 52, 0.3);
+  background: rgba(22, 101, 52, 0.08);
 }
 
 .draft {
-  color: var(--muted);
-  border-color: var(--border);
+  color: #64748b;
+  border-color: #e2e8f0;
   background: transparent;
 }
 
 .cardDesc {
   font-size: 0.85rem;
-  color: var(--muted);
+  color: #64748b;
   font-weight: 600;
   line-height: 1.6;
 }
@@ -201,7 +204,7 @@
   gap: 6px;
   font-size: 0.82rem;
   font-weight: 700;
-  color: var(--muted);
+  color: #64748b;
 }
 
 .cardFooter {
@@ -209,13 +212,13 @@
   gap: 10px;
   margin-top: auto;
   padding-top: 12px;
-  border-top: 2px dashed var(--border);
+  border-top: 2px dashed #e2e8f0;
 }
 
 .joinBtn {
   flex: 1;
-  background: var(--coral);
-  color: #fff;
+  background: #00274c;
+  color: #ffcb05;
   padding: 8px 14px;
   border-radius: 50px;
   font-size: 0.82rem;
@@ -227,15 +230,16 @@
 }
 
 .joinBtn:hover {
+  background: #ffcb05;
+  color: #00274c;
   transform: translateY(-2px);
-  box-shadow: 0 4px 0 #c94530;
 }
 
 .copyBtn {
   flex: 1;
   background: transparent;
-  color: var(--muted);
-  border: 2.5px solid var(--border);
+  color: #64748b;
+  border: 2.5px solid #e2e8f0;
   padding: 8px 14px;
   border-radius: 50px;
   font-size: 0.82rem;
@@ -246,8 +250,9 @@
 }
 
 .copyBtn:hover {
-  border-color: var(--coral);
-  color: var(--coral);
+  border-color: #ffcb05;
+  color: #00274c;
+  background: rgba(255, 203, 5, 0.1);
 }
 
 @media (max-width: 900px) {

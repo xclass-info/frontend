@@ -59,7 +59,7 @@ function HomePage() {
       <ResearchPrograms />;
       <Navbar />
       <ResearchSection />
-      <InternshipSection />
+      {/* <InternshipSection /> */}
       <Tutors />
       <Testimonials />
       <Footer />
