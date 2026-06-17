@@ -20,6 +20,22 @@ import { HashRouter, Routes, Route } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
 import AdminDashboard from "./components/AdminDashboard";
 
+import { useNavigate } from "react-router-dom";
+
+// Redirect component
+function MeetingRedirect() {
+  useEffect(() => {
+    window.location.href = "https://xclass-meeting.daily.co/happyresearch";
+  }, []);
+  return (
+    <div style={{ padding: 40, textAlign: "center" }}>
+      Redirecting to meeting...
+    </div>
+  );
+}
+
+// Add this route in App.jsx:
+
 function HomePage() {
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -67,6 +83,7 @@ export default function App() {
         <Route path='/teacher/create-class' element={<CreateClass />} />
         <Route path='/adpost' element={<AdPostForm />} />
         <Route path='/admin' element={<AdminDashboard />} />
+        <Route path='/happyresearch' element={<MeetingRedirect />} />
       </Routes>
     </HashRouter>
   );
