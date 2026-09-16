@@ -82,7 +82,15 @@ export default function PrivateLessons() {
                 </div>
               ))}
             </div>
-            <a href='#contact' className={styles.bookBtn}>
+            <a
+              href='#contact'
+              className={styles.bookBtn}
+              onClick={(e) => {
+                e.preventDefault();
+                const el = document.getElementById("contact");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
               Book a Private Session →
             </a>
           </div>
