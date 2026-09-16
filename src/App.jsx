@@ -56,8 +56,10 @@ function HomePage() {
   return (
     <>
       {/* <LoadingScreen /> */}
-      <ResearchPrograms />;
       <Navbar />
+      <Hero />
+      <HowItWorks />
+      <ResearchPrograms />
       <ResearchSection />
       {/* <InternshipSection /> */}
       <Tutors />
@@ -133,7 +135,7 @@ export default function App() {
         <Route path='/admin' element={<AdminDashboard />} />
         <Route path='/teacher/:teacherId' element={<TeacherProfile />} />
         <Route path='/research' element={<ResearchListing />} />
-        <Route path='/internship' element={<InternshipListing />} />;
+        <Route path='/internship' element={<InternshipListing />} />
         <Route path='/about' element={<AboutUs />} />
         <Route path='/contact' element={<ContactUs />} />
         <Route path='/gallery' element={<Gallery />} />

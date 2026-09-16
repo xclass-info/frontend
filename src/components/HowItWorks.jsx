@@ -3,26 +3,26 @@ import styles from "./HowItWorks.module.css";
 const STEPS = [
   {
     icon: "🔍",
-    title: "Find a tutor",
-    desc: "Browse hundreds of expert tutors by subject, rating, price, and availability.",
+    title: "Choose a research area",
+    desc: "Pick from neuroscience, AI, public health, bioinformatics, and more.",
     color: "#34d399",
   },
   {
-    icon: "📅",
-    title: "Book a session",
-    desc: "Pick a time that works for you and book instantly — no back and forth.",
+    icon: "🧑‍🔬",
+    title: "Get matched with a mentor",
+    desc: "Connect with a PhD mentor from a top university who guides your project.",
     color: "#4a8fe2",
   },
   {
     icon: "🎥",
-    title: "Learn live",
-    desc: "Join your session via our built-in video classroom with chat and whiteboard.",
+    title: "Do the research",
+    desc: "Work 1-on-1 with your mentor via live video sessions, chat, and shared docs.",
     color: "#9b6bff",
   },
   {
-    icon: "⭐",
-    title: "Rate & grow",
-    desc: "Leave a review and track your progress over time.",
+    icon: "📄",
+    title: "Present & publish",
+    desc: "Turn your project into a paper, presentation, or portfolio piece.",
     color: "#ff6ba8",
   },
 ];
@@ -33,10 +33,10 @@ export default function HowItWorks() {
       <div className={styles.inner}>
         <div className={`${styles.top} reveal`}>
           <div className='section-label'>✨ How it works</div>
-          <h2>Start learning in minutes 🎯</h2>
+          <h2>From curiosity to research 🎯</h2>
           <p className='section-sub'>
-            From finding a tutor to your first session — it takes less than 5
-            minutes.
+            From choosing a research area to your first mentor session — it
+            takes less than 5 minutes to get started.
           </p>
         </div>
 

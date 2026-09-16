@@ -11,16 +11,17 @@ export default function Hero() {
         <div className={styles.content}>
           <div className={styles.tag}>
             <span className={styles.tagDot} />
-            🌍 Online · All ages · Any subject
+            🔬 Online · All ages · Real research
           </div>
           <h1 className={styles.h1}>
             <span className='grad-text'>
-              Learn from the best tutors online 🚀
+              Turn curiosity into real research 🔬
             </span>
           </h1>
           <p className={styles.sub}>
-            Connect with expert tutors for live 1-on-1 sessions, group classes,
-            and courses — in any subject, at any level. Start free today!
+            Get matched 1-on-1 with a PhD research mentor in neuroscience, AI,
+            bioinformatics, and more — and work on real research, not just
+            homework.
           </p>
           <div className={styles.actions}>
             <a
@@ -32,7 +33,7 @@ export default function Hero() {
               }}
               style={{ cursor: "pointer" }}
             >
-              Find a Teacher {"\u2192"}
+              Find a Mentor {"\u2192"}
             </a>
             <a href='#how' className='btn-ghost'>
               How it works
@@ -40,10 +41,10 @@ export default function Hero() {
           </div>
           <div className={styles.stats}>
             {[
-              ["10K+", "Students"],
-              ["500+", "Mentors"],
-              ["50+", "Subjects"],
-              ["4.9★", "Avg rating"],
+              ["5", "Research areas"],
+              ["PhD", "Led mentors"],
+              ["1:1", "Mentor sessions"],
+              ["100%", "Online"],
             ].map(([num, label]) => (
               <div key={label}>
                 <div className={styles.statNum}>{num}</div>
@@ -58,10 +59,10 @@ export default function Hero() {
           {/* Tutor card */}
           <div className={styles.terminal}>
             <div className={styles.termBar}>
-              <div className={styles.tutorAvatar}>👩‍🏫</div>
+              <div className={styles.tutorAvatar}>🧑‍🔬</div>
               <div>
-                <div className={styles.tutorName}>Sarah Johnson</div>
-                <div className={styles.tutorSubject}>Math & Physics</div>
+                <div className={styles.tutorName}>Dr. Sarah Johnson</div>
+                <div className={styles.tutorSubject}>Neuroscience Mentor</div>
               </div>
               <div className={styles.tutorBadge}>Top Rated</div>
             </div>
@@ -76,12 +77,12 @@ export default function Hero() {
                   <span className={styles.tutorStatLabel}>Rating</span>
                 </div>
                 <div className={styles.tutorStat}>
-                  <span className={styles.tutorStatNum}>$45</span>
-                  <span className={styles.tutorStatLabel}>Per hour</span>
+                  <span className={styles.tutorStatNum}>32</span>
+                  <span className={styles.tutorStatLabel}>Mentees</span>
                 </div>
               </div>
               <div className={styles.tutorTags}>
-                {["Algebra", "Calculus", "SAT Prep", "AP Physics"].map((t) => (
+                {["Cognitive Science", "Neural Circuits", "Neuroimaging", "Mental Health"].map((t) => (
                   <span key={t} className={styles.tutorTag}>
                     {t}
                   </span>
@@ -91,12 +92,12 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Live class pill */}
+          {/* Live session pill */}
           <div className={styles.aiPill}>
-            <div className={styles.aiIcon}>🎥</div>
+            <div className={styles.aiIcon}>🔬</div>
             <div>
-              <strong>Live Class in Progress</strong>
-              <p>Python for Beginners · 12 students joined</p>
+              <strong>Live Session in Progress</strong>
+              <p>Neuroscience Journal Club · 8 students joined</p>
             </div>
             <div className={styles.liveDot} />
           </div>

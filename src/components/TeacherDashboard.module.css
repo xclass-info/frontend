@@ -1,4 +1,4 @@
-cat > src/components/TeacherDashboard.module.css << "EOF" .loadingPage {
+.loadingPage {
   min-height: 100vh;
   display: flex;
   align-items: center;
