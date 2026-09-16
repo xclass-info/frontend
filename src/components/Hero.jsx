@@ -27,7 +27,8 @@ export default function Hero() {
             <a
               href='#tutors'
               className='btn-primary'
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 const el = document.getElementById("tutors");
                 if (el) el.scrollIntoView({ behavior: "smooth" });
               }}
@@ -35,7 +36,16 @@ export default function Hero() {
             >
               Find a Mentor {"\u2192"}
             </a>
-            <a href='#how' className='btn-ghost'>
+            <a
+              href='#how'
+              className='btn-ghost'
+              onClick={(e) => {
+                e.preventDefault();
+                const el = document.getElementById("how");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }}
+              style={{ cursor: "pointer" }}
+            >
               How it works
             </a>
           </div>
