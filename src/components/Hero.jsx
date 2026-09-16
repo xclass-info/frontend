@@ -1,6 +1,65 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { db } from "../firebase";
+import { collection, onSnapshot } from "firebase/firestore";
 import styles from "./Hero.module.css";
 
+function mentorTags(teacher) {
+  const raw = [teacher.expertise, teacher.researchArea]
+    .filter(Boolean)
+    .flatMap((s) => s.split(/&|,|\//))
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return [...new Set(raw)].slice(0, 4);
+}
+
+function mentorBadge(teacher) {
+  if (typeof teacher.rating === "number" && teacher.rating >= 4.5) {
+    return "Top Rated";
+  }
+  if (/phd|doctor/i.test(teacher.degree || "")) return "PhD Mentor";
+  return "Featured Mentor";
+}
+
+function mentorStats(teacher) {
+  const stats = [];
+  if (typeof teacher.rating === "number") {
+    stats.push([`${teacher.rating.toFixed(1)}★`, "Rating"]);
+  }
+  if (teacher.yearsOfExperience) {
+    stats.push([teacher.yearsOfExperience, "Years exp."]);
+  }
+  if (/phd|doctor/i.test(teacher.degree || "")) {
+    stats.push(["PhD", "Degree"]);
+  } else if (teacher.degree) {
+    stats.push([teacher.degree.split(" ")[0], "Degree"]);
+  }
+  if (teacher.projects?.length) {
+    stats.push([`${teacher.projects.length}`, "Project ideas"]);
+  }
+  return stats.slice(0, 3);
+}
+
 export default function Hero() {
+  const navigate = useNavigate();
+  const [mentor, setMentor] = useState(null);
+
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, "teachers"), (snapshot) => {
+      const data = snapshot.docs
+        .map((d) => ({ id: d.id, ...d.data() }))
+        .filter((t) => !t.disabled && t.name);
+      data.sort((a, b) => {
+        const ratingA = typeof a.rating === "number" ? a.rating : -1;
+        const ratingB = typeof b.rating === "number" ? b.rating : -1;
+        if (ratingB !== ratingA) return ratingB - ratingA;
+        return (b.photoURL ? 1 : 0) - (a.photoURL ? 1 : 0);
+      });
+      setMentor(data[0] || null);
+    });
+    return () => unsub();
+  }, []);
+
   return (
     <section className={styles.hero}>
       <div className={styles.blob1} />
@@ -65,53 +124,75 @@ export default function Hero() {
         </div>
 
         {/* Right visual */}
-        <div className={styles.visual}>
-          {/* Tutor card */}
-          <div className={styles.terminal}>
-            <div className={styles.termBar}>
-              <div className={styles.tutorAvatar}>🧑‍🔬</div>
-              <div>
-                <div className={styles.tutorName}>Dr. Sarah Johnson</div>
-                <div className={styles.tutorSubject}>Neuroscience Mentor</div>
+        {mentor && (
+          <div className={styles.visual}>
+            {/* Mentor card */}
+            <div className={styles.terminal}>
+              <div className={styles.termBar}>
+                {mentor.photoURL ? (
+                  <img
+                    src={mentor.photoURL}
+                    alt={mentor.name}
+                    className={styles.tutorAvatar}
+                    style={{ objectFit: "cover" }}
+                  />
+                ) : (
+                  <div className={styles.tutorAvatar}>🧑‍🔬</div>
+                )}
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <div className={styles.tutorName}>{mentor.name}</div>
+                  <div
+                    className={styles.tutorSubject}
+                    style={{
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {(mentor.expertise || mentor.researchArea || "Research Mentor").trim()}
+                  </div>
+                </div>
+                <div className={styles.tutorBadge}>{mentorBadge(mentor)}</div>
               </div>
-              <div className={styles.tutorBadge}>Top Rated</div>
+              <div className={styles.termBody}>
+                <div className={styles.tutorStats}>
+                  {mentorStats(mentor).map(([num, label]) => (
+                    <div className={styles.tutorStat} key={label}>
+                      <span className={styles.tutorStatNum}>{num}</span>
+                      <span className={styles.tutorStatLabel}>{label}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className={styles.tutorTags}>
+                  {mentorTags(mentor).map((t) => (
+                    <span key={t} className={styles.tutorTag}>
+                      {t}
+                    </span>
+                  ))}
+                </div>
+                <button
+                  className={styles.bookBtn}
+                  onClick={() => navigate(`/teacher/${mentor.id}`)}
+                >
+                  View Profile →
+                </button>
+              </div>
             </div>
-            <div className={styles.termBody}>
-              <div className={styles.tutorStats}>
-                <div className={styles.tutorStat}>
-                  <span className={styles.tutorStatNum}>128</span>
-                  <span className={styles.tutorStatLabel}>Sessions</span>
-                </div>
-                <div className={styles.tutorStat}>
-                  <span className={styles.tutorStatNum}>4.9★</span>
-                  <span className={styles.tutorStatLabel}>Rating</span>
-                </div>
-                <div className={styles.tutorStat}>
-                  <span className={styles.tutorStatNum}>32</span>
-                  <span className={styles.tutorStatLabel}>Mentees</span>
-                </div>
-              </div>
-              <div className={styles.tutorTags}>
-                {["Cognitive Science", "Neural Circuits", "Neuroimaging", "Mental Health"].map((t) => (
-                  <span key={t} className={styles.tutorTag}>
-                    {t}
-                  </span>
-                ))}
-              </div>
-              <button className={styles.bookBtn}>Book a Session →</button>
-            </div>
-          </div>
 
-          {/* Live session pill */}
-          <div className={styles.aiPill}>
-            <div className={styles.aiIcon}>🔬</div>
-            <div>
-              <strong>Live Session in Progress</strong>
-              <p>Neuroscience Journal Club · 8 students joined</p>
+            {/* Live session pill */}
+            <div className={styles.aiPill}>
+              <div className={styles.aiIcon}>🔬</div>
+              <div>
+                <strong>Live Session in Progress</strong>
+                <p>
+                  {mentorTags(mentor)[0] || "Research"} Journal Club · 8
+                  students joined
+                </p>
+              </div>
+              <div className={styles.liveDot} />
             </div>
-            <div className={styles.liveDot} />
           </div>
-        </div>
+        )}
       </div>
     </section>
   );
