@@ -1,7 +1,7 @@
 // src/components/TeacherProfile.jsx
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { db } from "../firebase";
+import { db, auth } from "../firebase";
 import {
   doc,
   onSnapshot,
@@ -24,6 +24,15 @@ export default function TeacherProfile() {
   const [submitting, setSubmitting] = useState(false);
   const [booked, setBooked] = useState(false);
   const [showBooking, setShowBooking] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const isOwnProfile = currentUserId === teacherId;
+
+  useEffect(() => {
+    const unsub = auth.onAuthStateChanged((user) => {
+      setCurrentUserId(user?.uid || null);
+    });
+    return () => unsub();
+  }, []);
 
   useEffect(() => {
     const unsub = onSnapshot(doc(db, "teachers", teacherId), (snap) => {
@@ -289,22 +298,42 @@ export default function TeacherProfile() {
               </p>
             )}
 
-            {/* Book button at bottom */}
-            <button
-              onClick={() => setShowBooking(true)}
-              style={{
-                padding: "14px 40px",
-                borderRadius: 12,
-                border: "none",
-                background: "#00274c",
-                color: "white",
-                fontSize: 16,
-                fontWeight: 700,
-                cursor: "pointer",
-              }}
-            >
-              📅 Book a Session
-            </button>
+            {/* Book / Edit button at bottom */}
+            {isOwnProfile ? (
+              <button
+                onClick={() =>
+                  navigate("/teacher/dashboard", { state: { tab: "profile" } })
+                }
+                style={{
+                  padding: "14px 40px",
+                  borderRadius: 12,
+                  border: "none",
+                  background: "#00274c",
+                  color: "white",
+                  fontSize: 16,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                ✏️ Edit Profile
+              </button>
+            ) : (
+              <button
+                onClick={() => setShowBooking(true)}
+                style={{
+                  padding: "14px 40px",
+                  borderRadius: 12,
+                  border: "none",
+                  background: "#00274c",
+                  color: "white",
+                  fontSize: 16,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                📅 Book a Session
+              </button>
+            )}
           </div>
         </div>
 

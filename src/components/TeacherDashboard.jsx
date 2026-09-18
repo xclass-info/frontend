@@ -10,7 +10,7 @@ import {
   getDoc,
   updateDoc,
 } from "firebase/firestore";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import styles from "./TeacherDashboard.module.css";
 
 import Availability from "./Availability";
@@ -23,10 +23,11 @@ import Footer from "./Footer";
 
 export default function TeacherDashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [teacher, setTeacher] = useState(null);
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("classes");
+  const [activeTab, setActiveTab] = useState(location.state?.tab || "classes");
 
   // Profile form state
   const [profile, setProfile] = useState({
