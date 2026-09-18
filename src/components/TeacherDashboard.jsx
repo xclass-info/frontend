@@ -21,6 +21,20 @@ import ResearchForm from "./ResearchForm";
 import InternshipForm from "./InternshipForm";
 import Footer from "./Footer";
 
+function profileFromTeacherData(data) {
+  return {
+    gender: data.gender || "",
+    degree: data.degree || "",
+    expertise: data.expertise || "",
+    researchArea: data.researchArea || "",
+    bio: data.bio || "",
+    university: data.university || "",
+    yearsOfExperience: data.yearsOfExperience || "",
+    languages: data.languages || "",
+    website: data.website || "",
+  };
+}
+
 export default function TeacherDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,6 +45,7 @@ export default function TeacherDashboard() {
 
   // Profile form state
   const [profile, setProfile] = useState({
+    gender: "",
     degree: "",
     expertise: "",
     researchArea: "",
@@ -40,6 +55,7 @@ export default function TeacherDashboard() {
     languages: "",
     website: "",
   });
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileSaved, setProfileSaved] = useState(false);
   const [wordCount, setWordCount] = useState(0);
@@ -59,16 +75,7 @@ export default function TeacherDashboard() {
         setTeacher(data);
         setProjects(data.projects || []);
         // Load existing profile data
-        setProfile({
-          degree: data.degree || "",
-          expertise: data.expertise || "",
-          researchArea: data.researchArea || "",
-          bio: data.bio || "",
-          university: data.university || "",
-          yearsOfExperience: data.yearsOfExperience || "",
-          languages: data.languages || "",
-          website: data.website || "",
-        });
+        setProfile(profileFromTeacherData(data));
         setWordCount(
           (data.bio || "").trim().split(/\s+/).filter(Boolean).length,
         );
@@ -102,6 +109,17 @@ export default function TeacherDashboard() {
 
   function removeProject(id) {
     setProjects((prev) => prev.filter((p) => p.id !== id));
+  }
+
+  function cancelProfileEdit() {
+    if (teacher) {
+      setProfile(profileFromTeacherData(teacher));
+      setProjects(teacher.projects || []);
+      setWordCount(
+        (teacher.bio || "").trim().split(/\s+/).filter(Boolean).length,
+      );
+    }
+    setIsEditingProfile(false);
   }
 
   async function handleLogout() {
@@ -160,8 +178,12 @@ export default function TeacherDashboard() {
         projects,
         updatedAt: new Date(),
       });
+      setTeacher((prev) => ({ ...prev, ...profile, projects }));
       setProfileSaved(true);
-      setTimeout(() => setProfileSaved(false), 2000);
+      setTimeout(() => {
+        setProfileSaved(false);
+        setIsEditingProfile(false);
+      }, 1200);
     } catch (err) {
       console.error(err);
       alert("Failed to save profile. Please try again.");
@@ -371,11 +393,144 @@ export default function TeacherDashboard() {
         {/* ── Profile Tab ── */}
         {activeTab === "profile" && (
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>👤 My Profile</h2>
-            <p style={{ color: "#888", fontSize: 14, marginBottom: 24 }}>
-              This information will be displayed on your public tutor profile.
-            </p>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+                gap: 16,
+                flexWrap: "wrap",
+              }}
+            >
+              <div>
+                <h2 className={styles.sectionTitle}>👤 My Profile</h2>
+                <p style={{ color: "#888", fontSize: 14, marginBottom: 24 }}>
+                  This information will be displayed on your public tutor
+                  profile.
+                </p>
+              </div>
+              {!isEditingProfile && (
+                <button
+                  onClick={() => setIsEditingProfile(true)}
+                  style={{
+                    padding: "10px 20px",
+                    borderRadius: 8,
+                    border: "none",
+                    background: "#00274c",
+                    color: "white",
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    flexShrink: 0,
+                  }}
+                >
+                  ✏️ Edit
+                </button>
+              )}
+            </div>
 
+            {!isEditingProfile ? (
+              <div style={{ maxWidth: 600 }}>
+                {[
+                  ["Gender", profile.gender],
+                  ["Degree", profile.degree],
+                  ["University / Institution", profile.university],
+                  ["Area of Expertise", profile.expertise],
+                  ["Research Area", profile.researchArea],
+                  [
+                    "Years of Teaching Experience",
+                    profile.yearsOfExperience,
+                  ],
+                  ["Languages Spoken", profile.languages],
+                ].map(([label, value]) => (
+                  <div style={fieldStyle} key={label}>
+                    <p style={labelStyle}>{label}</p>
+                    <p style={{ margin: "4px 0 0", fontSize: 15 }}>
+                      {value || <span style={{ color: "#bbb" }}>Not set</span>}
+                    </p>
+                  </div>
+                ))}
+                <div style={fieldStyle}>
+                  <p style={labelStyle}>Personal Website / LinkedIn</p>
+                  {profile.website ? (
+                    <a
+                      href={profile.website}
+                      target='_blank'
+                      rel='noreferrer'
+                      style={{
+                        display: "block",
+                        marginTop: 4,
+                        fontSize: 15,
+                        color: "#00274c",
+                      }}
+                    >
+                      {profile.website}
+                    </a>
+                  ) : (
+                    <p style={{ margin: "4px 0 0", fontSize: 15, color: "#bbb" }}>
+                      Not set
+                    </p>
+                  )}
+                </div>
+                <div style={fieldStyle}>
+                  <p style={labelStyle}>About Me</p>
+                  <p
+                    style={{
+                      margin: "4px 0 0",
+                      fontSize: 15,
+                      lineHeight: 1.7,
+                      whiteSpace: "pre-wrap",
+                    }}
+                  >
+                    {profile.bio || (
+                      <span style={{ color: "#bbb" }}>Not set</span>
+                    )}
+                  </p>
+                </div>
+                {projects.length > 0 && (
+                  <div style={{ marginBottom: 24 }}>
+                    <h3 style={{ fontSize: 16, marginBottom: 12 }}>
+                      💡 Project Ideas
+                    </h3>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 12,
+                      }}
+                    >
+                      {projects.map((project) => (
+                        <div
+                          key={project.id}
+                          style={{
+                            padding: 16,
+                            borderRadius: 10,
+                            background: "#f9fafb",
+                            border: "1px solid #eee",
+                          }}
+                        >
+                          <h4 style={{ margin: "0 0 6px", fontSize: 15 }}>
+                            {project.title}
+                          </h4>
+                          {project.description && (
+                            <p
+                              style={{
+                                margin: 0,
+                                fontSize: 13,
+                                color: "#666",
+                                lineHeight: 1.5,
+                              }}
+                            >
+                              {project.description}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
             <div style={{ maxWidth: 600 }}>
               {/* Gender */}
               <div style={fieldStyle}>
@@ -737,29 +892,48 @@ export default function TeacherDashboard() {
                 </div>
               </div>
 
-              {/* Save button */}
-              <button
-                onClick={saveProfile}
-                disabled={profileSaving}
-                style={{
-                  padding: "12px 32px",
-                  borderRadius: 8,
-                  border: "none",
-                  background: profileSaved ? "#27ae60" : "#00274c",
-                  color: "white",
-                  fontSize: 15,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  transition: "background 0.2s",
-                }}
-              >
-                {profileSaving
-                  ? "Saving..."
-                  : profileSaved
-                    ? "Saved!"
-                    : "Save Profile"}
-              </button>
+              {/* Save / Cancel buttons */}
+              <div style={{ display: "flex", gap: 12 }}>
+                <button
+                  onClick={saveProfile}
+                  disabled={profileSaving}
+                  style={{
+                    padding: "12px 32px",
+                    borderRadius: 8,
+                    border: "none",
+                    background: profileSaved ? "#27ae60" : "#00274c",
+                    color: "white",
+                    fontSize: 15,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    transition: "background 0.2s",
+                  }}
+                >
+                  {profileSaving
+                    ? "Saving..."
+                    : profileSaved
+                      ? "Saved!"
+                      : "Save Profile"}
+                </button>
+                <button
+                  onClick={cancelProfileEdit}
+                  disabled={profileSaving}
+                  style={{
+                    padding: "12px 32px",
+                    borderRadius: 8,
+                    border: "1px solid #ddd",
+                    background: "white",
+                    color: "#555",
+                    fontSize: 15,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
+            )}
           </div>
         )}
       </div>
