@@ -132,6 +132,7 @@ export default function App() {
         <Route path='/teacher/register' element={<TeacherRegister />} />
         <Route path='/teacher/login' element={<TeacherLogin />} />
         <Route path='/teacher/dashboard' element={<TeacherDashboard />} />
+        <Route path='/teacher/create-class' element={<CreateClass />} />
         <Route path='/admin' element={<AdminDashboard />} />
         <Route path='/teacher/:teacherId' element={<TeacherProfile />} />
         <Route path='/research' element={<ResearchListing />} />
