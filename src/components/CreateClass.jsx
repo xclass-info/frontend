@@ -140,6 +140,40 @@ export default function CreateClass() {
             )}
           </div>
 
+          {/* Start & End Time */}
+          <div className={styles.row}>
+            <div className={styles.field}>
+              <label className={styles.label}>Start Time</label>
+              <input
+                className={`${styles.input} ${errors.startTime ? styles.inputError : ""}`}
+                name='startTime'
+                type='time'
+                value={form.startTime}
+                onChange={handleChange}
+              />
+              {errors.startTime && (
+                <p className={styles.errorMsg}>{errors.startTime}</p>
+              )}
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label}>End Time</label>
+              <input
+                className={`${styles.input} ${errors.endTime ? styles.inputError : ""}`}
+                name='endTime'
+                type='time'
+                value={form.endTime}
+                onChange={handleChange}
+              />
+              {errors.endTime && (
+                <p className={styles.errorMsg}>{errors.endTime}</p>
+              )}
+            </div>
+          </div>
+          <p style={{ fontSize: 12, color: "#aaa", marginTop: -8 }}>
+            This is the default time applied to each new lesson. Change it
+            before adding a date for a lesson that meets at a different time.
+          </p>
+
           {/* Lessons */}
           <div className={styles.field}>
             <label className={styles.label}>Lessons</label>
@@ -217,40 +251,6 @@ export default function CreateClass() {
               <p className={styles.errorMsg}>{errors.lessons}</p>
             )}
           </div>
-
-          {/* Start & End Time */}
-          <div className={styles.row}>
-            <div className={styles.field}>
-              <label className={styles.label}>Start Time</label>
-              <input
-                className={`${styles.input} ${errors.startTime ? styles.inputError : ""}`}
-                name='startTime'
-                type='time'
-                value={form.startTime}
-                onChange={handleChange}
-              />
-              {errors.startTime && (
-                <p className={styles.errorMsg}>{errors.startTime}</p>
-              )}
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label}>End Time</label>
-              <input
-                className={`${styles.input} ${errors.endTime ? styles.inputError : ""}`}
-                name='endTime'
-                type='time'
-                value={form.endTime}
-                onChange={handleChange}
-              />
-              {errors.endTime && (
-                <p className={styles.errorMsg}>{errors.endTime}</p>
-              )}
-            </div>
-          </div>
-          <p style={{ fontSize: 12, color: "#aaa", marginTop: -8 }}>
-            This is the default time applied to each new lesson. Change it
-            before adding a date for a lesson that meets at a different time.
-          </p>
 
           {/* Max Seats */}
           <div className={styles.field}>
