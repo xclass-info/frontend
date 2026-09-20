@@ -9,6 +9,7 @@ import {
   doc,
   getDoc,
   updateDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import styles from "./TeacherDashboard.module.css";
@@ -49,6 +50,9 @@ export default function TeacherDashboard() {
   const location = useLocation();
   const [teacher, setTeacher] = useState(null);
   const [classes, setClasses] = useState([]);
+  const [research, setResearch] = useState([]);
+  const [showResearchForm, setShowResearchForm] = useState(false);
+  const [editingResearch, setEditingResearch] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(location.state?.tab || "classes");
 
@@ -96,7 +100,18 @@ export default function TeacherDashboard() {
         setLoading(false);
       });
 
-      return () => unsubscribeClasses();
+      const researchQuery = query(
+        collection(db, "research"),
+        where("teacherId", "==", user.uid),
+      );
+      const unsubscribeResearch = onSnapshot(researchQuery, (snapshot) => {
+        setResearch(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+      });
+
+      return () => {
+        unsubscribeClasses();
+        unsubscribeResearch();
+      };
     });
 
     return () => unsubscribeAuth();
@@ -115,6 +130,16 @@ export default function TeacherDashboard() {
   async function handleLogout() {
     await signOut(auth);
     navigate("/teacher/login");
+  }
+
+  async function deleteResearch(id) {
+    if (!confirm("Delete this research post? This can't be undone.")) return;
+    try {
+      await deleteDoc(doc(db, "research", id));
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete. Please try again.");
+    }
   }
 
   function handleProfileChange(e) {
@@ -300,7 +325,87 @@ export default function TeacherDashboard() {
         </div>
         {activeTab === "research" && (
           <div className={styles.section}>
-            <ResearchForm />
+            {showResearchForm ? (
+              <ResearchForm
+                research={editingResearch}
+                onClose={() => {
+                  setShowResearchForm(false);
+                  setEditingResearch(null);
+                }}
+              />
+            ) : (
+              <>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: 16,
+                  }}
+                >
+                  <h2 className={styles.sectionTitle}>Your Research</h2>
+                  <button
+                    onClick={() => {
+                      setEditingResearch(null);
+                      setShowResearchForm(true);
+                    }}
+                    className={styles.createBtn}
+                  >
+                    + Add Research
+                  </button>
+                </div>
+                {research.length === 0 ? (
+                  <div className={styles.empty}>
+                    <p>🔬 No research posted yet!</p>
+                    <button
+                      onClick={() => {
+                        setEditingResearch(null);
+                        setShowResearchForm(true);
+                      }}
+                      className={styles.createBtn}
+                    >
+                      + Post your first research
+                    </button>
+                  </div>
+                ) : (
+                  <div className={styles.grid}>
+                    {research.map((r) => (
+                      <div key={r.id} className={styles.card}>
+                        <div className={styles.cardTop}>
+                          <h3 className={styles.cardTitle}>{r.title}</h3>
+                          <span
+                            className={`${styles.badge} ${r.type === "publication" ? styles.active : styles.draft}`}
+                          >
+                            {r.type === "publication"
+                              ? "Publication"
+                              : "Exploration"}
+                          </span>
+                        </div>
+                        <p className={styles.cardDesc}>{r.idea}</p>
+                        <div className={styles.cardFooter}>
+                          <button
+                            className={styles.joinBtn}
+                            onClick={() => {
+                              setEditingResearch(r);
+                              setShowResearchForm(true);
+                            }}
+                          >
+                            ✏️ Edit
+                          </button>
+                          <button
+                            className={styles.copyBtn}
+                            onClick={() => deleteResearch(r.id)}
+                            style={{ color: "#e74c3c" }}
+                          >
+                            🗑️ Delete
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
           </div>
         )}
         {/* ── Classes Tab ── */}

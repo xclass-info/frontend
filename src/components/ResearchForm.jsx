@@ -1,16 +1,17 @@
 // src/components/ResearchForm.jsx
 import { useState } from "react";
 import { db, auth } from "../firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, doc, updateDoc } from "firebase/firestore";
 import styles from "./TeacherAuth.module.css";
 
-export default function ResearchForm({ onClose }) {
+export default function ResearchForm({ research, onClose }) {
+  const isEditing = Boolean(research);
   const [form, setForm] = useState({
-    title: "",
-    idea: "",
-    impact: "",
-    details: "",
-    type: "exploration",
+    title: research?.title || "",
+    idea: research?.idea || "",
+    impact: research?.impact || "",
+    details: research?.details || "",
+    type: research?.type || "exploration",
   });
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -40,17 +41,27 @@ export default function ResearchForm({ onClose }) {
     setLoading(true);
     try {
       const user = auth.currentUser;
-      await addDoc(collection(db, "research"), {
+      const payload = {
         title: form.title.trim(),
         idea: form.idea.trim(),
         impact: form.impact.trim(),
         details: form.details.trim() || null,
         type: form.type,
-        teacherId: user.uid,
-        teacherName: user.displayName || "Teacher",
-        createdAt: new Date(),
-        status: "published",
-      });
+      };
+      if (isEditing) {
+        await updateDoc(doc(db, "research", research.id), {
+          ...payload,
+          updatedAt: new Date(),
+        });
+      } else {
+        await addDoc(collection(db, "research"), {
+          ...payload,
+          teacherId: user.uid,
+          teacherName: user.displayName || "Teacher",
+          createdAt: new Date(),
+          status: "published",
+        });
+      }
       setSaved(true);
       setTimeout(() => {
         setSaved(false);
@@ -66,9 +77,30 @@ export default function ResearchForm({ onClose }) {
 
   return (
     <div style={{ maxWidth: 600 }}>
-      <h3 style={{ marginBottom: 4 }}>🔬 Post Research</h3>
+      {onClose && (
+        <button
+          type='button'
+          onClick={onClose}
+          style={{
+            background: "none",
+            border: "none",
+            color: "#00274c",
+            cursor: "pointer",
+            fontSize: 14,
+            marginBottom: 12,
+            padding: 0,
+          }}
+        >
+          ← Back
+        </button>
+      )}
+      <h3 style={{ marginBottom: 4 }}>
+        {isEditing ? "🔬 Edit Research" : "🔬 Post Research"}
+      </h3>
       <p style={{ color: "#888", fontSize: 14, marginBottom: 24 }}>
-        Share your research with the community.
+        {isEditing
+          ? "Update your research post."
+          : "Share your research with the community."}
       </p>
 
       <form onSubmit={handleSubmit}>
@@ -131,7 +163,17 @@ export default function ResearchForm({ onClose }) {
           disabled={loading}
           style={{ background: saved ? "#27ae60" : undefined }}
         >
-          {loading ? "Posting..." : saved ? "Posted! ✓" : "Post Research 🔬"}
+          {loading
+            ? isEditing
+              ? "Saving..."
+              : "Posting..."
+            : saved
+              ? isEditing
+                ? "Saved! ✓"
+                : "Posted! ✓"
+              : isEditing
+                ? "Save Changes"
+                : "Post Research 🔬"}
         </button>
       </form>
     </div>
