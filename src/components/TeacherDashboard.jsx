@@ -307,10 +307,10 @@ export default function TeacherDashboard() {
           }}
         >
           {[
+            { id: "research", label: "🔬 Research" },
             { id: "classes", label: "📚 Courses" },
             { id: "availability", label: "🗓 Availability" },
             { id: "bookings", label: "📬 Bookings" },
-            { id: "research", label: "🔬 Research" },
           ].map((tab) => (
             <button
               key={tab.id}
