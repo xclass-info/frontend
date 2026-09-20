@@ -20,6 +20,16 @@ import ResearchForm from "./ResearchForm";
 
 import Footer from "./Footer";
 
+function lessonWeekday(dateStr) {
+  try {
+    return new Date(`${dateStr}T00:00:00`).toLocaleDateString("en-US", {
+      weekday: "long",
+    });
+  } catch {
+    return "";
+  }
+}
+
 function profileFromTeacherData(data) {
   return {
     gender: data.gender || "",
@@ -319,14 +329,20 @@ export default function TeacherDashboard() {
                     <p className={styles.cardDesc}>{cls.description}</p>
                     <div className={styles.cardMeta}>
                       {cls.lessons?.length > 0 ? (
-                        <span>
-                          📅{" "}
-                          {cls.lessons
-                            .map(
-                              (l) => `${l.date} (${l.startTime}–${l.endTime})`,
-                            )
-                            .join(", ")}
-                        </span>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 2,
+                          }}
+                        >
+                          {cls.lessons.map((l) => (
+                            <span key={l.date}>
+                              📅 {l.date} ({lessonWeekday(l.date)}) ·{" "}
+                              {l.startTime}–{l.endTime}
+                            </span>
+                          ))}
+                        </div>
                       ) : (
                         <span>
                           📅 {cls.date || cls.dates?.join(", ")}

@@ -16,6 +16,16 @@ import { SkeletonClassCard } from "./Skeleton";
 import Navbar from "./Navbar";
 import PaymentModal from "./PaymentModal";
 
+function lessonWeekday(dateStr) {
+  try {
+    return new Date(`${dateStr}T00:00:00`).toLocaleDateString("en-US", {
+      weekday: "long",
+    });
+  } catch {
+    return "";
+  }
+}
+
 export default function ClassListing() {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -156,12 +166,20 @@ export default function ClassListing() {
 
                   <div className={styles.meta}>
                     {cls.lessons?.length > 0 ? (
-                      <span>
-                        📅{" "}
-                        {cls.lessons
-                          .map((l) => `${l.date} (${l.startTime}–${l.endTime})`)
-                          .join(", ")}
-                      </span>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 2,
+                        }}
+                      >
+                        {cls.lessons.map((l) => (
+                          <span key={l.date}>
+                            📅 {l.date} ({lessonWeekday(l.date)}) ·{" "}
+                            {l.startTime}–{l.endTime}
+                          </span>
+                        ))}
+                      </div>
                     ) : (
                       <span>
                         📅 {cls.date || cls.dates?.join(", ")}
