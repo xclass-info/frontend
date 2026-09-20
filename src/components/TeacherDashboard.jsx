@@ -132,6 +132,15 @@ export default function TeacherDashboard() {
     navigate("/teacher/login");
   }
 
+  async function updateCourseStatus(id, status) {
+    try {
+      await updateDoc(doc(db, "classes", id), { status });
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update status. Please try again.");
+    }
+  }
+
   async function deleteCourse(id) {
     if (!confirm("Delete this course? This can't be undone.")) return;
     try {
@@ -451,11 +460,24 @@ export default function TeacherDashboard() {
                   <div key={cls.id} className={styles.card}>
                     <div className={styles.cardTop}>
                       <h3 className={styles.cardTitle}>{cls.title}</h3>
-                      <span
-                        className={`${styles.badge} ${cls.status === "active" ? styles.active : styles.draft}`}
+                      <select
+                        value={cls.status || "registration"}
+                        onChange={(e) =>
+                          updateCourseStatus(cls.id, e.target.value)
+                        }
+                        className={`${styles.badge} ${
+                          cls.status === "completed"
+                            ? styles.completed
+                            : cls.status === "active"
+                              ? styles.active
+                              : styles.registration
+                        }`}
+                        style={{ cursor: "pointer" }}
                       >
-                        {cls.status || "draft"}
-                      </span>
+                        <option value='registration'>Registration</option>
+                        <option value='active'>Active</option>
+                        <option value='completed'>Completed</option>
+                      </select>
                     </div>
                     <p className={styles.cardDesc}>{cls.description}</p>
                     <div className={styles.cardMeta}>

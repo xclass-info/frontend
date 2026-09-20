@@ -37,7 +37,10 @@ export default function ClassListing() {
   const [paymentData, setPaymentData] = useState(null);
 
   useEffect(() => {
-    const q = query(collection(db, "classes"), where("status", "==", "active"));
+    const q = query(
+      collection(db, "classes"),
+      where("status", "in", ["registration", "active"]),
+    );
     const unsub = onSnapshot(q, (snapshot) => {
       setClasses(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
       setLoading(false);

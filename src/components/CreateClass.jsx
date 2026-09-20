@@ -144,7 +144,7 @@ export default function CreateClass() {
           ...payload,
           teacherId: user.uid,
           enrolledCount: 0,
-          status: "active",
+          status: "registration",
           createdAt: new Date(),
         });
       }
