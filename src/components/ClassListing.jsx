@@ -73,9 +73,7 @@ export default function ClassListing() {
         classTitle: cls.title,
         studentName: form.name,
         studentEmail: form.email,
-        dates: cls.dates,
-        startTime: cls.startTime,
-        endTime: cls.endTime,
+        lessons: cls.lessons,
         bookedAt: new Date(),
         paid: cls.price > 0,
         amount: cls.price || 0,
@@ -104,7 +102,7 @@ export default function ClassListing() {
       <div className={styles.page}>
         <div className={styles.inner}>
           <div className={styles.header}>
-            <h1 className={styles.title}>📚 Training Classes</h1>
+            <h1 className={styles.title}>📚 Training Courses</h1>
           </div>
           <div className={styles.grid}>
             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -122,16 +120,16 @@ export default function ClassListing() {
       <div className={styles.inner}>
         {/* Header */}
         <div className={styles.header}>
-          <h1 className={styles.title}>📚 Training Classes</h1>
+          <h1 className={styles.title}>📚 Training Courses</h1>
           <p className={styles.sub}>
-            Browse and book a seat in one of our live online classes
+            Browse and book a seat in one of our live online courses
           </p>
         </div>
 
         {/* Empty state */}
         {classes.length === 0 ? (
           <div className={styles.empty}>
-            <p>😴 No classes available right now. Check back soon!</p>
+            <p>😴 No courses available right now. Check back soon!</p>
           </div>
         ) : (
           <div className={styles.grid}>
@@ -157,10 +155,19 @@ export default function ClassListing() {
                   <p className={styles.cardDesc}>{cls.description}</p>
 
                   <div className={styles.meta}>
-                    <span>📅 {cls.dates?.join(", ")}</span>
-                    <span>
-                      ⏰ {cls.startTime} – {cls.endTime}
-                    </span>
+                    {cls.lessons?.length > 0 ? (
+                      <span>
+                        📅{" "}
+                        {cls.lessons
+                          .map((l) => `${l.date} (${l.startTime}–${l.endTime})`)
+                          .join(", ")}
+                      </span>
+                    ) : (
+                      <span>
+                        📅 {cls.date || cls.dates?.join(", ")}
+                        {cls.startTime && ` ⏰ ${cls.startTime}–${cls.endTime}`}
+                      </span>
+                    )}
                     <span>
                       👥 {cls.enrolledCount || 0} / {cls.maxSeats} enrolled
                     </span>

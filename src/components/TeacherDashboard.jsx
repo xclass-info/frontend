@@ -222,7 +222,7 @@ export default function TeacherDashboard() {
           </div>
           <div className={styles.headerRight}>
             <Link to='/teacher/create-class' className={styles.createBtn}>
-              + Create Class
+              + Create Course
             </Link>
             <button className={styles.logoutBtn} onClick={handleLogout}>
               Logout
@@ -233,13 +233,13 @@ export default function TeacherDashboard() {
         <div className={styles.stats}>
           <div className={styles.statCard}>
             <span className={styles.statNum}>{classes.length}</span>
-            <span className={styles.statLabel}>Total Classes</span>
+            <span className={styles.statLabel}>Total Courses</span>
           </div>
           <div className={styles.statCard}>
             <span className={styles.statNum}>
               {classes.filter((c) => c.status === "active").length}
             </span>
-            <span className={styles.statLabel}>Active Classes</span>
+            <span className={styles.statLabel}>Active Courses</span>
           </div>
           <div className={styles.statCard}>
             <span className={styles.statNum}>
@@ -259,7 +259,7 @@ export default function TeacherDashboard() {
           }}
         >
           {[
-            { id: "classes", label: "📚 Classes" },
+            { id: "classes", label: "📚 Courses" },
             { id: "availability", label: "🗓 Availability" },
             { id: "bookings", label: "📬 Bookings" },
             { id: "profile", label: "👤 Profile" },
@@ -296,12 +296,12 @@ export default function TeacherDashboard() {
         {/* ── Classes Tab ── */}
         {activeTab === "classes" && (
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Your Classes</h2>
+            <h2 className={styles.sectionTitle}>Your Courses</h2>
             {classes.length === 0 ? (
               <div className={styles.empty}>
-                <p>🎒 No classes yet!</p>
+                <p>🎒 No courses yet!</p>
                 <Link to='/teacher/create-class' className={styles.createBtn}>
-                  + Create your first class
+                  + Create your first course
                 </Link>
               </div>
             ) : (
@@ -318,10 +318,22 @@ export default function TeacherDashboard() {
                     </div>
                     <p className={styles.cardDesc}>{cls.description}</p>
                     <div className={styles.cardMeta}>
-                      <span>
-                        📅 {cls.dates?.join(", ")} · {cls.startTime} –{" "}
-                        {cls.endTime}
-                      </span>
+                      {cls.lessons?.length > 0 ? (
+                        <span>
+                          📅{" "}
+                          {cls.lessons
+                            .map(
+                              (l) => `${l.date} (${l.startTime}–${l.endTime})`,
+                            )
+                            .join(", ")}
+                        </span>
+                      ) : (
+                        <span>
+                          📅 {cls.date || cls.dates?.join(", ")}
+                          {cls.startTime &&
+                            ` · ${cls.startTime}–${cls.endTime}`}
+                        </span>
+                      )}
                       <span>
                         👥 {cls.enrolledCount || 0} / {cls.maxSeats} seats
                       </span>

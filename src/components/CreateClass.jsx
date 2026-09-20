@@ -9,12 +9,12 @@ export default function CreateClass() {
   const [form, setForm] = useState({
     title: "",
     description: "",
-    dates: [],
     startTime: "",
     endTime: "",
     maxSeats: "",
     price: "", // ← added
   });
+  const [lessons, setLessons] = useState([]);
   const [newDate, setNewDate] = useState("");
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -24,30 +24,43 @@ export default function CreateClass() {
     setErrors({ ...errors, [e.target.name]: "" });
   }
 
-  function addDate() {
+  function addLesson() {
     if (!newDate) return;
-    if (form.dates.includes(newDate)) {
+    if (!form.startTime || !form.endTime) {
+      return setErrors({
+        ...errors,
+        lessons: "Set a start and end time before adding a date",
+      });
+    }
+    if (lessons.some((l) => l.date === newDate)) {
       setNewDate("");
       return;
     }
-    setForm({ ...form, dates: [...form.dates, newDate].sort() });
-    setErrors({ ...errors, dates: "" });
+    const lesson = {
+      date: newDate,
+      startTime: form.startTime,
+      endTime: form.endTime,
+    };
+    setLessons(
+      [...lessons, lesson].sort((a, b) => a.date.localeCompare(b.date)),
+    );
+    setErrors({ ...errors, lessons: "" });
     setNewDate("");
   }
 
-  function removeDate(d) {
-    setForm({ ...form, dates: form.dates.filter((date) => date !== d) });
+  function removeLesson(date) {
+    setLessons(lessons.filter((l) => l.date !== date));
   }
 
   function validate() {
     const newErrors = {};
     if (!form.title.trim()) newErrors.title = "Required";
     if (!form.description.trim()) newErrors.description = "Required";
-    if (form.dates.length === 0) newErrors.dates = "Add at least one date";
     if (!form.startTime) newErrors.startTime = "Required";
     if (!form.endTime) newErrors.endTime = "Required";
     else if (form.startTime && form.endTime <= form.startTime)
       newErrors.endTime = "Must be after start time";
+    if (lessons.length === 0) newErrors.lessons = "Add at least one lesson";
     if (!form.maxSeats) newErrors.maxSeats = "Required";
     else if (isNaN(form.maxSeats) || Number(form.maxSeats) < 1)
       newErrors.maxSeats = "Must be at least 1";
@@ -71,9 +84,7 @@ export default function CreateClass() {
       await addDoc(collection(db, "classes"), {
         title: form.title,
         description: form.description,
-        dates: form.dates,
-        startTime: form.startTime,
-        endTime: form.endTime,
+        lessons,
         maxSeats: Number(form.maxSeats),
         price: Number(form.price), // ← added
         teacherId: user.uid,
@@ -96,13 +107,13 @@ export default function CreateClass() {
         <Link to='/teacher/dashboard' className={styles.back}>
           ← Back to Dashboard
         </Link>
-        <h1 className={styles.title}>📚 Create a Class</h1>
-        <p className={styles.sub}>Fill in the details for your new class</p>
+        <h1 className={styles.title}>📚 Create a Course</h1>
+        <p className={styles.sub}>Fill in the details for your new course</p>
 
         <form onSubmit={handleSubmit} className={styles.form}>
           {/* Title */}
           <div className={styles.field}>
-            <label className={styles.label}>Class Title</label>
+            <label className={styles.label}>Course Title</label>
             <input
               className={`${styles.input} ${errors.title ? styles.inputError : ""}`}
               name='title'
@@ -121,7 +132,7 @@ export default function CreateClass() {
               name='description'
               value={form.description}
               onChange={handleChange}
-              placeholder='What will students learn in this class?'
+              placeholder='What will students learn in this course?'
               rows={3}
             />
             {errors.description && (
@@ -158,38 +169,44 @@ export default function CreateClass() {
               )}
             </div>
           </div>
+          <p style={{ fontSize: 12, color: "#aaa", marginTop: -8 }}>
+            Used as the default time for each lesson you add below — change
+            it before adding a date if that lesson meets at a different time.
+          </p>
 
-          {/* Dates */}
+          {/* Lessons */}
           <div className={styles.field}>
-            <label className={styles.label}>Dates</label>
-            {form.dates.length > 0 && (
+            <label className={styles.label}>Lessons</label>
+            {lessons.length > 0 && (
               <div
                 style={{
                   display: "flex",
-                  flexWrap: "wrap",
+                  flexDirection: "column",
                   gap: 8,
                   marginBottom: 10,
                 }}
               >
-                {form.dates.map((d) => (
-                  <span
-                    key={d}
+                {lessons.map((lesson) => (
+                  <div
+                    key={lesson.date}
                     style={{
-                      display: "inline-flex",
+                      display: "flex",
                       alignItems: "center",
-                      gap: 6,
-                      padding: "6px 10px",
-                      borderRadius: 20,
+                      justifyContent: "space-between",
+                      padding: "8px 12px",
+                      borderRadius: 8,
                       background: "#f0f4ff",
                       color: "#00274c",
                       fontSize: 13,
                       fontWeight: 600,
                     }}
                   >
-                    📅 {d}
+                    <span>
+                      📅 {lesson.date} · {lesson.startTime}–{lesson.endTime}
+                    </span>
                     <button
                       type='button'
-                      onClick={() => removeDate(d)}
+                      onClick={() => removeLesson(lesson.date)}
                       style={{
                         background: "none",
                         border: "none",
@@ -202,20 +219,20 @@ export default function CreateClass() {
                     >
                       ✕
                     </button>
-                  </span>
+                  </div>
                 ))}
               </div>
             )}
             <div style={{ display: "flex", gap: 8 }}>
               <input
-                className={`${styles.input} ${errors.dates ? styles.inputError : ""}`}
+                className={`${styles.input} ${errors.lessons ? styles.inputError : ""}`}
                 type='date'
                 value={newDate}
                 onChange={(e) => setNewDate(e.target.value)}
               />
               <button
                 type='button'
-                onClick={addDate}
+                onClick={addLesson}
                 style={{
                   padding: "0 16px",
                   borderRadius: 8,
@@ -227,10 +244,12 @@ export default function CreateClass() {
                   whiteSpace: "nowrap",
                 }}
               >
-                + Add Date
+                + Add Lesson
               </button>
             </div>
-            {errors.dates && <p className={styles.errorMsg}>{errors.dates}</p>}
+            {errors.lessons && (
+              <p className={styles.errorMsg}>{errors.lessons}</p>
+            )}
           </div>
 
           {/* Max Seats */}
@@ -268,7 +287,7 @@ export default function CreateClass() {
           </div>
 
           <button className={styles.btn} type='submit' disabled={loading}>
-            {loading ? "Creating..." : "Create Class 🚀"}
+            {loading ? "Creating..." : "Create Course 🚀"}
           </button>
         </form>
       </div>
