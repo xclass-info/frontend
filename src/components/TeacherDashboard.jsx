@@ -373,13 +373,6 @@ export default function TeacherDashboard() {
                       <div key={r.id} className={styles.card}>
                         <div className={styles.cardTop}>
                           <h3 className={styles.cardTitle}>{r.title}</h3>
-                          <span
-                            className={`${styles.badge} ${r.type === "publication" ? styles.active : styles.draft}`}
-                          >
-                            {r.type === "publication"
-                              ? "Publication"
-                              : "Exploration"}
-                          </span>
                         </div>
                         <p className={styles.cardDesc}>{r.idea}</p>
                         <div className={styles.cardFooter}>
