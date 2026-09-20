@@ -10,7 +10,7 @@ export default function ResearchForm({ onClose }) {
     idea: "",
     impact: "",
     details: "",
-    type: "exploration", // ← added
+    type: "exploration",
   });
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -45,7 +45,7 @@ export default function ResearchForm({ onClose }) {
         idea: form.idea.trim(),
         impact: form.impact.trim(),
         details: form.details.trim() || null,
-        type: form.type, // ← added
+        type: form.type,
         teacherId: user.uid,
         teacherName: user.displayName || "Teacher",
         createdAt: new Date(),
@@ -72,20 +72,6 @@ export default function ResearchForm({ onClose }) {
       </p>
 
       <form onSubmit={handleSubmit}>
-        {/* Research Type */}
-        <div className={styles.field}>
-          <label className={styles.label}>Research Track *</label>
-          <select
-            className={styles.input}
-            name='type'
-            value={form.type}
-            onChange={handleChange}
-          >
-            <option value='exploration'>🧪 Research Exploration Track</option>
-            <option value='publication'>📄 Research Publication Track</option>
-          </select>
-        </div>
-
         <div className={styles.field}>
           <label className={styles.label}>Research Topic *</label>
           <input
