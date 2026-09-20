@@ -320,7 +320,7 @@ export default function TeacherDashboard() {
                 border: "none",
                 background: "none",
                 cursor: "pointer",
-                fontSize: 17,
+                fontSize: 19,
                 fontWeight: 600,
                 color: activeTab === tab.id ? "#00274c" : "#888",
                 borderBottom:

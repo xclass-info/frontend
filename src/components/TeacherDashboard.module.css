@@ -25,14 +25,14 @@
 
 .headerLeft .logo {
   font-family: "Fredoka One", cursive;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   color: #00274c;
   margin-bottom: 4px;
 }
 
 .welcome {
   color: #64748b;
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   font-weight: 600;
 }
 
@@ -47,7 +47,7 @@
   color: #00274c;
   padding: 10px 22px;
   border-radius: 50px;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 800;
   text-decoration: none;
   border: none;
@@ -68,7 +68,7 @@
   border: 2.5px solid #e2e8f0;
   padding: 10px 22px;
   border-radius: 50px;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 800;
   cursor: pointer;
   font-family: "Nunito", sans-serif;
@@ -204,7 +204,7 @@
 }
 
 .cardDesc {
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: #64748b;
   font-weight: 600;
   line-height: 1.6;
