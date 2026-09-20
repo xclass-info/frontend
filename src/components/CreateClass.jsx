@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { auth, db } from "../firebase";
-import { collection, addDoc } from "firebase/firestore";
-import { useNavigate, Link } from "react-router-dom";
+import { collection, addDoc, doc, getDoc, updateDoc } from "firebase/firestore";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import styles from "./TeacherAuth.module.css";
 
 export default function CreateClass() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const editCourseId = location.state?.editCourseId || null;
+  const isEditing = Boolean(editCourseId);
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -19,6 +22,30 @@ export default function CreateClass() {
   const [editingDate, setEditingDate] = useState(null);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [loadingCourse, setLoadingCourse] = useState(isEditing);
+
+  useEffect(() => {
+    if (!editCourseId) return;
+    (async () => {
+      try {
+        const snap = await getDoc(doc(db, "classes", editCourseId));
+        if (snap.exists()) {
+          const data = snap.data();
+          setForm({
+            title: data.title || "",
+            description: data.description || "",
+            maxSeats: data.maxSeats ?? "",
+            price: data.price ?? "",
+          });
+          setLessons(data.lessons || []);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoadingCourse(false);
+      }
+    })();
+  }, [editCourseId]);
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -100,17 +127,27 @@ export default function CreateClass() {
     setLoading(true);
     try {
       const user = auth.currentUser;
-      await addDoc(collection(db, "classes"), {
+      const payload = {
         title: form.title,
         description: form.description,
         lessons,
         maxSeats: Number(form.maxSeats),
         price: Number(form.price), // ← added
-        teacherId: user.uid,
-        enrolledCount: 0,
-        status: "active",
-        createdAt: new Date(),
-      });
+      };
+      if (isEditing) {
+        await updateDoc(doc(db, "classes", editCourseId), {
+          ...payload,
+          updatedAt: new Date(),
+        });
+      } else {
+        await addDoc(collection(db, "classes"), {
+          ...payload,
+          teacherId: user.uid,
+          enrolledCount: 0,
+          status: "active",
+          createdAt: new Date(),
+        });
+      }
       navigate("/teacher/dashboard");
     } catch (err) {
       console.error(err);
@@ -120,14 +157,32 @@ export default function CreateClass() {
     }
   }
 
+  if (loadingCourse) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.card} style={{ maxWidth: 760 }}>
+          <p style={{ textAlign: "center", color: "#aaa", padding: "40px 0" }}>
+            Loading course...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.page}>
       <div className={styles.card} style={{ maxWidth: 760 }}>
         <Link to='/teacher/dashboard' className={styles.back}>
           ← Back to Dashboard
         </Link>
-        <h1 className={styles.title}>📚 Create a Course</h1>
-        <p className={styles.sub}>Fill in the details for your new course</p>
+        <h1 className={styles.title}>
+          {isEditing ? "📚 Edit Course" : "📚 Create a Course"}
+        </h1>
+        <p className={styles.sub}>
+          {isEditing
+            ? "Update your course details"
+            : "Fill in the details for your new course"}
+        </p>
 
         <form onSubmit={handleSubmit} className={styles.form}>
           {/* Title */}
@@ -342,7 +397,13 @@ export default function CreateClass() {
           </div>
 
           <button className={styles.btn} type='submit' disabled={loading}>
-            {loading ? "Creating..." : "Create Course 🚀"}
+            {loading
+              ? isEditing
+                ? "Saving..."
+                : "Creating..."
+              : isEditing
+                ? "Save Changes"
+                : "Create Course 🚀"}
           </button>
         </form>
       </div>

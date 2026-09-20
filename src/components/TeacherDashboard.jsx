@@ -132,6 +132,16 @@ export default function TeacherDashboard() {
     navigate("/teacher/login");
   }
 
+  async function deleteCourse(id) {
+    if (!confirm("Delete this course? This can't be undone.")) return;
+    try {
+      await deleteDoc(doc(db, "classes", id));
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete. Please try again.");
+    }
+  }
+
   async function deleteResearch(id) {
     if (!confirm("Delete this research post? This can't be undone.")) return;
     try {
@@ -492,6 +502,20 @@ export default function TeacherDashboard() {
                         }}
                       >
                         📋 Copy Link
+                      </button>
+                      <Link
+                        to='/teacher/create-class'
+                        state={{ editCourseId: cls.id }}
+                        className={styles.copyBtn}
+                      >
+                        ✏️ Edit
+                      </Link>
+                      <button
+                        className={styles.copyBtn}
+                        onClick={() => deleteCourse(cls.id)}
+                        style={{ color: "#e74c3c" }}
+                      >
+                        🗑️ Delete
                       </button>
                     </div>
                   </div>
