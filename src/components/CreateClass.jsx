@@ -9,12 +9,13 @@ export default function CreateClass() {
   const [form, setForm] = useState({
     title: "",
     description: "",
-    date: "",
+    dates: [],
     startTime: "",
     endTime: "",
     maxSeats: "",
     price: "", // ← added
   });
+  const [newDate, setNewDate] = useState("");
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -23,11 +24,26 @@ export default function CreateClass() {
     setErrors({ ...errors, [e.target.name]: "" });
   }
 
+  function addDate() {
+    if (!newDate) return;
+    if (form.dates.includes(newDate)) {
+      setNewDate("");
+      return;
+    }
+    setForm({ ...form, dates: [...form.dates, newDate].sort() });
+    setErrors({ ...errors, dates: "" });
+    setNewDate("");
+  }
+
+  function removeDate(d) {
+    setForm({ ...form, dates: form.dates.filter((date) => date !== d) });
+  }
+
   function validate() {
     const newErrors = {};
     if (!form.title.trim()) newErrors.title = "Required";
     if (!form.description.trim()) newErrors.description = "Required";
-    if (!form.date) newErrors.date = "Required";
+    if (form.dates.length === 0) newErrors.dates = "Add at least one date";
     if (!form.startTime) newErrors.startTime = "Required";
     if (!form.endTime) newErrors.endTime = "Required";
     else if (form.startTime && form.endTime <= form.startTime)
@@ -55,7 +71,7 @@ export default function CreateClass() {
       await addDoc(collection(db, "classes"), {
         title: form.title,
         description: form.description,
-        date: form.date,
+        dates: form.dates,
         startTime: form.startTime,
         endTime: form.endTime,
         maxSeats: Number(form.maxSeats),
@@ -113,17 +129,78 @@ export default function CreateClass() {
             )}
           </div>
 
-          {/* Date */}
+          {/* Dates */}
           <div className={styles.field}>
-            <label className={styles.label}>Date</label>
-            <input
-              className={`${styles.input} ${errors.date ? styles.inputError : ""}`}
-              name='date'
-              type='date'
-              value={form.date}
-              onChange={handleChange}
-            />
-            {errors.date && <p className={styles.errorMsg}>{errors.date}</p>}
+            <label className={styles.label}>Dates</label>
+            {form.dates.length > 0 && (
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 8,
+                  marginBottom: 10,
+                }}
+              >
+                {form.dates.map((d) => (
+                  <span
+                    key={d}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                      padding: "6px 10px",
+                      borderRadius: 20,
+                      background: "#f0f4ff",
+                      color: "#00274c",
+                      fontSize: 13,
+                      fontWeight: 600,
+                    }}
+                  >
+                    📅 {d}
+                    <button
+                      type='button'
+                      onClick={() => removeDate(d)}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "#e74c3c",
+                        cursor: "pointer",
+                        fontSize: 14,
+                        lineHeight: 1,
+                        padding: 0,
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            <div style={{ display: "flex", gap: 8 }}>
+              <input
+                className={`${styles.input} ${errors.dates ? styles.inputError : ""}`}
+                type='date'
+                value={newDate}
+                onChange={(e) => setNewDate(e.target.value)}
+              />
+              <button
+                type='button'
+                onClick={addDate}
+                style={{
+                  padding: "0 16px",
+                  borderRadius: 8,
+                  border: "none",
+                  background: "#00274c",
+                  color: "white",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                + Add Date
+              </button>
+            </div>
+            {errors.dates && <p className={styles.errorMsg}>{errors.dates}</p>}
           </div>
 
           {/* Start & End Time */}

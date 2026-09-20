@@ -73,7 +73,7 @@ export default function ClassListing() {
         classTitle: cls.title,
         studentName: form.name,
         studentEmail: form.email,
-        date: cls.date,
+        dates: cls.dates,
         startTime: cls.startTime,
         endTime: cls.endTime,
         bookedAt: new Date(),
@@ -157,7 +157,7 @@ export default function ClassListing() {
                   <p className={styles.cardDesc}>{cls.description}</p>
 
                   <div className={styles.meta}>
-                    <span>📅 {cls.date}</span>
+                    <span>📅 {cls.dates?.join(", ")}</span>
                     <span>
                       ⏰ {cls.startTime} – {cls.endTime}
                     </span>
