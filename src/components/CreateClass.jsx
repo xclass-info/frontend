@@ -9,13 +9,13 @@ export default function CreateClass() {
   const [form, setForm] = useState({
     title: "",
     description: "",
-    startTime: "",
-    endTime: "",
     maxSeats: "",
     price: "", // ← added
   });
   const [lessons, setLessons] = useState([]);
   const [newDate, setNewDate] = useState("");
+  const [newStartTime, setNewStartTime] = useState("");
+  const [newEndTime, setNewEndTime] = useState("");
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -25,22 +25,23 @@ export default function CreateClass() {
   }
 
   function addLesson() {
-    if (!newDate) return;
-    if (!form.startTime || !form.endTime) {
+    if (!newDate || !newStartTime || !newEndTime) {
       return setErrors({
         ...errors,
-        lessons: "Set a start and end time before adding a date",
+        lessons: "Set a date, start time, and end time",
+      });
+    }
+    if (newEndTime <= newStartTime) {
+      return setErrors({
+        ...errors,
+        lessons: "End time must be after start time",
       });
     }
     if (lessons.some((l) => l.date === newDate)) {
-      setNewDate("");
+      setErrors({ ...errors, lessons: "That date is already added" });
       return;
     }
-    const lesson = {
-      date: newDate,
-      startTime: form.startTime,
-      endTime: form.endTime,
-    };
+    const lesson = { date: newDate, startTime: newStartTime, endTime: newEndTime };
     setLessons(
       [...lessons, lesson].sort((a, b) => a.date.localeCompare(b.date)),
     );
@@ -56,10 +57,6 @@ export default function CreateClass() {
     const newErrors = {};
     if (!form.title.trim()) newErrors.title = "Required";
     if (!form.description.trim()) newErrors.description = "Required";
-    if (!form.startTime) newErrors.startTime = "Required";
-    if (!form.endTime) newErrors.endTime = "Required";
-    else if (form.startTime && form.endTime <= form.startTime)
-      newErrors.endTime = "Must be after start time";
     if (lessons.length === 0) newErrors.lessons = "Add at least one lesson";
     if (!form.maxSeats) newErrors.maxSeats = "Required";
     else if (isNaN(form.maxSeats) || Number(form.maxSeats) < 1)
@@ -103,7 +100,7 @@ export default function CreateClass() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.card}>
+      <div className={styles.card} style={{ maxWidth: 760 }}>
         <Link to='/teacher/dashboard' className={styles.back}>
           ← Back to Dashboard
         </Link>
@@ -139,40 +136,6 @@ export default function CreateClass() {
               <p className={styles.errorMsg}>{errors.description}</p>
             )}
           </div>
-
-          {/* Start & End Time */}
-          <div className={styles.row}>
-            <div className={styles.field}>
-              <label className={styles.label}>Start Time</label>
-              <input
-                className={`${styles.input} ${errors.startTime ? styles.inputError : ""}`}
-                name='startTime'
-                type='time'
-                value={form.startTime}
-                onChange={handleChange}
-              />
-              {errors.startTime && (
-                <p className={styles.errorMsg}>{errors.startTime}</p>
-              )}
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label}>End Time</label>
-              <input
-                className={`${styles.input} ${errors.endTime ? styles.inputError : ""}`}
-                name='endTime'
-                type='time'
-                value={form.endTime}
-                onChange={handleChange}
-              />
-              {errors.endTime && (
-                <p className={styles.errorMsg}>{errors.endTime}</p>
-              )}
-            </div>
-          </div>
-          <p style={{ fontSize: 12, color: "#aaa", marginTop: -8 }}>
-            This is the default time applied to each new lesson. Change it
-            before adding a date for a lesson that meets at a different time.
-          </p>
 
           {/* Lessons */}
           <div className={styles.field}>
@@ -223,18 +186,50 @@ export default function CreateClass() {
                 ))}
               </div>
             )}
-            <div style={{ display: "flex", gap: 8 }}>
-              <input
-                className={`${styles.input} ${errors.lessons ? styles.inputError : ""}`}
-                type='date'
-                value={newDate}
-                onChange={(e) => setNewDate(e.target.value)}
-              />
+            <div
+              style={{
+                display: "flex",
+                gap: 8,
+                flexWrap: "wrap",
+                alignItems: "flex-end",
+              }}
+            >
+              <div>
+                <label style={{ fontSize: 11, color: "#888" }}>Date</label>
+                <input
+                  className={`${styles.input} ${errors.lessons ? styles.inputError : ""}`}
+                  type='date'
+                  value={newDate}
+                  onChange={(e) => setNewDate(e.target.value)}
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, color: "#888" }}>
+                  Start Time
+                </label>
+                <input
+                  className={`${styles.input} ${errors.lessons ? styles.inputError : ""}`}
+                  type='time'
+                  value={newStartTime}
+                  onChange={(e) => setNewStartTime(e.target.value)}
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, color: "#888" }}>
+                  End Time
+                </label>
+                <input
+                  className={`${styles.input} ${errors.lessons ? styles.inputError : ""}`}
+                  type='time'
+                  value={newEndTime}
+                  onChange={(e) => setNewEndTime(e.target.value)}
+                />
+              </div>
               <button
                 type='button'
                 onClick={addLesson}
                 style={{
-                  padding: "0 16px",
+                  padding: "10px 16px",
                   borderRadius: 8,
                   border: "none",
                   background: "#00274c",
