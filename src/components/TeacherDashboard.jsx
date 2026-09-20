@@ -310,7 +310,6 @@ export default function TeacherDashboard() {
             { id: "classes", label: "📚 Courses" },
             { id: "availability", label: "🗓 Availability" },
             { id: "bookings", label: "📬 Bookings" },
-            { id: "profile", label: "👤 Profile" },
             { id: "research", label: "🔬 Research" },
           ].map((tab) => (
             <button
