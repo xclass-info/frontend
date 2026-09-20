@@ -293,25 +293,6 @@ export default function TeacherDashboard() {
             </button>
           </div>
         </div>
-        {/* Stats */}
-        <div className={styles.stats}>
-          <div className={styles.statCard}>
-            <span className={styles.statNum}>{classes.length}</span>
-            <span className={styles.statLabel}>Total Courses</span>
-          </div>
-          <div className={styles.statCard}>
-            <span className={styles.statNum}>
-              {classes.filter((c) => c.status === "active").length}
-            </span>
-            <span className={styles.statLabel}>Active Courses</span>
-          </div>
-          <div className={styles.statCard}>
-            <span className={styles.statNum}>
-              {classes.reduce((acc, c) => acc + (c.enrolledCount || 0), 0)}
-            </span>
-            <span className={styles.statLabel}>Total Students</span>
-          </div>
-        </div>
         {/* Tabs */}
         <div
           style={{
