@@ -129,6 +129,36 @@ export default function CreateClass() {
             )}
           </div>
 
+          {/* Start & End Time */}
+          <div className={styles.row}>
+            <div className={styles.field}>
+              <label className={styles.label}>Start Time</label>
+              <input
+                className={`${styles.input} ${errors.startTime ? styles.inputError : ""}`}
+                name='startTime'
+                type='time'
+                value={form.startTime}
+                onChange={handleChange}
+              />
+              {errors.startTime && (
+                <p className={styles.errorMsg}>{errors.startTime}</p>
+              )}
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label}>End Time</label>
+              <input
+                className={`${styles.input} ${errors.endTime ? styles.inputError : ""}`}
+                name='endTime'
+                type='time'
+                value={form.endTime}
+                onChange={handleChange}
+              />
+              {errors.endTime && (
+                <p className={styles.errorMsg}>{errors.endTime}</p>
+              )}
+            </div>
+          </div>
+
           {/* Dates */}
           <div className={styles.field}>
             <label className={styles.label}>Dates</label>
@@ -201,36 +231,6 @@ export default function CreateClass() {
               </button>
             </div>
             {errors.dates && <p className={styles.errorMsg}>{errors.dates}</p>}
-          </div>
-
-          {/* Start & End Time */}
-          <div className={styles.row}>
-            <div className={styles.field}>
-              <label className={styles.label}>Start Time</label>
-              <input
-                className={`${styles.input} ${errors.startTime ? styles.inputError : ""}`}
-                name='startTime'
-                type='time'
-                value={form.startTime}
-                onChange={handleChange}
-              />
-              {errors.startTime && (
-                <p className={styles.errorMsg}>{errors.startTime}</p>
-              )}
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label}>End Time</label>
-              <input
-                className={`${styles.input} ${errors.endTime ? styles.inputError : ""}`}
-                name='endTime'
-                type='time'
-                value={form.endTime}
-                onChange={handleChange}
-              />
-              {errors.endTime && (
-                <p className={styles.errorMsg}>{errors.endTime}</p>
-              )}
-            </div>
           </div>
 
           {/* Max Seats */}
