@@ -60,6 +60,7 @@ export default function ResearchForm({ research, onClose }) {
           teacherName: user.displayName || "Teacher",
           createdAt: new Date(),
           status: "published",
+          stage: "active",
         });
       }
       setSaved(true);

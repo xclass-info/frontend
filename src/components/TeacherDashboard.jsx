@@ -142,6 +142,16 @@ export default function TeacherDashboard() {
     }
   }
 
+  async function toggleResearchStage(r) {
+    const nextStage = r.stage === "completed" ? "active" : "completed";
+    try {
+      await updateDoc(doc(db, "research", r.id), { stage: nextStage });
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update status. Please try again.");
+    }
+  }
+
   function handleProfileChange(e) {
     const { name, value } = e.target;
     if (name === "bio") {
@@ -373,6 +383,11 @@ export default function TeacherDashboard() {
                       <div key={r.id} className={styles.card}>
                         <div className={styles.cardTop}>
                           <h3 className={styles.cardTitle}>{r.title}</h3>
+                          <span
+                            className={`${styles.badge} ${r.stage === "completed" ? styles.draft : styles.active}`}
+                          >
+                            {r.stage === "completed" ? "Completed" : "Active"}
+                          </span>
                         </div>
                         <p className={styles.cardDesc}>{r.idea}</p>
                         <div className={styles.cardFooter}>
@@ -384,6 +399,14 @@ export default function TeacherDashboard() {
                             }}
                           >
                             ✏️ Edit
+                          </button>
+                          <button
+                            className={styles.copyBtn}
+                            onClick={() => toggleResearchStage(r)}
+                          >
+                            {r.stage === "completed"
+                              ? "🔄 Mark Active"
+                              : "✅ Mark Completed"}
                           </button>
                           <button
                             className={styles.copyBtn}
