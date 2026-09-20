@@ -16,6 +16,7 @@ export default function CreateClass() {
   const [newDate, setNewDate] = useState("");
   const [newStartTime, setNewStartTime] = useState("");
   const [newEndTime, setNewEndTime] = useState("");
+  const [editingDate, setEditingDate] = useState(null);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -24,7 +25,7 @@ export default function CreateClass() {
     setErrors({ ...errors, [e.target.name]: "" });
   }
 
-  function addLesson() {
+  function saveLesson() {
     if (!newDate || !newStartTime || !newEndTime) {
       return setErrors({
         ...errors,
@@ -37,20 +38,41 @@ export default function CreateClass() {
         lessons: "End time must be after start time",
       });
     }
-    if (lessons.some((l) => l.date === newDate)) {
+    const isDuplicate = lessons.some(
+      (l) => l.date === newDate && l.date !== editingDate,
+    );
+    if (isDuplicate) {
       setErrors({ ...errors, lessons: "That date is already added" });
       return;
     }
     const lesson = { date: newDate, startTime: newStartTime, endTime: newEndTime };
-    setLessons(
-      [...lessons, lesson].sort((a, b) => a.date.localeCompare(b.date)),
-    );
+    const updated = editingDate
+      ? lessons.map((l) => (l.date === editingDate ? lesson : l))
+      : [...lessons, lesson];
+    setLessons(updated.sort((a, b) => a.date.localeCompare(b.date)));
     setErrors({ ...errors, lessons: "" });
     setNewDate("");
+    setEditingDate(null);
+  }
+
+  function editLesson(lesson) {
+    setNewDate(lesson.date);
+    setNewStartTime(lesson.startTime);
+    setNewEndTime(lesson.endTime);
+    setEditingDate(lesson.date);
+    setErrors({ ...errors, lessons: "" });
+  }
+
+  function cancelEdit() {
+    setNewDate("");
+    setNewStartTime("");
+    setNewEndTime("");
+    setEditingDate(null);
   }
 
   function removeLesson(date) {
     setLessons(lessons.filter((l) => l.date !== date));
+    if (editingDate === date) cancelEdit();
   }
 
   function validate() {
@@ -158,7 +180,8 @@ export default function CreateClass() {
                       justifyContent: "space-between",
                       padding: "8px 12px",
                       borderRadius: 8,
-                      background: "#f0f4ff",
+                      background:
+                        editingDate === lesson.date ? "#fff4d6" : "#f0f4ff",
                       color: "#00274c",
                       fontSize: 13,
                       fontWeight: 600,
@@ -167,21 +190,40 @@ export default function CreateClass() {
                     <span>
                       📅 {lesson.date} · {lesson.startTime}–{lesson.endTime}
                     </span>
-                    <button
-                      type='button'
-                      onClick={() => removeLesson(lesson.date)}
-                      style={{
-                        background: "none",
-                        border: "none",
-                        color: "#e74c3c",
-                        cursor: "pointer",
-                        fontSize: 14,
-                        lineHeight: 1,
-                        padding: 0,
-                      }}
-                    >
-                      ✕
-                    </button>
+                    <span style={{ display: "flex", gap: 10 }}>
+                      <button
+                        type='button'
+                        onClick={() => editLesson(lesson)}
+                        title='Edit lesson'
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: "#00274c",
+                          cursor: "pointer",
+                          fontSize: 14,
+                          lineHeight: 1,
+                          padding: 0,
+                        }}
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        type='button'
+                        onClick={() => removeLesson(lesson.date)}
+                        title='Remove lesson'
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: "#e74c3c",
+                          cursor: "pointer",
+                          fontSize: 14,
+                          lineHeight: 1,
+                          padding: 0,
+                        }}
+                      >
+                        ✕
+                      </button>
+                    </span>
                   </div>
                 ))}
               </div>
@@ -227,7 +269,7 @@ export default function CreateClass() {
               </div>
               <button
                 type='button'
-                onClick={addLesson}
+                onClick={saveLesson}
                 style={{
                   padding: "10px 16px",
                   borderRadius: 8,
@@ -239,8 +281,26 @@ export default function CreateClass() {
                   whiteSpace: "nowrap",
                 }}
               >
-                + Add Lesson
+                {editingDate ? "Update Lesson" : "+ Add Lesson"}
               </button>
+              {editingDate && (
+                <button
+                  type='button'
+                  onClick={cancelEdit}
+                  style={{
+                    padding: "10px 16px",
+                    borderRadius: 8,
+                    border: "1px solid #ddd",
+                    background: "white",
+                    color: "#555",
+                    cursor: "pointer",
+                    fontWeight: 600,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Cancel
+                </button>
+              )}
             </div>
             {errors.lessons && (
               <p className={styles.errorMsg}>{errors.lessons}</p>
