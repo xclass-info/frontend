@@ -10,9 +10,9 @@ export default function CreateClass() {
     title: "",
     description: "",
     date: "",
-    time: "",
+    startTime: "",
+    endTime: "",
     maxSeats: "",
-    subject: "",
     price: "", // ← added
   });
   const [errors, setErrors] = useState({});
@@ -28,11 +28,13 @@ export default function CreateClass() {
     if (!form.title.trim()) newErrors.title = "Required";
     if (!form.description.trim()) newErrors.description = "Required";
     if (!form.date) newErrors.date = "Required";
-    if (!form.time) newErrors.time = "Required";
+    if (!form.startTime) newErrors.startTime = "Required";
+    if (!form.endTime) newErrors.endTime = "Required";
+    else if (form.startTime && form.endTime <= form.startTime)
+      newErrors.endTime = "Must be after start time";
     if (!form.maxSeats) newErrors.maxSeats = "Required";
     else if (isNaN(form.maxSeats) || Number(form.maxSeats) < 1)
       newErrors.maxSeats = "Must be at least 1";
-    if (!form.subject) newErrors.subject = "Required";
     if (form.price === "") newErrors.price = "Required";
     else if (isNaN(form.price) || Number(form.price) < 0)
       newErrors.price = "Must be a valid price";
@@ -54,9 +56,9 @@ export default function CreateClass() {
         title: form.title,
         description: form.description,
         date: form.date,
-        time: form.time,
+        startTime: form.startTime,
+        endTime: form.endTime,
         maxSeats: Number(form.maxSeats),
-        subject: form.subject,
         price: Number(form.price), // ← added
         teacherId: user.uid,
         enrolledCount: 0,
@@ -95,30 +97,6 @@ export default function CreateClass() {
             {errors.title && <p className={styles.errorMsg}>{errors.title}</p>}
           </div>
 
-          {/* Subject */}
-          <div className={styles.field}>
-            <label className={styles.label}>Subject</label>
-            <select
-              className={`${styles.input} ${errors.subject ? styles.inputError : ""}`}
-              name='subject'
-              value={form.subject}
-              onChange={handleChange}
-            >
-              <option value=''>Select subject</option>
-              <option value='Python'>Python</option>
-              <option value='AI & Machine Learning'>
-                AI & Machine Learning
-              </option>
-              <option value='Web Development'>Web Development</option>
-              <option value='Self-Driving Cars'>Self-Driving Cars</option>
-              <option value='AP Computer Science'>AP Computer Science</option>
-              <option value='Other'>Other</option>
-            </select>
-            {errors.subject && (
-              <p className={styles.errorMsg}>{errors.subject}</p>
-            )}
-          </div>
-
           {/* Description */}
           <div className={styles.field}>
             <label className={styles.label}>Description</label>
@@ -135,29 +113,46 @@ export default function CreateClass() {
             )}
           </div>
 
-          {/* Date & Time */}
+          {/* Date */}
+          <div className={styles.field}>
+            <label className={styles.label}>Date</label>
+            <input
+              className={`${styles.input} ${errors.date ? styles.inputError : ""}`}
+              name='date'
+              type='date'
+              value={form.date}
+              onChange={handleChange}
+            />
+            {errors.date && <p className={styles.errorMsg}>{errors.date}</p>}
+          </div>
+
+          {/* Start & End Time */}
           <div className={styles.row}>
             <div className={styles.field}>
-              <label className={styles.label}>Date</label>
+              <label className={styles.label}>Start Time</label>
               <input
-                className={`${styles.input} ${errors.date ? styles.inputError : ""}`}
-                name='date'
-                type='date'
-                value={form.date}
+                className={`${styles.input} ${errors.startTime ? styles.inputError : ""}`}
+                name='startTime'
+                type='time'
+                value={form.startTime}
                 onChange={handleChange}
               />
-              {errors.date && <p className={styles.errorMsg}>{errors.date}</p>}
+              {errors.startTime && (
+                <p className={styles.errorMsg}>{errors.startTime}</p>
+              )}
             </div>
             <div className={styles.field}>
-              <label className={styles.label}>Time</label>
+              <label className={styles.label}>End Time</label>
               <input
-                className={`${styles.input} ${errors.time ? styles.inputError : ""}`}
-                name='time'
+                className={`${styles.input} ${errors.endTime ? styles.inputError : ""}`}
+                name='endTime'
                 type='time'
-                value={form.time}
+                value={form.endTime}
                 onChange={handleChange}
               />
-              {errors.time && <p className={styles.errorMsg}>{errors.time}</p>}
+              {errors.endTime && (
+                <p className={styles.errorMsg}>{errors.endTime}</p>
+              )}
             </div>
           </div>
 

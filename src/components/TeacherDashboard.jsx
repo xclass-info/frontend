@@ -319,7 +319,7 @@ export default function TeacherDashboard() {
                     <p className={styles.cardDesc}>{cls.description}</p>
                     <div className={styles.cardMeta}>
                       <span>
-                        📅 {cls.date} at {cls.time}
+                        📅 {cls.date} · {cls.startTime} – {cls.endTime}
                       </span>
                       <span>
                         👥 {cls.enrolledCount || 0} / {cls.maxSeats} seats

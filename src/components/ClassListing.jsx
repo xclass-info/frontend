@@ -74,7 +74,8 @@ export default function ClassListing() {
         studentName: form.name,
         studentEmail: form.email,
         date: cls.date,
-        time: cls.time,
+        startTime: cls.startTime,
+        endTime: cls.endTime,
         bookedAt: new Date(),
         paid: cls.price > 0,
         amount: cls.price || 0,
@@ -143,7 +144,6 @@ export default function ClassListing() {
                 <div key={cls.id} className={styles.card}>
                   {/* Card header */}
                   <div className={styles.cardTop}>
-                    <span className={styles.subject}>{cls.subject}</span>
                     <span
                       className={`${styles.seats} ${isFull ? styles.full : ""}`}
                     >
@@ -158,7 +158,9 @@ export default function ClassListing() {
 
                   <div className={styles.meta}>
                     <span>📅 {cls.date}</span>
-                    <span>⏰ {cls.time}</span>
+                    <span>
+                      ⏰ {cls.startTime} – {cls.endTime}
+                    </span>
                     <span>
                       👥 {cls.enrolledCount || 0} / {cls.maxSeats} enrolled
                     </span>
