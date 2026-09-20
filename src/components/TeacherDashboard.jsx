@@ -285,9 +285,12 @@ export default function TeacherDashboard() {
             </p>
           </div>
           <div className={styles.headerRight}>
-            <Link to='/teacher/create-class' className={styles.createBtn}>
-              + Create Course
-            </Link>
+            <button
+              className={styles.createBtn}
+              onClick={() => setActiveTab("profile")}
+            >
+              Profile
+            </button>
             <button className={styles.logoutBtn} onClick={handleLogout}>
               Logout
             </button>
@@ -427,7 +430,21 @@ export default function TeacherDashboard() {
         {/* ── Classes Tab ── */}
         {activeTab === "classes" && (
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Your Courses</h2>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 16,
+              }}
+            >
+              <h2 className={styles.sectionTitle} style={{ marginBottom: 0 }}>
+                Your Courses
+              </h2>
+              <Link to='/teacher/create-class' className={styles.createBtn}>
+                + Create Course
+              </Link>
+            </div>
             {classes.length === 0 ? (
               <div className={styles.empty}>
                 <p>🎒 No courses yet!</p>
