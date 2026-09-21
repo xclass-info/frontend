@@ -136,7 +136,7 @@ function SeatsRow({ kind, item, onRegister, extra }) {
         marginTop: 10,
       }}
     >
-      <span style={{ fontSize: 13, color: "#555", fontWeight: 600 }}>
+      <span style={{ fontSize: 14, color: "#555", fontWeight: 600 }}>
         👥 {seatsStatus(totalSeats(kind, item), item.enrolledCount)}
         {extra}
       </span>
@@ -144,12 +144,12 @@ function SeatsRow({ kind, item, onRegister, extra }) {
         <button
           onClick={() => onRegister(kind, item)}
           style={{
-            padding: "8px 18px",
-            borderRadius: 8,
+            padding: "12px 30px",
+            borderRadius: 10,
             border: "none",
             background: "#00274c",
             color: "white",
-            fontSize: 13,
+            fontSize: 16,
             fontWeight: 700,
             cursor: "pointer",
           }}
