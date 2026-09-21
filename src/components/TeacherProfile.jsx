@@ -116,6 +116,103 @@ function ExpandableText({ text, style }) {
   );
 }
 
+// Research cards expand in place (like Show more on projects/courses)
+// instead of navigating away.
+function ResearchItem({ r }) {
+  const [open, setOpen] = useState(false);
+  const labelStyle = {
+    margin: "0 0 4px",
+    fontSize: 11,
+    fontWeight: 700,
+    textTransform: "uppercase",
+    letterSpacing: "0.05em",
+  };
+  const bodyStyle = {
+    margin: 0,
+    fontSize: 13,
+    color: "#555",
+    lineHeight: 1.6,
+    whiteSpace: "pre-wrap",
+  };
+  return (
+    <div style={itemStyle}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          gap: 12,
+          marginBottom: 6,
+        }}
+      >
+        <h4 style={{ margin: 0, fontSize: 15, color: "#333" }}>{r.title}</h4>
+        <StatusBadge status={r.stage} />
+      </div>
+      <p
+        style={{
+          ...bodyStyle,
+          color: "#666",
+          ...(open
+            ? {}
+            : {
+                display: "-webkit-box",
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+              }),
+        }}
+      >
+        {r.idea}
+      </p>
+      {open && (
+        <>
+          <div
+            style={{
+              marginTop: 10,
+              padding: "10px 12px",
+              borderRadius: 8,
+              background: "#f0fdf4",
+              borderLeft: "3px solid #27ae60",
+            }}
+          >
+            <p style={{ ...labelStyle, color: "#16a34a" }}>Impact</p>
+            <p style={bodyStyle}>{r.impact}</p>
+          </div>
+          {r.details && (
+            <div
+              style={{
+                marginTop: 10,
+                padding: "10px 12px",
+                borderRadius: 8,
+                background: "white",
+                border: "1px solid #eee",
+              }}
+            >
+              <p style={{ ...labelStyle, color: "#aaa" }}>Additional details</p>
+              <p style={bodyStyle}>{r.details}</p>
+            </div>
+          )}
+        </>
+      )}
+      <button
+        onClick={() => setOpen(!open)}
+        style={{
+          background: "none",
+          border: "none",
+          color: "#00274c",
+          cursor: "pointer",
+          fontSize: 12,
+          fontWeight: 600,
+          padding: 0,
+          marginTop: 8,
+        }}
+      >
+        {open ? "Show less" : "Show more"}
+      </button>
+    </div>
+  );
+}
+
 const newestFirst = (a, b) =>
   (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
 
@@ -567,45 +664,7 @@ export default function TeacherProfile() {
             <h3 style={sectionTitle}>🔬 Research</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {research.map((r) => (
-                <div
-                  key={r.id}
-                  onClick={() => navigate(`/research/${r.id}`)}
-                  style={{ ...itemStyle, cursor: "pointer" }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "flex-start",
-                      gap: 12,
-                      marginBottom: 6,
-                    }}
-                  >
-                    <h4 style={{ margin: 0, fontSize: 15, color: "#333" }}>
-                      {r.title}
-                    </h4>
-                    <StatusBadge status={r.stage} />
-                  </div>
-                  <p
-                    style={{
-                      margin: "0 0 8px",
-                      fontSize: 13,
-                      color: "#666",
-                      lineHeight: 1.6,
-                      display: "-webkit-box",
-                      WebkitLineClamp: 3,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                    }}
-                  >
-                    {r.idea}
-                  </p>
-                  <span
-                    style={{ fontSize: 12, color: "#00274c", fontWeight: 600 }}
-                  >
-                    Read more →
-                  </span>
-                </div>
+                <ResearchItem key={r.id} r={r} />
               ))}
             </div>
           </div>
