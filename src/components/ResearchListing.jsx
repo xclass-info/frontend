@@ -10,7 +10,7 @@ import {
 } from "firebase/firestore";
 import Navbar from "./Navbar";
 import { SkeletonClassCard } from "./Skeleton";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import Footer from "./Footer";
 
 function formatMentorName(name) {
@@ -64,6 +64,22 @@ export default function ResearchListing() {
     return r.teacherName && r.teacherName !== "Teacher"
       ? r.teacherName
       : "Mentor";
+  }
+
+  // Link to the mentor's profile page when we can resolve them; plain text
+  // otherwise (e.g. a post whose author no longer has a profile).
+  function mentorLabel(r) {
+    const name = mentorName(r);
+    if (!teachers[r.teacherId]) return name;
+    return (
+      <Link
+        to={`/teacher/${r.teacherId}`}
+        onClick={(e) => e.stopPropagation()}
+        style={{ color: "#00274c", textDecoration: "underline" }}
+      >
+        {name}
+      </Link>
+    );
   }
 
   const filtered =
@@ -226,7 +242,7 @@ export default function ResearchListing() {
                   }}
                 >
                   <span style={{ fontSize: 12, color: "#888" }}>
-                    👩‍🏫 Mentored by: {mentorName(r)}
+                    👩‍🏫 Mentored by: {mentorLabel(r)}
                   </span>
                   <span
                     style={{ fontSize: 12, color: "#00274c", fontWeight: 600 }}
@@ -403,7 +419,7 @@ export default function ResearchListing() {
                 paddingTop: 16,
               }}
             >
-              👩‍🏫 Mentored by: {mentorName(selected)}
+              👩‍🏫 Mentored by: {mentorLabel(selected)}
             </div>
           </div>
         </div>
