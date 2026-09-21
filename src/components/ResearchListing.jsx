@@ -226,7 +226,7 @@ export default function ResearchListing() {
                   }}
                 >
                   <span style={{ fontSize: 12, color: "#888" }}>
-                    👩‍🏫 {mentorName(r)}
+                    👩‍🏫 Mentored by: {mentorName(r)}
                   </span>
                   <span
                     style={{ fontSize: 12, color: "#00274c", fontWeight: 600 }}
@@ -403,7 +403,7 @@ export default function ResearchListing() {
                 paddingTop: 16,
               }}
             >
-              👩‍🏫 Posted by {mentorName(selected)}
+              👩‍🏫 Mentored by: {mentorName(selected)}
             </div>
           </div>
         </div>
