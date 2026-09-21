@@ -96,7 +96,7 @@ export default function ResearchForm({ research, onClose }) {
         </button>
       )}
       <h3 style={{ marginBottom: 4 }}>
-        {isEditing ? "🔬 Edit Research" : "🔬 Post Research"}
+        {isEditing ? "🔬 Edit Research" : "🔬 Create Research"}
       </h3>
       <p style={{ color: "#888", fontSize: 14, marginBottom: 24 }}>
         {isEditing
@@ -175,7 +175,7 @@ export default function ResearchForm({ research, onClose }) {
                   : "Posted! ✓"
                 : isEditing
                   ? "Save Changes"
-                  : "Post Research 🔬"}
+                  : "Create Research 🔬"}
           </button>
           {isEditing && onClose && (
             <button
