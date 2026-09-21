@@ -4,6 +4,21 @@ import { db, auth } from "../firebase";
 import { collection, addDoc, doc, updateDoc } from "firebase/firestore";
 import styles from "./TeacherAuth.module.css";
 
+const WORD_LIMITS = { title: 100, description: 500, learning: 300 };
+
+function countWords(str) {
+  const trimmed = str.trim();
+  return trimmed ? trimmed.split(/\s+/).length : 0;
+}
+
+function WordCount({ count, limit }) {
+  return (
+    <span style={{ fontSize: 12, color: count >= limit ? "#e74c3c" : "#aaa" }}>
+      {count} / {limit} words
+    </span>
+  );
+}
+
 export default function ProjectForm({ project, onClose }) {
   const isEditing = Boolean(project);
   const [form, setForm] = useState({
@@ -16,8 +31,11 @@ export default function ProjectForm({ project, onClose }) {
   const [errors, setErrors] = useState({});
 
   function handleChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" });
+    const { name, value } = e.target;
+    const limit = WORD_LIMITS[name];
+    if (limit && countWords(value) > limit) return;
+    setForm({ ...form, [name]: value });
+    setErrors({ ...errors, [name]: "" });
   }
 
   function validate() {
@@ -101,7 +119,19 @@ export default function ProjectForm({ project, onClose }) {
 
       <form onSubmit={handleSubmit}>
         <div className={styles.field}>
-          <label className={styles.label}>Project Title *</label>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <label className={styles.label}>Project Title *</label>
+            <WordCount
+              count={countWords(form.title)}
+              limit={WORD_LIMITS.title}
+            />
+          </div>
           <input
             className={`${styles.input} ${errors.title ? styles.inputError : ""}`}
             name='title'
@@ -114,7 +144,19 @@ export default function ProjectForm({ project, onClose }) {
         </div>
 
         <div className={styles.field}>
-          <label className={styles.label}>Project Description *</label>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <label className={styles.label}>Project Description *</label>
+            <WordCount
+              count={countWords(form.description)}
+              limit={WORD_LIMITS.description}
+            />
+          </div>
           <textarea
             className={`${styles.input} ${styles.textarea} ${errors.description ? styles.inputError : ""}`}
             name='description'
@@ -130,7 +172,19 @@ export default function ProjectForm({ project, onClose }) {
         </div>
 
         <div className={styles.field}>
-          <label className={styles.label}>What Students Will Learn *</label>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <label className={styles.label}>What Students Will Learn *</label>
+            <WordCount
+              count={countWords(form.learning)}
+              limit={WORD_LIMITS.learning}
+            />
+          </div>
           <textarea
             className={`${styles.input} ${styles.textarea} ${errors.learning ? styles.inputError : ""}`}
             name='learning'
@@ -155,11 +209,11 @@ export default function ProjectForm({ project, onClose }) {
             {loading
               ? isEditing
                 ? "Saving..."
-                : "Posting..."
+                : "Creating..."
               : saved
                 ? isEditing
                   ? "Saved! ✓"
-                  : "Posted! ✓"
+                  : "Created! ✓"
                 : isEditing
                   ? "Save Changes"
                   : "Create Project 💡"}
