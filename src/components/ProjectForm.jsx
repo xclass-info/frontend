@@ -31,6 +31,7 @@ export default function ProjectForm({ project, onClose }) {
     title: project?.title || "",
     description: project?.description || "",
     learning: project?.learning || "",
+    seats: project?.seats ?? "",
   });
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -49,6 +50,9 @@ export default function ProjectForm({ project, onClose }) {
     if (!form.title.trim()) newErrors.title = "Required";
     if (!form.description.trim()) newErrors.description = "Required";
     if (!form.learning.trim()) newErrors.learning = "Required";
+    if (form.seats === "") newErrors.seats = "Required";
+    else if (!Number.isInteger(Number(form.seats)) || Number(form.seats) < 1)
+      newErrors.seats = "Must be a whole number, at least 1";
     return newErrors;
   }
 
@@ -68,6 +72,7 @@ export default function ProjectForm({ project, onClose }) {
         title: form.title.trim(),
         description: form.description.trim(),
         learning: form.learning.trim(),
+        seats: Number(form.seats),
       };
       if (isEditing) {
         await updateDoc(doc(db, "projects", project.id), {
@@ -204,6 +209,22 @@ export default function ProjectForm({ project, onClose }) {
           {errors.learning && (
             <p className={styles.errorMsg}>{errors.learning}</p>
           )}
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label}>Seats *</label>
+          <input
+            className={`${styles.input} ${errors.seats ? styles.inputError : ""}`}
+            name='seats'
+            type='number'
+            min='1'
+            max='50'
+            value={form.seats}
+            onChange={handleChange}
+            placeholder='e.g. 2'
+            style={{ fontSize: "1.1rem" }}
+          />
+          {errors.seats && <p className={styles.errorMsg}>{errors.seats}</p>}
         </div>
 
         <div style={{ display: "flex", gap: 12 }}>

@@ -514,6 +514,11 @@ export default function TeacherDashboard() {
                           </span>
                         </div>
                         <p className={styles.cardDesc}>{p.description}</p>
+                        {p.seats ? (
+                          <div className={styles.cardMeta}>
+                            <span>👥 {seatsLabel(p.seats)}</span>
+                          </div>
+                        ) : null}
                         <div className={styles.cardFooter}>
                           <button
                             className={styles.joinBtn}

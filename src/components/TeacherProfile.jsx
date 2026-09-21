@@ -714,6 +714,18 @@ export default function TeacherProfile() {
                       }}
                     />
                   )}
+                  {project.seats ? (
+                    <p
+                      style={{
+                        margin: "8px 0 0",
+                        fontSize: 12,
+                        color: "#555",
+                        fontWeight: 600,
+                      }}
+                    >
+                      👥 {seatsLabel(project.seats)}
+                    </p>
+                  ) : null}
                   {project.learning && (
                     <div
                       style={{
