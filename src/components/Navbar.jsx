@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./Navbar.module.css";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { auth, db } from "../firebase";
+import { signOut } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 
 // Replace with this:
 export default function Navbar() {
@@ -8,6 +11,31 @@ export default function Navbar() {
   const [researchOpen, setResearchOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const [student, setStudent] = useState(null);
+
+  // Mentors are logged-in users too, so a student is someone with a
+  // students record.
+  useEffect(() => {
+    const unsub = auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        setStudent(null);
+        return;
+      }
+      try {
+        const snap = await getDoc(doc(db, "students", user.uid));
+        setStudent(snap.exists() ? { name: snap.data().name } : null);
+      } catch {
+        setStudent(null);
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  async function handleStudentLogout() {
+    await signOut(auth);
+    setStudent(null);
+    navigate("/");
+  }
 
   function scrollTo(id) {
     if (location.pathname !== "/") {
@@ -73,9 +101,29 @@ export default function Navbar() {
 
       {/* Desktop right side buttons */}
       <div className={styles.navRight}>
-        <Link to='/teacher/login' className={styles.teacherBtn}>
-          Mentor Login
-        </Link>
+        {student ? (
+          <>
+            <Link to='/student/registrations' className={styles.teacherBtn}>
+              My Registrations
+            </Link>
+            <button
+              className={styles.teacherBtn}
+              onClick={handleStudentLogout}
+              style={{ cursor: "pointer" }}
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <Link to='/student/login' className={styles.teacherBtn}>
+              Student Login
+            </Link>
+            <Link to='/teacher/login' className={styles.teacherBtn}>
+              Mentor Login
+            </Link>
+          </>
+        )}
         {/* <Link to='/register' className={styles.cta}>
           Student Login →
         </Link> */}
@@ -116,9 +164,27 @@ export default function Navbar() {
           <li>
             <Link to='/contact'>Contact</Link>
           </li>
-          <li>
-            <Link to='/teacher/login'>Mentor Login</Link>
-          </li>
+          {student ? (
+            <>
+              <li>
+                <Link to='/student/registrations'>My Registrations</Link>
+              </li>
+              <li>
+                <a onClick={handleStudentLogout} style={{ cursor: "pointer" }}>
+                  Logout
+                </a>
+              </li>
+            </>
+          ) : (
+            <>
+              <li>
+                <Link to='/student/login'>Student Login</Link>
+              </li>
+              <li>
+                <Link to='/teacher/login'>Mentor Login</Link>
+              </li>
+            </>
+          )}
           {/* <li>
             <Link to='/register'>Student Login →</Link>
           </li> */}

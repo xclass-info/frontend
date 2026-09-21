@@ -51,6 +51,7 @@ export async function registerForItem(kind, itemId, { name, email }) {
       teacherId: item.teacherId,
       studentName: name.trim(),
       studentEmail: email.trim(),
+      studentEmailLower: email.trim().toLowerCase(),
       createdAt: new Date(),
     });
   });

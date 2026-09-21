@@ -22,6 +22,9 @@ import AdminDashboard from "./components/AdminDashboard";
 import TeacherProfile from "./components/TeacherProfile";
 import ResearchListing from "./components/ResearchListing";
 import ResearchDetail from "./components/ResearchDetail";
+import StudentLogin from "./components/StudentLogin";
+import StudentRegister from "./components/StudentRegister";
+import StudentRegistrations from "./components/StudentRegistrations";
 import ResearchSection from "./components/ResearchSection";
 
 import { seedResearch } from "./components/seedResearch";
@@ -130,6 +133,12 @@ export default function App() {
       <Routes>
         <Route path='/' element={<HomePage />} />
         <Route path='/tutors' element={<Tutors standalone={true} />} />
+        <Route path='/student/login' element={<StudentLogin />} />
+        <Route path='/student/register' element={<StudentRegister />} />
+        <Route
+          path='/student/registrations'
+          element={<StudentRegistrations />}
+        />
         <Route path='/teacher/register' element={<TeacherRegister />} />
         <Route path='/teacher/login' element={<TeacherLogin />} />
         <Route path='/teacher/dashboard' element={<TeacherDashboard />} />

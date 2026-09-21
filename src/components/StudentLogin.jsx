@@ -1,0 +1,239 @@
+import { useState } from "react";
+import { auth, db } from "../firebase";
+import {
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  sendEmailVerification,
+  signOut,
+} from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { useNavigate, Link } from "react-router-dom";
+import styles from "./TeacherAuth.module.css";
+import Footer from "./Footer";
+
+const CONTINUE_URL = "https://happyresearch.org/#/student/login";
+
+export default function StudentLogin() {
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSent, setResendSent] = useState(false);
+  const [showResend, setShowResend] = useState(false);
+
+  function handleChange(e) {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setError("");
+    setShowResend(false);
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const { user } = await signInWithEmailAndPassword(
+        auth,
+        form.email,
+        form.password,
+      );
+
+      if (!user.emailVerified) {
+        await signOut(auth);
+        setError(
+          "Please verify your email before logging in. Check your inbox (and spam folder) for the verification link.",
+        );
+        setShowResend(true);
+        return;
+      }
+
+      // Mentors have accounts too - only student accounts belong here.
+      const student = await getDoc(doc(db, "students", user.uid));
+      if (!student.exists()) {
+        await signOut(auth);
+        setError(
+          "No student account found for this email. If you're a mentor, use Mentor Login.",
+        );
+        return;
+      }
+
+      navigate("/student/registrations");
+    } catch (err) {
+      if (
+        err.code === "auth/invalid-credential" ||
+        err.code === "auth/wrong-password" ||
+        err.code === "auth/user-not-found"
+      ) {
+        setError("Invalid email or password.");
+      } else if (err.code === "auth/too-many-requests") {
+        setError("Too many failed attempts. Please try again later.");
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleForgotPassword() {
+    if (!form.email.trim()) {
+      setError("Please enter your email address first");
+      return;
+    }
+    setResetLoading(true);
+    try {
+      await sendPasswordResetEmail(auth, form.email, {
+        url: CONTINUE_URL,
+        handleCodeInApp: false,
+      });
+      setResetSent(true);
+      setError("");
+    } catch (err) {
+      console.error("Reset error:", err.code, err.message);
+      setError("Could not send reset email. Please check your email address.");
+    } finally {
+      setResetLoading(false);
+    }
+  }
+
+  async function handleResendVerification() {
+    if (!form.email || !form.password) {
+      setError("Please enter your email and password first.");
+      return;
+    }
+    setResendLoading(true);
+    try {
+      const { user } = await signInWithEmailAndPassword(
+        auth,
+        form.email,
+        form.password,
+      );
+      await sendEmailVerification(user, {
+        url: CONTINUE_URL,
+        handleCodeInApp: false,
+      });
+      await signOut(auth);
+      setResendSent(true);
+      setError("");
+    } catch {
+      setError(
+        "Could not resend verification email. Please check your credentials.",
+      );
+    } finally {
+      setResendLoading(false);
+    }
+  }
+
+  const notice = {
+    color: "#27ae60",
+    fontSize: 14,
+    marginBottom: 12,
+    textAlign: "center",
+  };
+
+  return (
+    <>
+      <div className={styles.page}>
+        <div className={styles.card}>
+          <button className={styles.closeBtn} onClick={() => navigate("/")}>
+            ✕
+          </button>
+          <h1 className={styles.title}>🎓 Student Login</h1>
+          <p className={styles.sub}>Welcome back to HappyResearch</p>
+
+          {error && <p className={styles.error}>{error}</p>}
+
+          {showResend && !resendSent && (
+            <button
+              type='button'
+              onClick={handleResendVerification}
+              disabled={resendLoading}
+              style={{
+                width: "100%",
+                padding: "10px",
+                borderRadius: 8,
+                border: "1px solid #00274c",
+                background: "transparent",
+                color: "#00274c",
+                cursor: "pointer",
+                fontSize: 13,
+                fontWeight: 600,
+                marginBottom: 12,
+              }}
+            >
+              {resendLoading ? "Sending..." : "📧 Resend Verification Email"}
+            </button>
+          )}
+          {resendSent && (
+            <p style={notice}>
+              ✅ Verification email sent! Check your inbox and spam folder.
+            </p>
+          )}
+          {resetSent && (
+            <p style={notice}>
+              ✅ Password reset email sent! Check your inbox and spam folder.
+            </p>
+          )}
+
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.field}>
+              <label className={styles.label}>Email</label>
+              <input
+                className={styles.input}
+                name='email'
+                type='email'
+                value={form.email}
+                onChange={handleChange}
+                placeholder='you@email.com'
+                required
+              />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label}>Password</label>
+              <input
+                className={styles.input}
+                name='password'
+                type='password'
+                value={form.password}
+                onChange={handleChange}
+                placeholder='••••••••'
+                required
+              />
+            </div>
+
+            <div style={{ textAlign: "right", marginBottom: 12 }}>
+              <button
+                type='button'
+                onClick={handleForgotPassword}
+                disabled={resetLoading}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "#00274c",
+                  cursor: "pointer",
+                  fontSize: 13,
+                }}
+              >
+                {resetLoading ? "Sending..." : "Forgot password?"}
+              </button>
+            </div>
+
+            <button className={styles.btn} type='submit' disabled={loading}>
+              {loading ? "Logging in..." : "Login →"}
+            </button>
+          </form>
+
+          <p className={styles.switch}>
+            New here? <Link to='/student/register'>Create a student account</Link>
+          </p>
+          <p className={styles.switch}>
+            Are you a mentor? <Link to='/teacher/login'>Mentor Login</Link>
+          </p>
+        </div>
+      </div>
+      <Footer />
+    </>
+  );
+}
