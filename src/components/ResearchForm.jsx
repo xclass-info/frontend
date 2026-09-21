@@ -129,7 +129,10 @@ export default function ResearchForm({ research, onClose }) {
           : "Share your research with the community."}
       </p>
 
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: "flex", flexDirection: "column", gap: 28 }}
+      >
         <div className={styles.field}>
           <div
             style={{
