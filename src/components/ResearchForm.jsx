@@ -1,7 +1,13 @@
 // src/components/ResearchForm.jsx
 import { useState } from "react";
 import { db, auth } from "../firebase";
-import { collection, addDoc, doc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  doc,
+  getDoc,
+  updateDoc,
+} from "firebase/firestore";
 import styles from "./TeacherAuth.module.css";
 
 const WORD_LIMITS = { title: 100, idea: 500, impact: 300, details: 300 };
@@ -59,6 +65,7 @@ export default function ResearchForm({ research, onClose }) {
     setLoading(true);
     try {
       const user = auth.currentUser;
+      const teacherSnap = await getDoc(doc(db, "teachers", user.uid));
       const payload = {
         title: form.title.trim(),
         idea: form.idea.trim(),
@@ -75,7 +82,7 @@ export default function ResearchForm({ research, onClose }) {
         await addDoc(collection(db, "research"), {
           ...payload,
           teacherId: user.uid,
-          teacherName: user.displayName || "Teacher",
+          teacherName: teacherSnap.data()?.name || user.displayName || "Teacher",
           createdAt: new Date(),
           status: "published",
           stage: "active",

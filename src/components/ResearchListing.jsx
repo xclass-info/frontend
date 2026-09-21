@@ -1,15 +1,27 @@
 // src/components/ResearchListing.jsx
 import { useEffect, useState } from "react";
 import { db } from "../firebase";
-import { collection, query, where, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  getDocs,
+} from "firebase/firestore";
 import Navbar from "./Navbar";
 import { SkeletonClassCard } from "./Skeleton";
 import { useLocation } from "react-router-dom";
 import Footer from "./Footer";
 
+function formatMentorName(name) {
+  if (name.startsWith("Prof.")) return name.split(" ").slice(0, 2).join(" ");
+  return `Dr. ${name.split(" ").pop()}`;
+}
+
 export default function ResearchListing() {
   const location = useLocation();
   const [research, setResearch] = useState([]);
+  const [teachers, setTeachers] = useState({});
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const [filter, setFilter] = useState("all");
@@ -31,6 +43,28 @@ export default function ResearchListing() {
     });
     return () => unsub();
   }, []);
+
+  useEffect(() => {
+    getDocs(collection(db, "teachers"))
+      .then((snap) => {
+        const map = {};
+        snap.docs.forEach((d) => {
+          map[d.id] = d.data().name;
+        });
+        setTeachers(map);
+      })
+      .catch((err) => console.error(err));
+  }, []);
+
+  // Mentor's live name from their profile; the name saved on the post is
+  // only a fallback (older posts stored the literal string "Teacher").
+  function mentorName(r) {
+    const liveName = teachers[r.teacherId];
+    if (liveName) return formatMentorName(liveName);
+    return r.teacherName && r.teacherName !== "Teacher"
+      ? r.teacherName
+      : "Mentor";
+  }
 
   const filtered =
     filter === "all" ? research : research.filter((r) => r.type === filter);
@@ -192,7 +226,7 @@ export default function ResearchListing() {
                   }}
                 >
                   <span style={{ fontSize: 12, color: "#888" }}>
-                    👩‍🏫 {r.teacherName}
+                    👩‍🏫 {mentorName(r)}
                   </span>
                   <span
                     style={{ fontSize: 12, color: "#00274c", fontWeight: 600 }}
@@ -369,7 +403,7 @@ export default function ResearchListing() {
                 paddingTop: 16,
               }}
             >
-              👩‍🏫 Posted by {selected.teacherName}
+              👩‍🏫 Posted by {mentorName(selected)}
             </div>
           </div>
         </div>

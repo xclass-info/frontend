@@ -1,7 +1,13 @@
 // src/components/ProjectForm.jsx
 import { useState } from "react";
 import { db, auth } from "../firebase";
-import { collection, addDoc, doc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  doc,
+  getDoc,
+  updateDoc,
+} from "firebase/firestore";
 import styles from "./TeacherAuth.module.css";
 
 const WORD_LIMITS = { title: 100, description: 500, learning: 300 };
@@ -57,6 +63,7 @@ export default function ProjectForm({ project, onClose }) {
     setLoading(true);
     try {
       const user = auth.currentUser;
+      const teacherSnap = await getDoc(doc(db, "teachers", user.uid));
       const payload = {
         title: form.title.trim(),
         description: form.description.trim(),
@@ -71,7 +78,7 @@ export default function ProjectForm({ project, onClose }) {
         await addDoc(collection(db, "projects"), {
           ...payload,
           teacherId: user.uid,
-          teacherName: user.displayName || "Teacher",
+          teacherName: teacherSnap.data()?.name || user.displayName || "Teacher",
           createdAt: new Date(),
           stage: "active",
         });
