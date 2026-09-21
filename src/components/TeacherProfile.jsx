@@ -8,9 +8,116 @@ import {
   collection,
   getDocs,
   addDoc,
+  query,
+  where,
 } from "firebase/firestore";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import { lessonWeekday, safeUrl } from "../utils/format";
+
+const cardStyle = {
+  background: "white",
+  borderRadius: 16,
+  padding: 24,
+  boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
+  marginBottom: 24,
+};
+const sectionTitle = { margin: "0 0 16px", fontSize: 16, color: "#333" };
+const itemStyle = {
+  padding: 16,
+  borderRadius: 10,
+  background: "#f9fafb",
+  border: "1px solid #eee",
+};
+
+const BADGES = {
+  registration: {
+    label: "Registration",
+    color: "#92400e",
+    bg: "rgba(217,119,6,0.08)",
+    border: "rgba(217,119,6,0.3)",
+  },
+  active: {
+    label: "Active",
+    color: "#166534",
+    bg: "rgba(22,101,52,0.08)",
+    border: "rgba(22,101,52,0.3)",
+  },
+  completed: {
+    label: "Completed",
+    color: "#1e40af",
+    bg: "rgba(37,99,235,0.08)",
+    border: "rgba(37,99,235,0.3)",
+  },
+};
+
+function StatusBadge({ status }) {
+  const b = BADGES[status] || BADGES.active;
+  return (
+    <span
+      style={{
+        fontSize: 11,
+        fontWeight: 800,
+        textTransform: "uppercase",
+        padding: "3px 10px",
+        borderRadius: 50,
+        border: `2px solid ${b.border}`,
+        color: b.color,
+        background: b.bg,
+        whiteSpace: "nowrap",
+      }}
+    >
+      {b.label}
+    </span>
+  );
+}
+
+// Long descriptions are clamped with a Show more toggle so one course or
+// project doesn't push everything else off the page.
+function ExpandableText({ text, style }) {
+  const [open, setOpen] = useState(false);
+  const isLong = text.length > 280;
+  return (
+    <>
+      <p
+        style={{
+          ...style,
+          whiteSpace: "pre-wrap",
+          ...(isLong && !open
+            ? {
+                display: "-webkit-box",
+                WebkitLineClamp: 4,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+              }
+            : {}),
+        }}
+      >
+        {text}
+      </p>
+      {isLong && (
+        <button
+          onClick={() => setOpen(!open)}
+          style={{
+            background: "none",
+            border: "none",
+            color: "#00274c",
+            cursor: "pointer",
+            fontSize: 12,
+            fontWeight: 600,
+            padding: 0,
+            marginTop: 4,
+          }}
+        >
+          {open ? "Show less" : "Show more"}
+        </button>
+      )}
+    </>
+  );
+}
+
+const newestFirst = (a, b) =>
+  (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
 
 export default function TeacherProfile() {
   const { teacherId } = useParams();
@@ -24,6 +131,9 @@ export default function TeacherProfile() {
   const [submitting, setSubmitting] = useState(false);
   const [booked, setBooked] = useState(false);
   const [showBooking, setShowBooking] = useState(false);
+  const [research, setResearch] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [currentUserId, setCurrentUserId] = useState(null);
   const isOwnProfile = currentUserId === teacherId;
 
@@ -57,6 +167,30 @@ export default function TeacherProfile() {
       setSlots(available);
     }
     fetchSlots();
+  }, [teacherId]);
+
+  // Same content the mentor sees in their dashboard, read-only. Bookings are
+  // intentionally not loaded - they contain students' names and emails.
+  useEffect(() => {
+    async function loadPortfolio() {
+      const byTeacher = (name) =>
+        getDocs(query(collection(db, name), where("teacherId", "==", teacherId)));
+      const toList = (snap) =>
+        snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort(newestFirst);
+      try {
+        const [r, p, c] = await Promise.all([
+          byTeacher("research"),
+          byTeacher("projects"),
+          byTeacher("classes"),
+        ]);
+        setResearch(toList(r).filter((x) => x.status === "published"));
+        setProjects(toList(p));
+        setCourses(toList(c));
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    loadPortfolio();
   }, [teacherId]);
 
   function validate() {
@@ -405,6 +539,27 @@ export default function TeacherProfile() {
                   </p>
                 </div>
               )}
+              {teacher.website && (
+                <div>
+                  <p style={{ fontSize: 12, color: "#aaa", margin: "0 0 2px" }}>
+                    Website / LinkedIn
+                  </p>
+                  {safeUrl(teacher.website) ? (
+                    <a
+                      href={safeUrl(teacher.website)}
+                      target='_blank'
+                      rel='noreferrer'
+                      style={{ fontSize: 14, color: "#00274c" }}
+                    >
+                      {teacher.website}
+                    </a>
+                  ) : (
+                    <p style={{ fontSize: 14, color: "#333", margin: 0 }}>
+                      {teacher.website}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -435,20 +590,60 @@ export default function TeacherProfile() {
           )}
         </div>
 
-        {/* Project Ideas */}
-        {teacher.projects && teacher.projects.length > 0 && (
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              padding: 24,
-              boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
-              marginBottom: 24,
-            }}
-          >
-            <h3 style={{ margin: "0 0 16px", fontSize: 16, color: "#333" }}>
-              💡 Project Ideas
-            </h3>
+        {/* Research */}
+        {research.length > 0 && (
+          <div style={cardStyle}>
+            <h3 style={sectionTitle}>🔬 Research</h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {research.map((r) => (
+                <div
+                  key={r.id}
+                  onClick={() => navigate(`/research/${r.id}`)}
+                  style={{ ...itemStyle, cursor: "pointer" }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                      gap: 12,
+                      marginBottom: 6,
+                    }}
+                  >
+                    <h4 style={{ margin: 0, fontSize: 15, color: "#333" }}>
+                      {r.title}
+                    </h4>
+                    <StatusBadge status={r.stage} />
+                  </div>
+                  <p
+                    style={{
+                      margin: "0 0 8px",
+                      fontSize: 13,
+                      color: "#666",
+                      lineHeight: 1.6,
+                      display: "-webkit-box",
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {r.idea}
+                  </p>
+                  <span
+                    style={{ fontSize: 12, color: "#00274c", fontWeight: 600 }}
+                  >
+                    Read more →
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Projects (new collection first, then the older per-profile list) */}
+        {[...projects, ...(teacher.projects || [])].length > 0 && (
+          <div style={cardStyle}>
+            <h3 style={sectionTitle}>💡 Projects</h3>
             <div
               style={{
                 display: "flex",
@@ -457,32 +652,65 @@ export default function TeacherProfile() {
                 marginBottom: 12,
               }}
             >
-              {teacher.projects.map((project) => (
-                <div
-                  key={project.id}
-                  style={{
-                    padding: 16,
-                    borderRadius: 10,
-                    background: "#f9fafb",
-                    border: "1px solid #eee",
-                  }}
-                >
-                  <h4
-                    style={{ margin: "0 0 6px", fontSize: 14, color: "#333" }}
+              {[...projects, ...(teacher.projects || [])].map((project) => (
+                <div key={project.id} style={itemStyle}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                      gap: 12,
+                      marginBottom: 6,
+                    }}
                   >
-                    {project.title}
-                  </h4>
+                    <h4 style={{ margin: 0, fontSize: 15, color: "#333" }}>
+                      {project.title}
+                    </h4>
+                    {project.stage && <StatusBadge status={project.stage} />}
+                  </div>
                   {project.description && (
-                    <p
+                    <ExpandableText
+                      text={project.description}
                       style={{
                         margin: 0,
                         fontSize: 13,
                         color: "#666",
-                        lineHeight: 1.5,
+                        lineHeight: 1.6,
+                      }}
+                    />
+                  )}
+                  {project.learning && (
+                    <div
+                      style={{
+                        marginTop: 10,
+                        padding: "10px 12px",
+                        borderRadius: 8,
+                        background: "#f0fdf4",
+                        borderLeft: "3px solid #27ae60",
                       }}
                     >
-                      {project.description}
-                    </p>
+                      <p
+                        style={{
+                          margin: "0 0 4px",
+                          fontSize: 11,
+                          fontWeight: 700,
+                          color: "#16a34a",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.05em",
+                        }}
+                      >
+                        What students will learn
+                      </p>
+                      <ExpandableText
+                        text={project.learning}
+                        style={{
+                          margin: 0,
+                          fontSize: 13,
+                          color: "#555",
+                          lineHeight: 1.6,
+                        }}
+                      />
+                    </div>
                   )}
                 </div>
               ))}
@@ -503,6 +731,72 @@ export default function TeacherProfile() {
               Students are encouraged to propose their own ideas or collaborate
               with mentors to develop projects that align with their interests.
             </p>
+          </div>
+        )}
+
+        {/* Courses */}
+        {courses.length > 0 && (
+          <div style={cardStyle}>
+            <h3 style={sectionTitle}>📚 Courses</h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {courses.map((c) => (
+                <div key={c.id} style={itemStyle}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                      gap: 12,
+                      marginBottom: 6,
+                    }}
+                  >
+                    <h4 style={{ margin: 0, fontSize: 15, color: "#333" }}>
+                      {c.title}
+                    </h4>
+                    <StatusBadge status={c.status || "registration"} />
+                  </div>
+                  {c.description && (
+                    <ExpandableText
+                      text={c.description}
+                      style={{
+                        margin: "0 0 10px",
+                        fontSize: 13,
+                        color: "#666",
+                        lineHeight: 1.6,
+                      }}
+                    />
+                  )}
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 2,
+                      fontSize: 13,
+                      color: "#555",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {c.lessons?.length > 0 ? (
+                      c.lessons.map((l) => (
+                        <span key={l.date}>
+                          📅 {l.date} ({lessonWeekday(l.date)}) · {l.startTime}–
+                          {l.endTime}
+                        </span>
+                      ))
+                    ) : (
+                      <span>
+                        📅 {c.date || c.dates?.join(", ")}
+                        {c.startTime && ` · ${c.startTime}–${c.endTime}`}
+                      </span>
+                    )}
+                    <span style={{ marginTop: 6 }}>
+                      👥 {c.enrolledCount || 0} / {c.maxSeats} seats · 💰{" "}
+                      {c.price > 0 ? `$${c.price}` : "Free"}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

@@ -21,16 +21,7 @@ import ResearchForm from "./ResearchForm";
 import ProjectForm from "./ProjectForm";
 
 import Footer from "./Footer";
-
-function lessonWeekday(dateStr) {
-  try {
-    return new Date(`${dateStr}T00:00:00`).toLocaleDateString("en-US", {
-      weekday: "long",
-    });
-  } catch {
-    return "";
-  }
-}
+import { lessonWeekday, safeUrl } from "../utils/format";
 
 function profileFromTeacherData(data) {
   return {
@@ -743,9 +734,9 @@ export default function TeacherDashboard() {
                 ))}
                 <div style={fieldStyle}>
                   <p style={labelStyle}>Personal Website / LinkedIn</p>
-                  {profile.website ? (
+                  {safeUrl(profile.website) ? (
                     <a
-                      href={profile.website}
+                      href={safeUrl(profile.website)}
                       target='_blank'
                       rel='noreferrer'
                       style={{

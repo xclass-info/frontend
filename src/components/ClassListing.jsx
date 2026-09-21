@@ -15,16 +15,7 @@ import styles from "./ClassListing.module.css";
 import { SkeletonClassCard } from "./Skeleton";
 import Navbar from "./Navbar";
 import PaymentModal from "./PaymentModal";
-
-function lessonWeekday(dateStr) {
-  try {
-    return new Date(`${dateStr}T00:00:00`).toLocaleDateString("en-US", {
-      weekday: "long",
-    });
-  } catch {
-    return "";
-  }
-}
+import { lessonWeekday } from "../utils/format";
 
 export default function ClassListing() {
   const [classes, setClasses] = useState([]);
