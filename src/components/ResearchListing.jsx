@@ -13,7 +13,7 @@ import { SkeletonClassCard } from "./Skeleton";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import Footer from "./Footer";
 import { formatMentorName } from "../utils/mentorName";
-import { seatsLabel } from "../utils/format";
+import { seatsStatus } from "../utils/format";
 
 
 export default function ResearchListing() {
@@ -241,7 +241,7 @@ export default function ResearchListing() {
                       margin: "0 0 12px",
                     }}
                   >
-                    👥 {seatsLabel(r.seats)}
+                    👥 {seatsStatus(r.seats, r.enrolledCount)}
                   </p>
                 ) : null}
 

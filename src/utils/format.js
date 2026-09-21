@@ -1,5 +1,7 @@
-export function seatsLabel(n) {
-  return `${n} ${Number(n) === 1 ? "seat" : "seats"}`;
+export function seatsStatus(total, enrolled = 0) {
+  const left = Math.max(Number(total) - Number(enrolled || 0), 0);
+  if (left === 0) return "Full";
+  return `${left} of ${total} ${left === 1 ? "seat" : "seats"} left`;
 }
 
 export function lessonWeekday(dateStr) {

@@ -21,7 +21,8 @@ import ResearchForm from "./ResearchForm";
 import ProjectForm from "./ProjectForm";
 
 import Footer from "./Footer";
-import { lessonWeekday, safeUrl, seatsLabel } from "../utils/format";
+import { lessonWeekday, safeUrl } from "../utils/format";
+import RegistrationList from "./RegistrationList";
 
 function profileFromTeacherData(data) {
   return {
@@ -419,9 +420,12 @@ export default function TeacherDashboard() {
                         <p className={styles.cardDesc}>{r.idea}</p>
                         {r.seats ? (
                           <div className={styles.cardMeta}>
-                            <span>👥 {seatsLabel(r.seats)}</span>
+                            <span>
+                              👥 {r.enrolledCount || 0} / {r.seats} seats
+                            </span>
                           </div>
                         ) : null}
+                        <RegistrationList itemId={r.id} />
                         <div className={styles.cardFooter}>
                           <button
                             className={styles.joinBtn}
@@ -516,9 +520,12 @@ export default function TeacherDashboard() {
                         <p className={styles.cardDesc}>{p.description}</p>
                         {p.seats ? (
                           <div className={styles.cardMeta}>
-                            <span>👥 {seatsLabel(p.seats)}</span>
+                            <span>
+                              👥 {p.enrolledCount || 0} / {p.seats} seats
+                            </span>
                           </div>
                         ) : null}
+                        <RegistrationList itemId={p.id} />
                         <div className={styles.cardFooter}>
                           <button
                             className={styles.joinBtn}
@@ -631,6 +638,7 @@ export default function TeacherDashboard() {
                         👥 {cls.enrolledCount || 0} / {cls.maxSeats} seats
                       </span>
                     </div>
+                    <RegistrationList itemId={cls.id} />
                     <div className={styles.cardFooter}>
                       <Link
                         to={`/classroom/${cls.id}`}
