@@ -615,14 +615,7 @@ export default function TeacherProfile() {
         {[...projects, ...(teacher.projects || [])].length > 0 && (
           <div style={cardStyle}>
             <h3 style={sectionTitle}>💡 Projects</h3>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 12,
-                marginBottom: 12,
-              }}
-            >
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {[...projects, ...(teacher.projects || [])].map((project) => (
                 <div key={project.id} style={itemStyle}>
                   <div
@@ -686,22 +679,6 @@ export default function TeacherProfile() {
                 </div>
               ))}
             </div>
-            <p
-              style={{
-                fontSize: 12,
-                color: "#00274c",
-                margin: 0,
-                lineHeight: 1.6,
-                fontStyle: "italic",
-                background: "#eff6ff",
-                padding: "10px 14px",
-                borderRadius: 8,
-                borderLeft: "3px solid #00274c",
-              }}
-            >
-              Students are encouraged to propose their own ideas or collaborate
-              with mentors to develop projects that align with their interests.
-            </p>
           </div>
         )}
 
