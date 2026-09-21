@@ -182,14 +182,15 @@ export default function ResearchForm({ research, onClose }) {
               type='button'
               onClick={onClose}
               style={{
-                padding: "8px 24px",
+                padding: "14px 28px",
                 borderRadius: 50,
-                border: "2.5px solid #e2e8f0",
+                border: "2.5px solid #cbd5e1",
                 background: "transparent",
-                color: "#64748b",
+                color: "#475569",
                 cursor: "pointer",
                 fontWeight: 800,
-                fontSize: "0.95rem",
+                fontSize: "1rem",
+                fontFamily: "Nunito, sans-serif",
               }}
             >
               Cancel
