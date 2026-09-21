@@ -175,7 +175,7 @@ export default function ResearchForm({ research, onClose }) {
             value={form.idea}
             onChange={handleChange}
             placeholder='Describe your research idea...'
-            rows={4}
+            rows={10}
             style={{ fontSize: "1.1rem" }}
           />
           {errors.idea && <p className={styles.errorMsg}>{errors.idea}</p>}
@@ -201,7 +201,7 @@ export default function ResearchForm({ research, onClose }) {
             value={form.impact}
             onChange={handleChange}
             placeholder='What impact will this research have?'
-            rows={3}
+            rows={7}
             style={{ fontSize: "1.1rem" }}
           />
           {errors.impact && <p className={styles.errorMsg}>{errors.impact}</p>}
