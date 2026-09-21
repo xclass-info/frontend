@@ -10,20 +10,17 @@ import {
 } from "firebase/firestore";
 import Navbar from "./Navbar";
 import { SkeletonClassCard } from "./Skeleton";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import Footer from "./Footer";
+import { formatMentorName } from "../utils/mentorName";
 
-function formatMentorName(name) {
-  if (name.startsWith("Prof.")) return name.split(" ").slice(0, 2).join(" ");
-  return `Dr. ${name.split(" ").pop()}`;
-}
 
 export default function ResearchListing() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [research, setResearch] = useState([]);
   const [teachers, setTeachers] = useState({});
   const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState(null);
   const [filter, setFilter] = useState("all");
 
   // Update filter when URL changes
@@ -143,7 +140,7 @@ export default function ResearchListing() {
             {filtered.map((r) => (
               <div
                 key={r.id}
-                onClick={() => setSelected(r)}
+                onClick={() => navigate(`/research/${r.id}`)}
                 style={{
                   background: "white",
                   borderRadius: 16,
@@ -257,173 +254,6 @@ export default function ResearchListing() {
       </div>
 
       {/* ── Detail Modal ── */}
-      {selected && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 200,
-            padding: 16,
-          }}
-        >
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              padding: 32,
-              width: "100%",
-              maxWidth: 600,
-              maxHeight: "90vh",
-              overflowY: "auto",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 20,
-              }}
-            >
-              <h3 style={{ margin: 0 }}>🔬 Research Details</h3>
-              <button
-                onClick={() => setSelected(null)}
-                style={{
-                  background: "none",
-                  border: "none",
-                  fontSize: 20,
-                  cursor: "pointer",
-                }}
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Type badge in modal */}
-            {/* <span
-              style={{
-                display: "inline-block",
-                fontSize: 12,
-                padding: "4px 12px",
-                borderRadius: 20,
-                fontWeight: 600,
-                marginBottom: 12,
-                background:
-                  selected.type === "publication" ? "#eff6ff" : "#f0fdf4",
-                color: selected.type === "publication" ? "#00274c" : "#16a34a",
-              }}
-            >
-              {selected.type === "publication"
-                ? "📄 Research Publication Track"
-                : "🧪 Research Exploration Track"}
-            </span> */}
-
-            <h2 style={{ fontSize: 20, marginBottom: 20 }}>{selected.title}</h2>
-
-            <div style={{ marginBottom: 20 }}>
-              <p
-                style={{
-                  fontSize: 12,
-                  color: "#aaa",
-                  margin: "0 0 8px",
-                  fontWeight: 600,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                }}
-              >
-                Research Idea
-              </p>
-              <p
-                style={{
-                  fontSize: 14,
-                  color: "#555",
-                  lineHeight: 1.7,
-                  margin: 0,
-                  background: "#f9fafb",
-                  padding: 14,
-                  borderRadius: 8,
-                }}
-              >
-                {selected.idea}
-              </p>
-            </div>
-
-            <div style={{ marginBottom: 20 }}>
-              <p
-                style={{
-                  fontSize: 12,
-                  color: "#aaa",
-                  margin: "0 0 8px",
-                  fontWeight: 600,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                }}
-              >
-                Research Impact
-              </p>
-              <p
-                style={{
-                  fontSize: 14,
-                  color: "#555",
-                  lineHeight: 1.7,
-                  margin: 0,
-                  background: "#f0fdf4",
-                  padding: 14,
-                  borderRadius: 8,
-                  borderLeft: "3px solid #27ae60",
-                }}
-              >
-                {selected.impact}
-              </p>
-            </div>
-
-            {selected.details && (
-              <div style={{ marginBottom: 20 }}>
-                <p
-                  style={{
-                    fontSize: 12,
-                    color: "#aaa",
-                    margin: "0 0 8px",
-                    fontWeight: 600,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                  }}
-                >
-                  Additional Details
-                </p>
-                <p
-                  style={{
-                    fontSize: 14,
-                    color: "#555",
-                    lineHeight: 1.7,
-                    margin: 0,
-                    background: "#f9fafb",
-                    padding: 14,
-                    borderRadius: 8,
-                  }}
-                >
-                  {selected.details}
-                </p>
-              </div>
-            )}
-
-            <div
-              style={{
-                fontSize: 13,
-                color: "#888",
-                borderTop: "1px solid #f0f0f0",
-                paddingTop: 16,
-              }}
-            >
-              👩‍🏫 Mentored by: {mentorLabel(selected)}
-            </div>
-          </div>
-        </div>
-      )}
       <Footer />
     </div>
   );

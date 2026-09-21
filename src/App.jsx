@@ -21,6 +21,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import AdminDashboard from "./components/AdminDashboard";
 import TeacherProfile from "./components/TeacherProfile";
 import ResearchListing from "./components/ResearchListing";
+import ResearchDetail from "./components/ResearchDetail";
 import ResearchSection from "./components/ResearchSection";
 
 import { seedResearch } from "./components/seedResearch";
@@ -136,6 +137,7 @@ export default function App() {
         <Route path='/admin' element={<AdminDashboard />} />
         <Route path='/teacher/:teacherId' element={<TeacherProfile />} />
         <Route path='/research' element={<ResearchListing />} />
+        <Route path='/research/:researchId' element={<ResearchDetail />} />
         <Route path='/internship' element={<InternshipListing />} />
         <Route path='/about' element={<AboutUs />} />
         <Route path='/contact' element={<ContactUs />} />
