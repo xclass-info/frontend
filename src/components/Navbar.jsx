@@ -49,7 +49,7 @@ export default function Navbar() {
         </li> */}
 
         <li>
-          <Link to='/research?type=publication'>Research</Link>
+          <Link to='/research'>Research</Link>
         </li>
 
         {/* <li>
@@ -99,7 +99,7 @@ export default function Navbar() {
           </li> */}
 
           <li>
-            <Link to='/research?type=publication'>🔬 Research</Link>
+            <Link to='/research'>🔬 Research</Link>
           </li>
 
           <li>

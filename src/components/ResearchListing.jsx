@@ -71,7 +71,7 @@ export default function ResearchListing() {
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <h1 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: 8 }}>
-            🔬 Publication Track Research
+            🔬 Research
           </h1>
           <p style={{ color: "#666", fontSize: "1rem" }}>
             Explore research topics, ideas and their impact from our mentors.
