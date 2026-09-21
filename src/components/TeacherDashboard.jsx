@@ -18,6 +18,7 @@ import Availability from "./Availability";
 import BookingRequests from "./BookingRequests";
 import { SkeletonDashboardCard } from "./Skeleton";
 import ResearchForm from "./ResearchForm";
+import ProjectForm from "./ProjectForm";
 
 import Footer from "./Footer";
 
@@ -53,6 +54,9 @@ export default function TeacherDashboard() {
   const [research, setResearch] = useState([]);
   const [showResearchForm, setShowResearchForm] = useState(false);
   const [editingResearch, setEditingResearch] = useState(null);
+  const [projects, setProjects] = useState([]);
+  const [showProjectForm, setShowProjectForm] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(location.state?.tab || "classes");
 
@@ -108,9 +112,18 @@ export default function TeacherDashboard() {
         setResearch(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
       });
 
+      const projectsQuery = query(
+        collection(db, "projects"),
+        where("teacherId", "==", user.uid),
+      );
+      const unsubscribeProjects = onSnapshot(projectsQuery, (snapshot) => {
+        setProjects(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+      });
+
       return () => {
         unsubscribeClasses();
         unsubscribeResearch();
+        unsubscribeProjects();
       };
     });
 
@@ -165,6 +178,26 @@ export default function TeacherDashboard() {
     const nextStage = r.stage === "completed" ? "active" : "completed";
     try {
       await updateDoc(doc(db, "research", r.id), { stage: nextStage });
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update status. Please try again.");
+    }
+  }
+
+  async function deleteProject(id) {
+    if (!confirm("Delete this project post? This can't be undone.")) return;
+    try {
+      await deleteDoc(doc(db, "projects", id));
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete. Please try again.");
+    }
+  }
+
+  async function toggleProjectStage(p) {
+    const nextStage = p.stage === "completed" ? "active" : "completed";
+    try {
+      await updateDoc(doc(db, "projects", p.id), { stage: nextStage });
     } catch (err) {
       console.error(err);
       alert("Failed to update status. Please try again.");
@@ -308,6 +341,7 @@ export default function TeacherDashboard() {
         >
           {[
             { id: "research", label: "🔬 Research" },
+            { id: "projects", label: "💡 Projects" },
             { id: "classes", label: "📚 Courses" },
             { id: "availability", label: "🗓 Availability" },
             { id: "bookings", label: "📬 Bookings" },
@@ -413,6 +447,98 @@ export default function TeacherDashboard() {
                           <button
                             className={styles.copyBtn}
                             onClick={() => deleteResearch(r.id)}
+                            style={{ color: "#e74c3c" }}
+                          >
+                            🗑️ Delete
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+        {/* ── Projects Tab ── */}
+        {activeTab === "projects" && (
+          <div className={styles.section}>
+            {showProjectForm ? (
+              <ProjectForm
+                project={editingProject}
+                onClose={() => {
+                  setShowProjectForm(false);
+                  setEditingProject(null);
+                }}
+              />
+            ) : (
+              <>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: 16,
+                  }}
+                >
+                  <h2 className={styles.sectionTitle}>Your Projects</h2>
+                  <button
+                    onClick={() => {
+                      setEditingProject(null);
+                      setShowProjectForm(true);
+                    }}
+                    className={styles.createBtn}
+                  >
+                    + Add Project
+                  </button>
+                </div>
+                {projects.length === 0 ? (
+                  <div className={styles.empty}>
+                    <p>💡 No projects posted yet!</p>
+                    <button
+                      onClick={() => {
+                        setEditingProject(null);
+                        setShowProjectForm(true);
+                      }}
+                      className={styles.createBtn}
+                    >
+                      + Post your first project
+                    </button>
+                  </div>
+                ) : (
+                  <div className={styles.grid}>
+                    {projects.map((p) => (
+                      <div key={p.id} className={styles.card}>
+                        <div className={styles.cardTop}>
+                          <h3 className={styles.cardTitle}>{p.title}</h3>
+                          <span
+                            className={`${styles.badge} ${p.stage === "completed" ? styles.draft : styles.active}`}
+                          >
+                            {p.stage === "completed" ? "Completed" : "Active"}
+                          </span>
+                        </div>
+                        <p className={styles.cardDesc}>{p.description}</p>
+                        <div className={styles.cardFooter}>
+                          <button
+                            className={styles.joinBtn}
+                            onClick={() => {
+                              setEditingProject(p);
+                              setShowProjectForm(true);
+                            }}
+                          >
+                            ✏️ Edit
+                          </button>
+                          <button
+                            className={styles.copyBtn}
+                            onClick={() => toggleProjectStage(p)}
+                          >
+                            {p.stage === "completed"
+                              ? "🔄 Mark Active"
+                              : "✅ Mark Completed"}
+                          </button>
+                          <button
+                            className={styles.copyBtn}
+                            onClick={() => deleteProject(p.id)}
                             style={{ color: "#e74c3c" }}
                           >
                             🗑️ Delete
