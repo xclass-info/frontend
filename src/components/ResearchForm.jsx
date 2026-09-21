@@ -4,6 +4,21 @@ import { db, auth } from "../firebase";
 import { collection, addDoc, doc, updateDoc } from "firebase/firestore";
 import styles from "./TeacherAuth.module.css";
 
+const WORD_LIMITS = { title: 100, idea: 500, impact: 300, details: 300 };
+
+function countWords(str) {
+  const trimmed = str.trim();
+  return trimmed ? trimmed.split(/\s+/).length : 0;
+}
+
+function WordCount({ count, limit }) {
+  return (
+    <span style={{ fontSize: 12, color: count >= limit ? "#e74c3c" : "#aaa" }}>
+      {count} / {limit} words
+    </span>
+  );
+}
+
 export default function ResearchForm({ research, onClose }) {
   const isEditing = Boolean(research);
   const [form, setForm] = useState({
@@ -18,8 +33,11 @@ export default function ResearchForm({ research, onClose }) {
   const [errors, setErrors] = useState({});
 
   function handleChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" });
+    const { name, value } = e.target;
+    const limit = WORD_LIMITS[name];
+    if (limit && countWords(value) > limit) return;
+    setForm({ ...form, [name]: value });
+    setErrors({ ...errors, [name]: "" });
   }
 
   function validate() {
@@ -106,7 +124,19 @@ export default function ResearchForm({ research, onClose }) {
 
       <form onSubmit={handleSubmit}>
         <div className={styles.field}>
-          <label className={styles.label}>Research Topic *</label>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <label className={styles.label}>Research Topic *</label>
+            <WordCount
+              count={countWords(form.title)}
+              limit={WORD_LIMITS.title}
+            />
+          </div>
           <input
             className={`${styles.input} ${errors.title ? styles.inputError : ""}`}
             name='title'
@@ -119,7 +149,19 @@ export default function ResearchForm({ research, onClose }) {
         </div>
 
         <div className={styles.field}>
-          <label className={styles.label}>Research Idea *</label>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <label className={styles.label}>Research Idea *</label>
+            <WordCount
+              count={countWords(form.idea)}
+              limit={WORD_LIMITS.idea}
+            />
+          </div>
           <textarea
             className={`${styles.input} ${styles.textarea} ${errors.idea ? styles.inputError : ""}`}
             name='idea'
@@ -133,7 +175,19 @@ export default function ResearchForm({ research, onClose }) {
         </div>
 
         <div className={styles.field}>
-          <label className={styles.label}>Research Impact *</label>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <label className={styles.label}>Research Impact *</label>
+            <WordCount
+              count={countWords(form.impact)}
+              limit={WORD_LIMITS.impact}
+            />
+          </div>
           <textarea
             className={`${styles.input} ${styles.textarea} ${errors.impact ? styles.inputError : ""}`}
             name='impact'
@@ -147,10 +201,24 @@ export default function ResearchForm({ research, onClose }) {
         </div>
 
         <div className={styles.field}>
-          <label className={styles.label}>
-            Additional Details{" "}
-            <span style={{ color: "#aaa", fontWeight: 400 }}>(optional)</span>
-          </label>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <label className={styles.label}>
+              Additional Details{" "}
+              <span style={{ color: "#aaa", fontWeight: 400 }}>
+                (optional)
+              </span>
+            </label>
+            <WordCount
+              count={countWords(form.details)}
+              limit={WORD_LIMITS.details}
+            />
+          </div>
           <textarea
             className={`${styles.input} ${styles.textarea}`}
             name='details'
@@ -172,11 +240,11 @@ export default function ResearchForm({ research, onClose }) {
             {loading
               ? isEditing
                 ? "Saving..."
-                : "Posting..."
+                : "Creating..."
               : saved
                 ? isEditing
                   ? "Saved! ✓"
-                  : "Posted! ✓"
+                  : "Created! ✓"
                 : isEditing
                   ? "Save Changes"
                   : "Create Research 🔬"}
