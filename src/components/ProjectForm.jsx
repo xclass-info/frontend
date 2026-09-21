@@ -128,7 +128,7 @@ export default function ProjectForm({ project, onClose }) {
         </div>
 
         <div className={styles.field}>
-          <label className={styles.label}>What You'll Learn *</label>
+          <label className={styles.label}>What Students Will Learn *</label>
           <textarea
             className={`${styles.input} ${styles.textarea} ${errors.learning ? styles.inputError : ""}`}
             name='learning'
