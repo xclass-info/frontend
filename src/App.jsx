@@ -16,7 +16,7 @@ import ClassListing from "./components/ClassListing";
 import Classroom from "./components/Classroom";
 import AdPostForm from "./components/AdPostForm";
 import AdPost from "./components/AdPost";
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
 import AdminDashboard from "./components/AdminDashboard";
 import TeacherProfile from "./components/TeacherProfile";
@@ -24,7 +24,7 @@ import ResearchListing from "./components/ResearchListing";
 import ResearchDetail from "./components/ResearchDetail";
 import StudentLogin from "./components/StudentLogin";
 import StudentRegister from "./components/StudentRegister";
-import StudentRegistrations from "./components/StudentRegistrations";
+import StudentDashboard from "./components/StudentDashboard";
 import ResearchSection from "./components/ResearchSection";
 
 import { seedResearch } from "./components/seedResearch";
@@ -135,9 +135,10 @@ export default function App() {
         <Route path='/tutors' element={<Tutors standalone={true} />} />
         <Route path='/student/login' element={<StudentLogin />} />
         <Route path='/student/register' element={<StudentRegister />} />
+        <Route path='/student/dashboard' element={<StudentDashboard />} />
         <Route
           path='/student/registrations'
-          element={<StudentRegistrations />}
+          element={<Navigate to='/student/dashboard' replace />}
         />
         <Route path='/teacher/register' element={<TeacherRegister />} />
         <Route path='/teacher/login' element={<TeacherLogin />} />

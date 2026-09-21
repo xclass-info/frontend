@@ -59,7 +59,7 @@ export default function StudentLogin() {
         return;
       }
 
-      navigate("/student/registrations");
+      navigate("/student/dashboard");
     } catch (err) {
       if (
         err.code === "auth/invalid-credential" ||

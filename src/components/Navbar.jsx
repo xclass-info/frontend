@@ -162,7 +162,7 @@ export default function Navbar() {
           {student ? (
             <>
               <li>
-                <Link to='/student/registrations'>My Registrations</Link>
+                <Link to='/student/dashboard'>My Dashboard</Link>
               </li>
               <li>
                 <a onClick={handleStudentLogout} style={{ cursor: "pointer" }}>
