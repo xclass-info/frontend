@@ -129,7 +129,10 @@ export default function ProjectForm({ project, onClose }) {
           : "Share a project idea students can work on with you."}
       </p>
 
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: "flex", flexDirection: "column", gap: 28 }}
+      >
         <div className={styles.field}>
           <div
             style={{
@@ -175,7 +178,7 @@ export default function ProjectForm({ project, onClose }) {
             value={form.description}
             onChange={handleChange}
             placeholder='Describe what the project involves...'
-            rows={4}
+            rows={10}
             style={{ fontSize: "1.1rem" }}
           />
           {errors.description && (
@@ -203,7 +206,7 @@ export default function ProjectForm({ project, onClose }) {
             value={form.learning}
             onChange={handleChange}
             placeholder='What skills or knowledge will students gain?'
-            rows={3}
+            rows={7}
             style={{ fontSize: "1.1rem" }}
           />
           {errors.learning && (
