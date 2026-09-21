@@ -113,6 +113,7 @@ export default function ResearchForm({ research, onClose }) {
             value={form.title}
             onChange={handleChange}
             placeholder='e.g. Edge Computing in Home Security'
+            style={{ fontSize: "1.1rem" }}
           />
           {errors.title && <p className={styles.errorMsg}>{errors.title}</p>}
         </div>
@@ -126,6 +127,7 @@ export default function ResearchForm({ research, onClose }) {
             onChange={handleChange}
             placeholder='Describe your research idea...'
             rows={4}
+            style={{ fontSize: "1.1rem" }}
           />
           {errors.idea && <p className={styles.errorMsg}>{errors.idea}</p>}
         </div>
@@ -139,6 +141,7 @@ export default function ResearchForm({ research, onClose }) {
             onChange={handleChange}
             placeholder='What impact will this research have?'
             rows={3}
+            style={{ fontSize: "1.1rem" }}
           />
           {errors.impact && <p className={styles.errorMsg}>{errors.impact}</p>}
         </div>
@@ -155,6 +158,7 @@ export default function ResearchForm({ research, onClose }) {
             onChange={handleChange}
             placeholder='Any additional information...'
             rows={3}
+            style={{ fontSize: "1.1rem" }}
           />
         </div>
 

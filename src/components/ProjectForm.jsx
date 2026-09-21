@@ -108,6 +108,7 @@ export default function ProjectForm({ project, onClose }) {
             value={form.title}
             onChange={handleChange}
             placeholder='e.g. Build a chatbot with Python'
+            style={{ fontSize: "1.1rem" }}
           />
           {errors.title && <p className={styles.errorMsg}>{errors.title}</p>}
         </div>
@@ -121,6 +122,7 @@ export default function ProjectForm({ project, onClose }) {
             onChange={handleChange}
             placeholder='Describe what the project involves...'
             rows={4}
+            style={{ fontSize: "1.1rem" }}
           />
           {errors.description && (
             <p className={styles.errorMsg}>{errors.description}</p>
@@ -136,6 +138,7 @@ export default function ProjectForm({ project, onClose }) {
             onChange={handleChange}
             placeholder='What skills or knowledge will students gain?'
             rows={3}
+            style={{ fontSize: "1.1rem" }}
           />
           {errors.learning && (
             <p className={styles.errorMsg}>{errors.learning}</p>
