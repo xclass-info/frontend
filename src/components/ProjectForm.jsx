@@ -159,7 +159,7 @@ export default function ProjectForm({ project, onClose }) {
                   : "Posted! ✓"
                 : isEditing
                   ? "Save Changes"
-                  : "Post Project 💡"}
+                  : "Create Project 💡"}
           </button>
           {isEditing && onClose && (
             <button
