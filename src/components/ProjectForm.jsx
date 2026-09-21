@@ -91,7 +91,7 @@ export default function ProjectForm({ project, onClose }) {
         </button>
       )}
       <h3 style={{ marginBottom: 4 }}>
-        {isEditing ? "💡 Edit Project" : "💡 Post Project"}
+        {isEditing ? "💡 Edit Project" : "💡 Create Project"}
       </h3>
       <p style={{ color: "#888", fontSize: 14, marginBottom: 24 }}>
         {isEditing
