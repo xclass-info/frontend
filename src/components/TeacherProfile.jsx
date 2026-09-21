@@ -13,7 +13,7 @@ import {
 } from "firebase/firestore";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import { lessonWeekday, safeUrl } from "../utils/format";
+import { lessonWeekday, safeUrl, seatsLabel } from "../utils/format";
 
 const cardStyle = {
   background: "white",
@@ -164,6 +164,18 @@ function ResearchItem({ r }) {
       >
         {r.idea}
       </p>
+      {r.seats ? (
+        <p
+          style={{
+            margin: "8px 0 0",
+            fontSize: 12,
+            color: "#555",
+            fontWeight: 600,
+          }}
+        >
+          👥 {seatsLabel(r.seats)}
+        </p>
+      ) : null}
       {open && (
         <>
           <div

@@ -6,6 +6,7 @@ import { doc, getDoc } from "firebase/firestore";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { formatMentorName } from "../utils/mentorName";
+import { seatsLabel } from "../utils/format";
 
 const sectionLabel = {
   fontSize: 12,
@@ -145,6 +146,7 @@ export default function ResearchDetail() {
             ) : (
               mentorLabel
             )}
+            {research.seats ? ` · 👥 ${seatsLabel(research.seats)}` : null}
           </p>
 
           <div style={{ marginBottom: 28 }}>

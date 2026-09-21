@@ -13,6 +13,7 @@ import { SkeletonClassCard } from "./Skeleton";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import Footer from "./Footer";
 import { formatMentorName } from "../utils/mentorName";
+import { seatsLabel } from "../utils/format";
 
 
 export default function ResearchListing() {
@@ -230,6 +231,19 @@ export default function ResearchListing() {
                     {r.impact}
                   </p>
                 </div>
+
+                {r.seats ? (
+                  <p
+                    style={{
+                      fontSize: 12,
+                      color: "#555",
+                      fontWeight: 600,
+                      margin: "0 0 12px",
+                    }}
+                  >
+                    👥 {seatsLabel(r.seats)}
+                  </p>
+                ) : null}
 
                 <div
                   style={{

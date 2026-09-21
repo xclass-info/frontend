@@ -1,3 +1,7 @@
+export function seatsLabel(n) {
+  return `${n} ${Number(n) === 1 ? "seat" : "seats"}`;
+}
+
 export function lessonWeekday(dateStr) {
   try {
     return new Date(`${dateStr}T00:00:00`).toLocaleDateString("en-US", {

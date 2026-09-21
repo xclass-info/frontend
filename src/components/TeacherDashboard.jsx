@@ -21,7 +21,7 @@ import ResearchForm from "./ResearchForm";
 import ProjectForm from "./ProjectForm";
 
 import Footer from "./Footer";
-import { lessonWeekday, safeUrl } from "../utils/format";
+import { lessonWeekday, safeUrl, seatsLabel } from "../utils/format";
 
 function profileFromTeacherData(data) {
   return {
@@ -417,6 +417,11 @@ export default function TeacherDashboard() {
                           </span>
                         </div>
                         <p className={styles.cardDesc}>{r.idea}</p>
+                        {r.seats ? (
+                          <div className={styles.cardMeta}>
+                            <span>👥 {seatsLabel(r.seats)}</span>
+                          </div>
+                        ) : null}
                         <div className={styles.cardFooter}>
                           <button
                             className={styles.joinBtn}

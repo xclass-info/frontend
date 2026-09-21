@@ -32,6 +32,7 @@ export default function ResearchForm({ research, onClose }) {
     idea: research?.idea || "",
     impact: research?.impact || "",
     details: research?.details || "",
+    seats: research?.seats ?? "",
     type: research?.type || "exploration",
   });
   const [loading, setLoading] = useState(false);
@@ -51,6 +52,9 @@ export default function ResearchForm({ research, onClose }) {
     if (!form.title.trim()) newErrors.title = "Required";
     if (!form.idea.trim()) newErrors.idea = "Required";
     if (!form.impact.trim()) newErrors.impact = "Required";
+    if (form.seats === "") newErrors.seats = "Required";
+    else if (!Number.isInteger(Number(form.seats)) || Number(form.seats) < 1)
+      newErrors.seats = "Must be a whole number, at least 1";
     return newErrors;
   }
 
@@ -71,6 +75,7 @@ export default function ResearchForm({ research, onClose }) {
         idea: form.idea.trim(),
         impact: form.impact.trim(),
         details: form.details.trim() || null,
+        seats: Number(form.seats),
         type: form.type,
       };
       if (isEditing) {
@@ -238,6 +243,22 @@ export default function ResearchForm({ research, onClose }) {
             rows={3}
             style={{ fontSize: "1.1rem" }}
           />
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label}>Seats *</label>
+          <input
+            className={`${styles.input} ${errors.seats ? styles.inputError : ""}`}
+            name='seats'
+            type='number'
+            min='1'
+            max='50'
+            value={form.seats}
+            onChange={handleChange}
+            placeholder='e.g. 2'
+            style={{ fontSize: "1.1rem" }}
+          />
+          {errors.seats && <p className={styles.errorMsg}>{errors.seats}</p>}
         </div>
 
         <div style={{ display: "flex", gap: 12 }}>
