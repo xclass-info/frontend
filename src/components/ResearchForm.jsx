@@ -158,24 +158,43 @@ export default function ResearchForm({ research, onClose }) {
           />
         </div>
 
-        <button
-          className={styles.btn}
-          type='submit'
-          disabled={loading}
-          style={{ background: saved ? "#27ae60" : undefined }}
-        >
-          {loading
-            ? isEditing
-              ? "Saving..."
-              : "Posting..."
-            : saved
+        <div style={{ display: "flex", gap: 12 }}>
+          <button
+            className={styles.btn}
+            type='submit'
+            disabled={loading}
+            style={{ background: saved ? "#27ae60" : undefined }}
+          >
+            {loading
               ? isEditing
-                ? "Saved! ✓"
-                : "Posted! ✓"
-              : isEditing
-                ? "Save Changes"
-                : "Post Research 🔬"}
-        </button>
+                ? "Saving..."
+                : "Posting..."
+              : saved
+                ? isEditing
+                  ? "Saved! ✓"
+                  : "Posted! ✓"
+                : isEditing
+                  ? "Save Changes"
+                  : "Post Research 🔬"}
+          </button>
+          {isEditing && onClose && (
+            <button
+              type='button'
+              onClick={onClose}
+              style={{
+                padding: "12px 24px",
+                borderRadius: 8,
+                border: "1px solid #ddd",
+                background: "white",
+                color: "#555",
+                cursor: "pointer",
+                fontWeight: 600,
+              }}
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </form>
     </div>
   );

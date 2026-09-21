@@ -396,15 +396,34 @@ export default function CreateClass() {
             {errors.price && <p className={styles.errorMsg}>{errors.price}</p>}
           </div>
 
-          <button className={styles.btn} type='submit' disabled={loading}>
-            {loading
-              ? isEditing
-                ? "Saving..."
-                : "Creating..."
-              : isEditing
-                ? "Save Changes"
-                : "Create Course 🚀"}
-          </button>
+          <div style={{ display: "flex", gap: 12 }}>
+            <button className={styles.btn} type='submit' disabled={loading}>
+              {loading
+                ? isEditing
+                  ? "Saving..."
+                  : "Creating..."
+                : isEditing
+                  ? "Save Changes"
+                  : "Create Course 🚀"}
+            </button>
+            {isEditing && (
+              <button
+                type='button'
+                onClick={() => navigate("/teacher/dashboard")}
+                style={{
+                  padding: "0 24px",
+                  borderRadius: 8,
+                  border: "1px solid #ddd",
+                  background: "white",
+                  color: "#555",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                }}
+              >
+                Cancel
+              </button>
+            )}
+          </div>
         </form>
       </div>
     </div>
