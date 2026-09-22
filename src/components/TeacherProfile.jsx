@@ -1,6 +1,6 @@
 // src/components/TeacherProfile.jsx
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { db } from "../firebase";
 import {
   doc,
@@ -15,6 +15,7 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { lessonWeekday, safeUrl } from "../utils/format";
 import { SeatsRow, RegisterModal } from "./RegisterControls";
+import { useStudentAuth } from "../utils/useStudentAuth";
 
 const cardStyle = {
   background: "white",
@@ -221,6 +222,8 @@ const newestFirst = (a, b) =>
 export default function TeacherProfile() {
   const { teacherId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { student } = useStudentAuth();
   const [teacher, setTeacher] = useState(null);
   const [loading, setLoading] = useState(true);
   const [slots, setSlots] = useState([]);
@@ -285,6 +288,12 @@ export default function TeacherProfile() {
   }, [teacherId]);
 
   function openRegister(kind, item) {
+    // Registering requires a logged-in student account, so it can be tied
+    // to the student's record and reliably show up on their dashboard.
+    if (!student) {
+      navigate("/student/login", { state: { from: location.pathname } });
+      return;
+    }
     setRegistering({ kind, item });
   }
 
@@ -1067,10 +1076,11 @@ export default function TeacherProfile() {
           </div>
         </div>
       )}
-      {registering && (
+      {registering && student && (
         <RegisterModal
           kind={registering.kind}
           item={registering.item}
+          student={student}
           onClose={() => setRegistering(null)}
           onRegistered={markRegistered}
         />

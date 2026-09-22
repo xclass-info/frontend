@@ -24,7 +24,7 @@ export function totalSeats(kind, item) {
 // registration record happen in a single transaction so two people can't both
 // take the last seat. The registration id is derived from item + email, so the
 // same email can't register for the same item twice.
-export async function registerForItem(kind, itemId, { name, email }) {
+export async function registerForItem(kind, itemId, { name, email, studentUid }) {
   const { collection: coll, seatsField } = KINDS[kind];
   const itemRef = doc(db, coll, itemId);
   const regRef = doc(
@@ -52,6 +52,7 @@ export async function registerForItem(kind, itemId, { name, email }) {
       studentName: name.trim(),
       studentEmail: email.trim(),
       studentEmailLower: email.trim().toLowerCase(),
+      ...(studentUid ? { studentUid } : {}),
       createdAt: new Date(),
     });
   });

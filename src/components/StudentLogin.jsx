@@ -7,7 +7,7 @@ import {
   signOut,
 } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import styles from "./TeacherAuth.module.css";
 import Footer from "./Footer";
 
@@ -15,6 +15,7 @@ const CONTINUE_URL = "https://happyresearch.org/#/student/login";
 
 export default function StudentLogin() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -59,7 +60,8 @@ export default function StudentLogin() {
         return;
       }
 
-      navigate("/student/dashboard");
+      // Came here from a "Register now" click - go back and let them finish.
+      navigate(location.state?.from || "/student/dashboard");
     } catch (err) {
       if (
         err.code === "auth/invalid-credential" ||
@@ -142,6 +144,10 @@ export default function StudentLogin() {
           </button>
           <h1 className={styles.title}>🎓 Student Login</h1>
           <p className={styles.sub}>Welcome back to HappyResearch</p>
+
+          {location.state?.from && (
+            <p style={notice}>Log in to finish registering.</p>
+          )}
 
           {error && <p className={styles.error}>{error}</p>}
 
@@ -226,7 +232,10 @@ export default function StudentLogin() {
           </form>
 
           <p className={styles.switch}>
-            New here? <Link to='/student/register'>Create a student account</Link>
+            New here?{" "}
+            <Link to='/student/register' state={location.state}>
+              Create a student account
+            </Link>
           </p>
           <p className={styles.switch}>
             Are you a mentor? <Link to='/teacher/login'>Mentor Login</Link>

@@ -441,7 +441,7 @@ export default function StudentDashboard() {
           navigate("/student/login");
           return;
         }
-        const rows = await loadStudentRegistrations(user.email);
+        const rows = await loadStudentRegistrations(user.email, user.uid);
         setData({ uid: user.uid, student: snap.data(), email: user.email, rows });
       } catch (err) {
         console.error(err);

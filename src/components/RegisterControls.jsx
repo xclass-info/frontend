@@ -51,26 +51,24 @@ const REGISTER_ERRORS = {
   NOT_FOUND: "This is no longer available.",
 };
 
-export function RegisterModal({ kind, item, onClose, onRegistered }) {
-  const [form, setForm] = useState({ name: "", email: "" });
-  const [errors, setErrors] = useState({});
+// `student` is the logged-in student's account ({ uid, name, email }) -
+// registering requires login, so there's no name/email form anymore, just a
+// confirmation using the account's details.
+export function RegisterModal({ kind, item, student, onClose, onRegistered }) {
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const isPaidCourse = kind === "course" && item.price > 0;
 
   async function submit() {
-    const e = {};
-    if (!form.name.trim()) e.name = "Required";
-    if (!form.email.trim()) e.email = "Required";
-    else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = "Invalid email";
-    setErrors(e);
-    if (Object.keys(e).length > 0) return;
-
     setSubmitting(true);
     setFormError("");
     try {
-      await registerForItem(kind, item.id, form);
+      await registerForItem(kind, item.id, {
+        name: student.name,
+        email: student.email,
+        studentUid: student.uid,
+      });
       onRegistered(kind, item.id);
       setDone(true);
     } catch (err) {
@@ -82,16 +80,6 @@ export function RegisterModal({ kind, item, onClose, onRegistered }) {
       setSubmitting(false);
     }
   }
-
-  const inputStyle = (hasError) => ({
-    width: "100%",
-    padding: 10,
-    borderRadius: 8,
-    border: `1px solid ${hasError ? "red" : "#ddd"}`,
-    marginBottom: 8,
-    boxSizing: "border-box",
-    fontSize: 14,
-  });
 
   return (
     <div
@@ -122,7 +110,7 @@ export function RegisterModal({ kind, item, onClose, onRegistered }) {
             <p style={{ fontSize: 48 }}>✅</p>
             <h3>You're registered!</h3>
             <p style={{ color: "#888", marginBottom: 20 }}>
-              The mentor will be in touch at {form.email}
+              The mentor will be in touch at {student.email}
               {isPaidCourse ? " about payment" : ""}.
             </p>
             <button
@@ -180,35 +168,34 @@ export function RegisterModal({ kind, item, onClose, onRegistered }) {
               </p>
             )}
 
-            <input
-              placeholder='Your full name'
-              value={form.name}
-              onChange={(e) => {
-                setForm({ ...form, name: e.target.value });
-                setErrors({ ...errors, name: "" });
+            <div
+              style={{
+                background: "#f9fafb",
+                border: "1px solid #eee",
+                borderRadius: 10,
+                padding: "12px 14px",
+                marginBottom: 16,
               }}
-              style={inputStyle(errors.name)}
-            />
-            {errors.name && (
-              <p style={{ color: "red", fontSize: 12, margin: "0 0 8px" }}>
-                {errors.name}
+            >
+              <p
+                style={{
+                  fontSize: 12,
+                  color: "#aaa",
+                  fontWeight: 600,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.03em",
+                  margin: "0 0 4px",
+                }}
+              >
+                Registering as
               </p>
-            )}
-            <input
-              placeholder='Your email'
-              type='email'
-              value={form.email}
-              onChange={(e) => {
-                setForm({ ...form, email: e.target.value });
-                setErrors({ ...errors, email: "" });
-              }}
-              style={inputStyle(errors.email)}
-            />
-            {errors.email && (
-              <p style={{ color: "red", fontSize: 12, margin: "0 0 8px" }}>
-                {errors.email}
+              <p style={{ margin: 0, fontWeight: 700, color: "#1a1a2e" }}>
+                {student.name}
               </p>
-            )}
+              <p style={{ margin: "2px 0 0", fontSize: 14, color: "#666" }}>
+                {student.email}
+              </p>
+            </div>
             {formError && (
               <p style={{ color: "red", fontSize: 13, margin: "0 0 12px" }}>
                 {formError}
@@ -230,7 +217,7 @@ export function RegisterModal({ kind, item, onClose, onRegistered }) {
                 opacity: submitting ? 0.6 : 1,
               }}
             >
-              {submitting ? "Registering..." : "Register now"}
+              {submitting ? "Registering..." : "Confirm Registration"}
             </button>
           </>
         )}

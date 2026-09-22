@@ -6,7 +6,7 @@ import {
   signOut,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import styles from "./TeacherAuth.module.css";
 import Footer from "./Footer";
 import { GRADE_OPTIONS } from "../utils/grades";
@@ -15,6 +15,7 @@ const CONTINUE_URL = "https://happyresearch.org/#/student/login";
 
 export default function StudentRegister() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -126,7 +127,9 @@ export default function StudentRegister() {
                 )}
               </p>
               <button
-                onClick={() => navigate("/student/login")}
+                onClick={() =>
+                  navigate("/student/login", { state: location.state })
+                }
                 className={styles.btn}
               >
                 Go to Login →
@@ -223,7 +226,9 @@ export default function StudentRegister() {
 
               <p className={styles.switch}>
                 Already have an account?{" "}
-                <Link to='/student/login'>Log in</Link>
+                <Link to='/student/login' state={location.state}>
+                  Log in
+                </Link>
               </p>
             </>
           )}
