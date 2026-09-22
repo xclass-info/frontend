@@ -22,6 +22,10 @@ import AdminDashboard from "./components/AdminDashboard";
 import TeacherProfile from "./components/TeacherProfile";
 import ResearchListing from "./components/ResearchListing";
 import ResearchDetail from "./components/ResearchDetail";
+import ProjectListing from "./components/ProjectListing";
+import ProjectDetail from "./components/ProjectDetail";
+import CourseListing from "./components/CourseListing";
+import CourseDetail from "./components/CourseDetail";
 import StudentLogin from "./components/StudentLogin";
 import StudentRegister from "./components/StudentRegister";
 import StudentDashboard from "./components/StudentDashboard";
@@ -148,6 +152,10 @@ export default function App() {
         <Route path='/teacher/:teacherId' element={<TeacherProfile />} />
         <Route path='/research' element={<ResearchListing />} />
         <Route path='/research/:researchId' element={<ResearchDetail />} />
+        <Route path='/projects' element={<ProjectListing />} />
+        <Route path='/projects/:projectId' element={<ProjectDetail />} />
+        <Route path='/courses' element={<CourseListing />} />
+        <Route path='/courses/:courseId' element={<CourseDetail />} />
         <Route path='/internship' element={<InternshipListing />} />
         <Route path='/about' element={<AboutUs />} />
         <Route path='/contact' element={<ContactUs />} />
