@@ -2,20 +2,13 @@ import { useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import HowItWorks from "./components/HowItWorks";
-import Subjects from "./components/Subjects";
 import Tutors from "./components/Tutors";
 import Testimonials from "./components/Testimonials";
-import ClassPosts from "./components/ClassPosts";
 import Footer from "./components/Footer";
-import LoadingScreen from "./components/LoadingScreen";
 import TeacherRegister from "./components/TeacherRegister";
 import TeacherLogin from "./components/TeacherLogin";
 import TeacherDashboard from "./components/TeacherDashboard";
 import CreateClass from "./components/CreateClass";
-import ClassListing from "./components/ClassListing";
-import Classroom from "./components/Classroom";
-import AdPostForm from "./components/AdPostForm";
-import AdPost from "./components/AdPost";
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
 import AdminDashboard from "./components/AdminDashboard";
@@ -31,13 +24,8 @@ import StudentRegister from "./components/StudentRegister";
 import StudentDashboard from "./components/StudentDashboard";
 import ResearchSection from "./components/ResearchSection";
 
-import { seedResearch } from "./components/seedResearch";
 import InternshipListing from "./components/InternshipListing";
-import InternshipSection from "./components/InternshipSection";
 
-import { seedInternships } from "./components/seedInternships";
-
-import { seedTeachers } from "./components/seedTeachers";
 import ContactUs from "./components/ContactUs";
 import AboutUs from "./components/AboutUs";
 import Gallery from "./components/Gallery";
@@ -63,69 +51,14 @@ function HomePage() {
 
   return (
     <>
-      {/* <LoadingScreen /> */}
       <Navbar />
       <Hero />
       <HowItWorks />
       <ResearchPrograms />
       <ResearchSection />
-      {/* <InternshipSection /> */}
       <Tutors />
       <Testimonials />
       <Footer />
-      {/* <button
-        onClick={seedResearch}
-        style={{
-          position: "fixed",
-          bottom: 20,
-          right: 20,
-          zIndex: 999,
-          padding: "10px 20px",
-          background: "#4a90e2",
-          color: "white",
-          border: "none",
-          borderRadius: 8,
-          cursor: "pointer",
-        }}
-      >
-        Seed Research
-      </button>
-
-      <button
-        onClick={seedInternships}
-        style={{
-          position: "fixed",
-          bottom: 20,
-          right: 20,
-          zIndex: 999,
-          padding: "10px 20px",
-          background: "#27ae60",
-          color: "white",
-          border: "none",
-          borderRadius: 8,
-          cursor: "pointer",
-        }}
-      >
-        Seed Internships
-      </button>
-
-      <button
-        onClick={seedTeachers}
-        style={{
-          position: "fixed",
-          bottom: 20,
-          left: 20,
-          zIndex: 999,
-          padding: "10px 20px",
-          background: "#9b6bff",
-          color: "white",
-          border: "none",
-          borderRadius: 8,
-          cursor: "pointer",
-        }}
-      >
-        Seed Teachers
-      </button> */}
     </>
   );
 }
