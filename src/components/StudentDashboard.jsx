@@ -120,31 +120,49 @@ function RegistrationCard({ row }) {
 
 const labelStyle = { fontSize: 13, color: "#888", fontWeight: 600 };
 const valueStyle = { margin: "4px 0 0", fontSize: 15 };
+const inputStyle = {
+  width: "100%",
+  padding: "10px 12px",
+  borderRadius: 8,
+  border: "1px solid #ddd",
+  fontSize: 16,
+  boxSizing: "border-box",
+  marginTop: 4,
+  fontFamily: "inherit",
+};
 
 export function StudentDashboardView({
   student,
   email,
   rows,
-  onSaveName,
+  onSaveProfile,
   onLogout,
 }) {
   const [activeTab, setActiveTab] = useState("profile");
   const [editing, setEditing] = useState(false);
-  const [nameDraft, setNameDraft] = useState(student.name);
+  const [draft, setDraft] = useState({
+    name: student.name,
+    grade: student.grade || "",
+    phone: student.phone || "",
+  });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   const rowsFor = (kind) => rows.filter((r) => r.reg.kind === kind);
 
   async function save() {
-    if (!nameDraft.trim()) {
+    if (!draft.name.trim()) {
       setError("Please enter your full name");
       return;
     }
     setSaving(true);
     setError("");
     try {
-      await onSaveName(nameDraft.trim());
+      await onSaveProfile({
+        name: draft.name.trim(),
+        grade: draft.grade.trim(),
+        phone: draft.phone.trim(),
+      });
       setEditing(false);
     } catch (err) {
       console.error(err);
@@ -233,7 +251,11 @@ export function StudentDashboardView({
               {!editing && (
                 <button
                   onClick={() => {
-                    setNameDraft(student.name);
+                    setDraft({
+                      name: student.name,
+                      grade: student.grade || "",
+                      phone: student.phone || "",
+                    });
                     setEditing(true);
                   }}
                   style={{
@@ -258,18 +280,11 @@ export function StudentDashboardView({
                 <p style={labelStyle}>Full name</p>
                 {editing ? (
                   <input
-                    value={nameDraft}
-                    onChange={(e) => setNameDraft(e.target.value)}
-                    style={{
-                      width: "100%",
-                      padding: "10px 12px",
-                      borderRadius: 8,
-                      border: "1px solid #ddd",
-                      fontSize: 16,
-                      boxSizing: "border-box",
-                      marginTop: 4,
-                      fontFamily: "inherit",
-                    }}
+                    value={draft.name}
+                    onChange={(e) =>
+                      setDraft({ ...draft, name: e.target.value })
+                    }
+                    style={inputStyle}
                   />
                 ) : (
                   <p style={valueStyle}>{student.name}</p>
@@ -283,6 +298,37 @@ export function StudentDashboardView({
                     ✓ verified
                   </span>
                 </p>
+              </div>
+              <div style={{ marginBottom: 20 }}>
+                <p style={labelStyle}>Grade</p>
+                {editing ? (
+                  <input
+                    value={draft.grade}
+                    onChange={(e) =>
+                      setDraft({ ...draft, grade: e.target.value })
+                    }
+                    placeholder='e.g. 10th grade'
+                    style={inputStyle}
+                  />
+                ) : (
+                  <p style={valueStyle}>{student.grade || "—"}</p>
+                )}
+              </div>
+              <div style={{ marginBottom: 20 }}>
+                <p style={labelStyle}>Phone Number</p>
+                {editing ? (
+                  <input
+                    type='tel'
+                    value={draft.phone}
+                    onChange={(e) =>
+                      setDraft({ ...draft, phone: e.target.value })
+                    }
+                    placeholder='(555) 555-5555'
+                    style={inputStyle}
+                  />
+                ) : (
+                  <p style={valueStyle}>{student.phone || "—"}</p>
+                )}
               </div>
               {student.createdAt?.toDate && (
                 <div style={{ marginBottom: 20 }}>
@@ -398,9 +444,9 @@ export default function StudentDashboard() {
     return () => unsub();
   }, [navigate]);
 
-  async function saveName(name) {
-    await updateDoc(doc(db, "students", data.uid), { name });
-    setData({ ...data, student: { ...data.student, name } });
+  async function saveProfile(fields) {
+    await updateDoc(doc(db, "students", data.uid), fields);
+    setData({ ...data, student: { ...data.student, ...fields } });
   }
 
   async function logout() {
@@ -421,7 +467,7 @@ export default function StudentDashboard() {
       student={data.student}
       email={data.email}
       rows={data.rows}
-      onSaveName={saveName}
+      onSaveProfile={saveProfile}
       onLogout={logout}
     />
   );

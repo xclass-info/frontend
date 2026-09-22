@@ -17,6 +17,8 @@ export default function StudentRegister() {
   const [form, setForm] = useState({
     name: "",
     email: "",
+    grade: "",
+    phone: "",
     password: "",
     confirmPassword: "",
   });
@@ -53,6 +55,8 @@ export default function StudentRegister() {
       await setDoc(doc(db, "students", user.uid), {
         name: form.name.trim(),
         email: form.email.trim().toLowerCase(),
+        grade: form.grade.trim(),
+        phone: form.phone.trim(),
         createdAt: new Date(),
       });
 
@@ -158,6 +162,27 @@ export default function StudentRegister() {
                     onChange={handleChange}
                     placeholder='you@email.com'
                     required
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.label}>Grade (optional)</label>
+                  <input
+                    className={styles.input}
+                    name='grade'
+                    value={form.grade}
+                    onChange={handleChange}
+                    placeholder='e.g. 10th grade'
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.label}>Phone Number (optional)</label>
+                  <input
+                    className={styles.input}
+                    name='phone'
+                    type='tel'
+                    value={form.phone}
+                    onChange={handleChange}
+                    placeholder='(555) 555-5555'
                   />
                 </div>
                 <div className={styles.field}>
