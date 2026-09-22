@@ -9,6 +9,7 @@ import { doc, setDoc } from "firebase/firestore";
 import { useNavigate, Link } from "react-router-dom";
 import styles from "./TeacherAuth.module.css";
 import Footer from "./Footer";
+import { GRADE_OPTIONS } from "../utils/grades";
 
 const CONTINUE_URL = "https://happyresearch.org/#/student/login";
 
@@ -166,13 +167,19 @@ export default function StudentRegister() {
                 </div>
                 <div className={styles.field}>
                   <label className={styles.label}>Grade (optional)</label>
-                  <input
+                  <select
                     className={styles.input}
                     name='grade'
                     value={form.grade}
                     onChange={handleChange}
-                    placeholder='e.g. 10th grade'
-                  />
+                  >
+                    <option value=''>Select grade</option>
+                    {GRADE_OPTIONS.map((g) => (
+                      <option key={g} value={g}>
+                        {g}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className={styles.field}>
                   <label className={styles.label}>Phone Number (optional)</label>

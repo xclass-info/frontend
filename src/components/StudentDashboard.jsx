@@ -10,6 +10,7 @@ import styles from "./TeacherDashboard.module.css";
 import Footer from "./Footer";
 import { formatMentorName } from "../utils/mentorName";
 import { lessonWeekday } from "../utils/format";
+import { GRADE_OPTIONS } from "../utils/grades";
 import { loadStudentRegistrations } from "../utils/studentData";
 
 const TABS = [
@@ -302,14 +303,20 @@ export function StudentDashboardView({
               <div style={{ marginBottom: 20 }}>
                 <p style={labelStyle}>Grade</p>
                 {editing ? (
-                  <input
+                  <select
                     value={draft.grade}
                     onChange={(e) =>
                       setDraft({ ...draft, grade: e.target.value })
                     }
-                    placeholder='e.g. 10th grade'
                     style={inputStyle}
-                  />
+                  >
+                    <option value=''>Select grade</option>
+                    {GRADE_OPTIONS.map((g) => (
+                      <option key={g} value={g}>
+                        {g}
+                      </option>
+                    ))}
+                  </select>
                 ) : (
                   <p style={valueStyle}>{student.grade || "—"}</p>
                 )}
