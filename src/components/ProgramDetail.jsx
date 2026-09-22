@@ -160,8 +160,9 @@ export default function ProgramDetail() {
   const program = programData[programId];
 
   const [mentors, setMentors] = useState([]);
-  const [internships, setInternships] = useState([]);
   const [research, setResearch] = useState([]);
+  const [relatedResearch, setRelatedResearch] = useState([]);
+  const [relatedProjects, setRelatedProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -245,34 +246,38 @@ export default function ProgramDetail() {
       );
     });
 
-    // Load internships
-    const internUnsub = onSnapshot(
-      query(collection(db, "internships"), where("status", "==", "open")),
-      (snap) => {
-        const all = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        setInternships(
-          all.filter((i) => {
-            const fields =
-              `${i.field} ${i.title} ${i.description}`.toLowerCase();
-            return keywords[programId]?.some((kw) => fields.includes(kw));
-          }),
-        );
-      },
-    );
-
     // Load research
     const researchUnsub = onSnapshot(
       query(collection(db, "research"), where("status", "==", "published")),
       (snap) => {
-        setResearch(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+        const all = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        setResearch(all);
+        setRelatedResearch(
+          all.filter((r) => {
+            const fields = `${r.title} ${r.idea} ${r.impact}`.toLowerCase();
+            return keywords[programId]?.some((kw) => fields.includes(kw));
+          }),
+        );
         setLoading(false);
       },
     );
 
+    // Load projects
+    const projectUnsub = onSnapshot(collection(db, "projects"), (snap) => {
+      const all = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setRelatedProjects(
+        all.filter((p) => {
+          const fields =
+            `${p.title} ${p.description} ${p.learning}`.toLowerCase();
+          return keywords[programId]?.some((kw) => fields.includes(kw));
+        }),
+      );
+    });
+
     return () => {
       mentorUnsub();
-      internUnsub();
       researchUnsub();
+      projectUnsub();
     };
   }, [programId]);
 
@@ -683,7 +688,7 @@ export default function ProgramDetail() {
           )}
         </div>
 
-        {/* Internships */}
+        {/* Related Research */}
         <div style={{ marginBottom: 48 }}>
           <h2
             style={{
@@ -693,9 +698,9 @@ export default function ProgramDetail() {
               marginBottom: 24,
             }}
           >
-            🧪 Related Internships
+            🔬 Related Research
           </h2>
-          {internships.length === 0 ? (
+          {relatedResearch.length === 0 ? (
             <div
               style={{
                 background: "white",
@@ -706,9 +711,9 @@ export default function ProgramDetail() {
                 border: "1px dashed #ddd",
               }}
             >
-              <p>Browse all internships to find opportunities in this area.</p>
+              <p>Browse all research to find topics in this area.</p>
               <button
-                onClick={() => navigate("/internship")}
+                onClick={() => navigate("/research")}
                 style={{
                   marginTop: 12,
                   padding: "8px 20px",
@@ -719,7 +724,7 @@ export default function ProgramDetail() {
                   cursor: "pointer",
                 }}
               >
-                Browse All Internships
+                Browse All Research
               </button>
             </div>
           ) : (
@@ -730,15 +735,26 @@ export default function ProgramDetail() {
                 gap: 16,
               }}
             >
-              {internships.map((intern) => (
+              {relatedResearch.map((r) => (
                 <div
-                  key={intern.id}
+                  key={r.id}
+                  onClick={() => navigate(`/research/${r.id}`)}
                   style={{
                     background: "white",
                     borderRadius: 12,
                     padding: 20,
                     border: "2px solid #e2e8f0",
                     borderTop: `4px solid ${program.color}`,
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = "#ffcb05";
+                    e.currentTarget.style.transform = "translateY(-4px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "#e2e8f0";
+                    e.currentTarget.style.transform = "translateY(0)";
                   }}
                 >
                   <h3
@@ -746,48 +762,124 @@ export default function ProgramDetail() {
                       fontSize: 15,
                       fontWeight: 700,
                       color: "#00274c",
-                      marginBottom: 6,
+                      marginBottom: 8,
                     }}
                   >
-                    {intern.title}
+                    {r.title}
                   </h3>
                   <p
                     style={{
                       fontSize: 12,
-                      color: "#00274c",
-                      fontWeight: 600,
-                      marginBottom: 8,
-                    }}
-                  >
-                    🔬 {intern.field}
-                  </p>
-                  <p
-                    style={{
-                      fontSize: 12,
                       color: "#64748b",
-                      marginBottom: 12,
+                      margin: 0,
                       display: "-webkit-box",
-                      WebkitLineClamp: 2,
+                      WebkitLineClamp: 3,
                       WebkitBoxOrient: "vertical",
                       overflow: "hidden",
                       lineHeight: 1.5,
                     }}
                   >
-                    {intern.description}
+                    {r.idea}
                   </p>
-                  <div
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Related Projects */}
+        <div style={{ marginBottom: 48 }}>
+          <h2
+            style={{
+              fontSize: "1.5rem",
+              fontWeight: 700,
+              color: "#00274c",
+              marginBottom: 24,
+            }}
+          >
+            💡 Related Projects
+          </h2>
+          {relatedProjects.length === 0 ? (
+            <div
+              style={{
+                background: "white",
+                borderRadius: 12,
+                padding: 32,
+                textAlign: "center",
+                color: "#aaa",
+                border: "1px dashed #ddd",
+              }}
+            >
+              <p>Browse all projects to find opportunities in this area.</p>
+              <button
+                onClick={() => navigate("/projects")}
+                style={{
+                  marginTop: 12,
+                  padding: "8px 20px",
+                  borderRadius: 8,
+                  border: "none",
+                  background: "#00274c",
+                  color: "white",
+                  cursor: "pointer",
+                }}
+              >
+                Browse All Projects
+              </button>
+            </div>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+                gap: 16,
+              }}
+            >
+              {relatedProjects.map((p) => (
+                <div
+                  key={p.id}
+                  onClick={() => navigate(`/projects/${p.id}`)}
+                  style={{
+                    background: "white",
+                    borderRadius: 12,
+                    padding: 20,
+                    border: "2px solid #e2e8f0",
+                    borderTop: `4px solid ${program.color}`,
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = "#ffcb05";
+                    e.currentTarget.style.transform = "translateY(-4px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "#e2e8f0";
+                    e.currentTarget.style.transform = "translateY(0)";
+                  }}
+                >
+                  <h3
                     style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      fontSize: 12,
-                      color: "#888",
+                      fontSize: 15,
+                      fontWeight: 700,
+                      color: "#00274c",
+                      marginBottom: 8,
                     }}
                   >
-                    <span>⏱ {intern.duration}</span>
-                    <span style={{ color: "#e74c3c" }}>
-                      📅 {intern.deadline}
-                    </span>
-                  </div>
+                    {p.title}
+                  </h3>
+                  <p
+                    style={{
+                      fontSize: 12,
+                      color: "#64748b",
+                      margin: 0,
+                      display: "-webkit-box",
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {p.description}
+                  </p>
                 </div>
               ))}
             </div>
@@ -821,7 +913,7 @@ export default function ProgramDetail() {
               lineHeight: 1.7,
             }}
           >
-            Apply for an internship or book a session with one of our{" "}
+            Explore a research topic or book a session with one of our{" "}
             {program.title} mentors today.
           </p>
           <div
@@ -833,7 +925,7 @@ export default function ProgramDetail() {
             }}
           >
             <button
-              onClick={() => navigate("/internship")}
+              onClick={() => navigate("/research")}
               style={{
                 padding: "12px 28px",
                 borderRadius: 24,
@@ -845,7 +937,7 @@ export default function ProgramDetail() {
                 cursor: "pointer",
               }}
             >
-              🧪 Browse Internships
+              🔬 Browse Research
             </button>
             <button
               onClick={() => navigate("/tutors")}
