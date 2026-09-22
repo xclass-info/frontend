@@ -6,7 +6,7 @@ import { doc, getDoc } from "firebase/firestore";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { formatMentorName } from "../utils/mentorName";
-import { seatsStatus } from "../utils/format";
+import { SeatsRow, RegisterModal } from "./RegisterControls";
 
 const sectionLabel = {
   fontSize: 12,
@@ -31,6 +31,11 @@ export default function ResearchDetail() {
   const { researchId } = useParams();
   const [research, setResearch] = useState(undefined); // undefined = loading
   const [mentor, setMentor] = useState(null);
+  const [registering, setRegistering] = useState(false);
+
+  function markRegistered() {
+    setResearch((r) => ({ ...r, enrolledCount: (r.enrolledCount || 0) + 1 }));
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -134,7 +139,7 @@ export default function ResearchDetail() {
             {research.title}
           </h1>
 
-          <p style={{ fontSize: 15, color: "#888", margin: "0 0 32px" }}>
+          <p style={{ fontSize: 15, color: "#888", margin: "0 0 8px" }}>
             👩‍🏫 Mentored by:{" "}
             {mentor ? (
               <Link
@@ -146,8 +151,17 @@ export default function ResearchDetail() {
             ) : (
               mentorLabel
             )}
-            {research.seats ? ` · 👥 ${seatsStatus(research.seats, research.enrolledCount)}` : null}
           </p>
+
+          {research.seats ? (
+            <div style={{ marginBottom: 24 }}>
+              <SeatsRow
+                kind='research'
+                item={research}
+                onRegister={() => setRegistering(true)}
+              />
+            </div>
+          ) : null}
 
           <div style={{ marginBottom: 28 }}>
             <p style={sectionLabel}>Research Idea</p>
@@ -179,6 +193,14 @@ export default function ResearchDetail() {
           )}
         </div>
       </div>
+      {registering && (
+        <RegisterModal
+          kind='research'
+          item={research}
+          onClose={() => setRegistering(false)}
+          onRegistered={markRegistered}
+        />
+      )}
       <Footer />
     </div>
   );
