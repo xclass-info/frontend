@@ -109,7 +109,7 @@ export default function TeacherRegister() {
             <>
               <h1 className={styles.title}>👩‍🏫 Mentor Register</h1>
               <p className={styles.sub}>
-                Create your xclass mentor account
+                Create your HappyClass mentor account
               </p>
 
               {error && <p className={styles.error}>{error}</p>}

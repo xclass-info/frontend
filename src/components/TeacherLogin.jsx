@@ -123,7 +123,7 @@ export default function TeacherLogin() {
             ✕
           </button>
           <h1 className={styles.title}>👩‍🏫 Mentor Login</h1>
-          <p className={styles.sub}>Welcome back to xclass</p>
+          <p className={styles.sub}>Welcome back to HappyClass</p>
 
           {error && <p className={styles.error}>{error}</p>}
 

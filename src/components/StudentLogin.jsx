@@ -143,7 +143,7 @@ export default function StudentLogin() {
             ✕
           </button>
           <h1 className={styles.title}>🎓 Student Login</h1>
-          <p className={styles.sub}>Welcome back to xclass</p>
+          <p className={styles.sub}>Welcome back to HappyClass</p>
 
           {location.state?.from && (
             <p style={notice}>Log in to finish registering.</p>

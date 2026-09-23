@@ -44,7 +44,7 @@ export default function BookingRequests() {
         Authorization: `Bearer ${DAILY_API_KEY}`,
       },
       body: JSON.stringify({
-        name: `xclass-session-${bookingId.slice(-8)}`,
+        name: `happyclass-session-${bookingId.slice(-8)}`,
         properties: {
           enable_chat: true,
           enable_screenshare: true,

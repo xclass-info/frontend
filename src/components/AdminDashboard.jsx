@@ -178,7 +178,7 @@ export default function AdminDashboard() {
       await addDoc(collection(db, addType), {
         ...addForm,
         teacherId: "admin",
-        teacherName: "xclass Team",
+        teacherName: "HappyClass Team",
         createdAt: new Date(),
         ...(addType === "research" && { status: "published" }),
         ...(addType === "internships" && { status: "open", applicants: 0 }),
@@ -252,7 +252,7 @@ export default function AdminDashboard() {
 
           <h2 style={{ marginBottom: 4 }}>🔐 Admin Login</h2>
           <p style={{ color: "#888", fontSize: 14, marginBottom: 24 }}>
-            xclass admin only
+            HappyClass admin only
           </p>
           {error && (
             <p style={{ color: "red", fontSize: 13, marginBottom: 12 }}>
