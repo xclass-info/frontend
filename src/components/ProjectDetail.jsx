@@ -164,6 +164,19 @@ export default function ProjectDetail() {
             )}
           </p>
 
+          {project.deliverable && (
+            <p
+              style={{
+                fontSize: 14,
+                color: "#166534",
+                fontWeight: 600,
+                margin: "0 0 16px",
+              }}
+            >
+              📦 You'll produce: {project.deliverable}
+            </p>
+          )}
+
           {project.seats ? (
             <div style={{ marginBottom: 24 }}>
               <SeatsRow

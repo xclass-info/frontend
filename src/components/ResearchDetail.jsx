@@ -167,6 +167,19 @@ export default function ResearchDetail() {
             )}
           </p>
 
+          {research.deliverable && (
+            <p
+              style={{
+                fontSize: 14,
+                color: "#166534",
+                fontWeight: 600,
+                margin: "0 0 16px",
+              }}
+            >
+              📦 You'll produce: {research.deliverable}
+            </p>
+          )}
+
           {research.seats ? (
             <div style={{ marginBottom: 24 }}>
               <SeatsRow

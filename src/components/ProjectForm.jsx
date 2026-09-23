@@ -9,6 +9,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import styles from "./TeacherAuth.module.css";
+import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
 
 const WORD_LIMITS = { title: 100, description: 500, learning: 300 };
 
@@ -32,6 +33,7 @@ export default function ProjectForm({ project, onClose }) {
     description: project?.description || "",
     learning: project?.learning || "",
     seats: project?.seats ?? "",
+    deliverable: project?.deliverable || "",
   });
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -50,6 +52,7 @@ export default function ProjectForm({ project, onClose }) {
     if (!form.title.trim()) newErrors.title = "Required";
     if (!form.description.trim()) newErrors.description = "Required";
     if (!form.learning.trim()) newErrors.learning = "Required";
+    if (!form.deliverable) newErrors.deliverable = "Required";
     if (form.seats === "") newErrors.seats = "Required";
     else if (!Number.isInteger(Number(form.seats)) || Number(form.seats) < 1)
       newErrors.seats = "Must be a whole number, at least 1";
@@ -73,6 +76,7 @@ export default function ProjectForm({ project, onClose }) {
         description: form.description.trim(),
         learning: form.learning.trim(),
         seats: Number(form.seats),
+        deliverable: form.deliverable,
       };
       if (isEditing) {
         await updateDoc(doc(db, "projects", project.id), {
@@ -211,6 +215,27 @@ export default function ProjectForm({ project, onClose }) {
           />
           {errors.learning && (
             <p className={styles.errorMsg}>{errors.learning}</p>
+          )}
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label}>What Students Will Produce *</label>
+          <select
+            className={`${styles.input} ${errors.deliverable ? styles.inputError : ""}`}
+            name='deliverable'
+            value={form.deliverable}
+            onChange={handleChange}
+            style={{ fontSize: "1.1rem" }}
+          >
+            <option value=''>Select an output type</option>
+            {DELIVERABLE_OPTIONS.map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
+            ))}
+          </select>
+          {errors.deliverable && (
+            <p className={styles.errorMsg}>{errors.deliverable}</p>
           )}
         </div>
 

@@ -166,6 +166,18 @@ function ResearchItem({ r, onRegister }) {
       >
         {r.idea}
       </p>
+      {r.deliverable && (
+        <p
+          style={{
+            fontSize: 12,
+            color: "#166534",
+            fontWeight: 600,
+            margin: "0 0 4px",
+          }}
+        >
+          📦 You'll produce: {r.deliverable}
+        </p>
+      )}
       <SeatsRow kind='research' item={r} onRegister={onRegister} />
       {open && (
         <>
@@ -728,6 +740,18 @@ export default function TeacherProfile() {
                         lineHeight: 1.6,
                       }}
                     />
+                  )}
+                  {project.deliverable && (
+                    <p
+                      style={{
+                        fontSize: 12,
+                        color: "#166534",
+                        fontWeight: 600,
+                        margin: "6px 0 0",
+                      }}
+                    >
+                      📦 You'll produce: {project.deliverable}
+                    </p>
                   )}
                   <SeatsRow
                     kind='project'

@@ -171,6 +171,19 @@ export default function ProjectListing() {
                   <p style={clampStyle(2)}>{p.learning}</p>
                 </div>
 
+                {p.deliverable && (
+                  <p
+                    style={{
+                      fontSize: 12,
+                      color: "#166534",
+                      fontWeight: 600,
+                      margin: "0 0 8px",
+                    }}
+                  >
+                    📦 You'll produce: {p.deliverable}
+                  </p>
+                )}
+
                 {p.seats ? (
                   <p
                     style={{

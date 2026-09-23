@@ -19,6 +19,7 @@ import BookingRequests from "./BookingRequests";
 import { SkeletonDashboardCard } from "./Skeleton";
 import ResearchForm from "./ResearchForm";
 import ProjectForm from "./ProjectForm";
+import ShowcaseForm from "./ShowcaseForm";
 
 import Footer from "./Footer";
 import { lessonWeekday, safeUrl } from "../utils/format";
@@ -49,6 +50,9 @@ export default function TeacherDashboard() {
   const [projects, setProjects] = useState([]);
   const [showProjectForm, setShowProjectForm] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
+  const [showcase, setShowcase] = useState([]);
+  const [showShowcaseForm, setShowShowcaseForm] = useState(false);
+  const [editingShowcase, setEditingShowcase] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(location.state?.tab || "classes");
 
@@ -112,10 +116,19 @@ export default function TeacherDashboard() {
         setProjects(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
       });
 
+      const showcaseQuery = query(
+        collection(db, "showcase"),
+        where("teacherId", "==", user.uid),
+      );
+      const unsubscribeShowcase = onSnapshot(showcaseQuery, (snapshot) => {
+        setShowcase(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+      });
+
       return () => {
         unsubscribeClasses();
         unsubscribeResearch();
         unsubscribeProjects();
+        unsubscribeShowcase();
       };
     });
 
@@ -193,6 +206,17 @@ export default function TeacherDashboard() {
     } catch (err) {
       console.error(err);
       alert("Failed to update status. Please try again.");
+    }
+  }
+
+  async function deleteShowcaseEntry(id) {
+    if (!confirm("Remove this from the Showcase? This can't be undone."))
+      return;
+    try {
+      await deleteDoc(doc(db, "showcase", id));
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete. Please try again.");
     }
   }
 
@@ -335,6 +359,7 @@ export default function TeacherDashboard() {
             { id: "research", label: "🔬 Research" },
             { id: "projects", label: "💡 Projects" },
             { id: "classes", label: "📚 Courses" },
+            { id: "showcase", label: "🏆 Showcase" },
             { id: "availability", label: "🗓 Availability" },
             { id: "bookings", label: "📬 Bookings" },
           ].map((tab) => (
@@ -418,6 +443,18 @@ export default function TeacherDashboard() {
                           </span>
                         </div>
                         <p className={styles.cardDesc}>{r.idea}</p>
+                        {r.deliverable && (
+                          <p
+                            style={{
+                              fontSize: 12,
+                              color: "#166534",
+                              fontWeight: 600,
+                              margin: "0 0 6px",
+                            }}
+                          >
+                            📦 {r.deliverable}
+                          </p>
+                        )}
                         {r.seats ? (
                           <div className={styles.cardMeta}>
                             <span>
@@ -518,6 +555,18 @@ export default function TeacherDashboard() {
                           </span>
                         </div>
                         <p className={styles.cardDesc}>{p.description}</p>
+                        {p.deliverable && (
+                          <p
+                            style={{
+                              fontSize: 12,
+                              color: "#166534",
+                              fontWeight: 600,
+                              margin: "0 0 6px",
+                            }}
+                          >
+                            📦 {p.deliverable}
+                          </p>
+                        )}
                         {p.seats ? (
                           <div className={styles.cardMeta}>
                             <span>
@@ -675,6 +724,123 @@ export default function TeacherDashboard() {
                   </div>
                 ))}
               </div>
+            )}
+          </div>
+        )}
+        {/* ── Showcase Tab ── */}
+        {activeTab === "showcase" && (
+          <div className={styles.section}>
+            {showShowcaseForm ? (
+              <ShowcaseForm
+                entry={editingShowcase}
+                onClose={() => {
+                  setShowShowcaseForm(false);
+                  setEditingShowcase(null);
+                }}
+              />
+            ) : (
+              <>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: 16,
+                  }}
+                >
+                  <div>
+                    <h2 className={styles.sectionTitle} style={{ marginBottom: 4 }}>
+                      Your Showcase
+                    </h2>
+                    <p style={{ color: "#888", fontSize: 13, margin: 0 }}>
+                      Finished student projects, shown publicly as proof of
+                      real outcomes.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setEditingShowcase(null);
+                      setShowShowcaseForm(true);
+                    }}
+                    className={styles.createBtn}
+                  >
+                    + Add to Showcase
+                  </button>
+                </div>
+                {showcase.length === 0 ? (
+                  <div className={styles.empty}>
+                    <p>🏆 Nothing published yet!</p>
+                    <p style={{ fontSize: 13, color: "#aaa", marginTop: -8 }}>
+                      Once a student finishes a research post or project,
+                      publish their outcome here.
+                    </p>
+                    <button
+                      onClick={() => {
+                        setEditingShowcase(null);
+                        setShowShowcaseForm(true);
+                      }}
+                      className={styles.createBtn}
+                    >
+                      + Add your first showcase entry
+                    </button>
+                  </div>
+                ) : (
+                  <div className={styles.grid}>
+                    {showcase.map((s) => (
+                      <div key={s.id} className={styles.card}>
+                        <div className={styles.cardTop}>
+                          <h3 className={styles.cardTitle}>{s.title}</h3>
+                          <span className={`${styles.badge} ${styles.active}`}>
+                            {s.outputType}
+                          </span>
+                        </div>
+                        <p
+                          style={{
+                            fontSize: 13,
+                            color: "#888",
+                            margin: "0 0 8px",
+                          }}
+                        >
+                          👤 {s.studentName}
+                        </p>
+                        <p className={styles.cardDesc}>{s.summary}</p>
+                        {s.outputUrl && (
+                          <a
+                            href={s.outputUrl}
+                            target='_blank'
+                            rel='noreferrer'
+                            style={{
+                              fontSize: 13,
+                              color: "#00274c",
+                              textDecoration: "underline",
+                            }}
+                          >
+                            View finished work →
+                          </a>
+                        )}
+                        <div className={styles.cardFooter}>
+                          <button
+                            className={styles.joinBtn}
+                            onClick={() => {
+                              setEditingShowcase(s);
+                              setShowShowcaseForm(true);
+                            }}
+                          >
+                            ✏️ Edit
+                          </button>
+                          <button
+                            className={styles.copyBtn}
+                            onClick={() => deleteShowcaseEntry(s.id)}
+                            style={{ color: "#e74c3c" }}
+                          >
+                            🗑️ Delete
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}

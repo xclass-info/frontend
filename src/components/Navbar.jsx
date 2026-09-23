@@ -85,6 +85,9 @@ export default function Navbar() {
         <li>
           <Link to='/courses'>Course</Link>
         </li>
+        <li>
+          <Link to='/showcase'>Showcase</Link>
+        </li>
 
         {/* <li>
           <a onClick={() => scrollTo("tutors")} style={{ cursor: "pointer" }}>
@@ -155,6 +158,9 @@ export default function Navbar() {
           </li>
           <li>
             <Link to='/courses'>📚 Course</Link>
+          </li>
+          <li>
+            <Link to='/showcase'>🏆 Showcase</Link>
           </li>
 
           <li>

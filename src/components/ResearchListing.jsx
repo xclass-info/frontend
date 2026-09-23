@@ -232,6 +232,19 @@ export default function ResearchListing() {
                   </p>
                 </div>
 
+                {r.deliverable && (
+                  <p
+                    style={{
+                      fontSize: 12,
+                      color: "#166534",
+                      fontWeight: 600,
+                      margin: "0 0 8px",
+                    }}
+                  >
+                    📦 You'll produce: {r.deliverable}
+                  </p>
+                )}
+
                 {r.seats ? (
                   <p
                     style={{

@@ -1,4 +1,6 @@
-// src/components/ResearchForm.jsx
+// src/components/ShowcaseForm.jsx
+// Lets a mentor publish a finished student project to the public Showcase
+// page - the "here's proof, not just a claim" feature.
 import { useState } from "react";
 import { db, auth } from "../firebase";
 import {
@@ -10,8 +12,9 @@ import {
 } from "firebase/firestore";
 import styles from "./TeacherAuth.module.css";
 import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
+import { safeUrl } from "../utils/format";
 
-const WORD_LIMITS = { title: 100, idea: 500, impact: 300, details: 300 };
+const WORD_LIMITS = { title: 100, summary: 400 };
 
 function countWords(str) {
   const trimmed = str.trim();
@@ -26,16 +29,14 @@ function WordCount({ count, limit }) {
   );
 }
 
-export default function ResearchForm({ research, onClose }) {
-  const isEditing = Boolean(research);
+export default function ShowcaseForm({ entry, onClose }) {
+  const isEditing = Boolean(entry);
   const [form, setForm] = useState({
-    title: research?.title || "",
-    idea: research?.idea || "",
-    impact: research?.impact || "",
-    details: research?.details || "",
-    seats: research?.seats ?? "",
-    type: research?.type || "exploration",
-    deliverable: research?.deliverable || "",
+    title: entry?.title || "",
+    studentName: entry?.studentName || "",
+    outputType: entry?.outputType || "",
+    summary: entry?.summary || "",
+    outputUrl: entry?.outputUrl || "",
   });
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -52,12 +53,11 @@ export default function ResearchForm({ research, onClose }) {
   function validate() {
     const newErrors = {};
     if (!form.title.trim()) newErrors.title = "Required";
-    if (!form.idea.trim()) newErrors.idea = "Required";
-    if (!form.impact.trim()) newErrors.impact = "Required";
-    if (!form.deliverable) newErrors.deliverable = "Required";
-    if (form.seats === "") newErrors.seats = "Required";
-    else if (!Number.isInteger(Number(form.seats)) || Number(form.seats) < 1)
-      newErrors.seats = "Must be a whole number, at least 1";
+    if (!form.studentName.trim()) newErrors.studentName = "Required";
+    if (!form.outputType) newErrors.outputType = "Required";
+    if (!form.summary.trim()) newErrors.summary = "Required";
+    if (form.outputUrl.trim() && !safeUrl(form.outputUrl))
+      newErrors.outputUrl = "Must be a valid http(s) link";
     return newErrors;
   }
 
@@ -75,26 +75,22 @@ export default function ResearchForm({ research, onClose }) {
       const teacherSnap = await getDoc(doc(db, "teachers", user.uid));
       const payload = {
         title: form.title.trim(),
-        idea: form.idea.trim(),
-        impact: form.impact.trim(),
-        details: form.details.trim() || null,
-        seats: Number(form.seats),
-        type: form.type,
-        deliverable: form.deliverable,
+        studentName: form.studentName.trim(),
+        outputType: form.outputType,
+        summary: form.summary.trim(),
+        outputUrl: form.outputUrl.trim() || null,
       };
       if (isEditing) {
-        await updateDoc(doc(db, "research", research.id), {
+        await updateDoc(doc(db, "showcase", entry.id), {
           ...payload,
           updatedAt: new Date(),
         });
       } else {
-        await addDoc(collection(db, "research"), {
+        await addDoc(collection(db, "showcase"), {
           ...payload,
           teacherId: user.uid,
           teacherName: teacherSnap.data()?.name || user.displayName || "Teacher",
           createdAt: new Date(),
-          status: "published",
-          stage: "active",
         });
       }
       setSaved(true);
@@ -130,12 +126,12 @@ export default function ResearchForm({ research, onClose }) {
         </button>
       )}
       <h3 style={{ marginBottom: 4 }}>
-        {isEditing ? "🔬 Edit Research" : "🔬 Create Research"}
+        {isEditing ? "🏆 Edit Showcase Entry" : "🏆 Add to Showcase"}
       </h3>
       <p style={{ color: "#888", fontSize: 14, marginBottom: 24 }}>
         {isEditing
-          ? "Update your research post."
-          : "Share your research with the community."}
+          ? "Update this finished project."
+          : "Publish a student's finished project - this is what visitors see as proof of real outcomes."}
       </p>
 
       <form
@@ -150,7 +146,7 @@ export default function ResearchForm({ research, onClose }) {
               alignItems: "center",
             }}
           >
-            <label className={styles.label}>Research Topic *</label>
+            <label className={styles.label}>Project Title *</label>
             <WordCount
               count={countWords(form.title)}
               limit={WORD_LIMITS.title}
@@ -161,100 +157,33 @@ export default function ResearchForm({ research, onClose }) {
             name='title'
             value={form.title}
             onChange={handleChange}
-            placeholder='e.g. Edge Computing in Home Security'
+            placeholder="e.g. Can AI Compose Music That Expresses Human Emotion?"
             style={{ fontSize: "1.1rem" }}
           />
           {errors.title && <p className={styles.errorMsg}>{errors.title}</p>}
         </div>
 
         <div className={styles.field}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <label className={styles.label}>Research Idea *</label>
-            <WordCount
-              count={countWords(form.idea)}
-              limit={WORD_LIMITS.idea}
-            />
-          </div>
-          <textarea
-            className={`${styles.input} ${styles.textarea} ${errors.idea ? styles.inputError : ""}`}
-            name='idea'
-            value={form.idea}
+          <label className={styles.label}>Student's Name *</label>
+          <input
+            className={`${styles.input} ${errors.studentName ? styles.inputError : ""}`}
+            name='studentName'
+            value={form.studentName}
             onChange={handleChange}
-            placeholder='Describe your research idea...'
-            rows={10}
+            placeholder="e.g. Jamie L."
             style={{ fontSize: "1.1rem" }}
           />
-          {errors.idea && <p className={styles.errorMsg}>{errors.idea}</p>}
+          {errors.studentName && (
+            <p className={styles.errorMsg}>{errors.studentName}</p>
+          )}
         </div>
 
         <div className={styles.field}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <label className={styles.label}>Research Impact *</label>
-            <WordCount
-              count={countWords(form.impact)}
-              limit={WORD_LIMITS.impact}
-            />
-          </div>
-          <textarea
-            className={`${styles.input} ${styles.textarea} ${errors.impact ? styles.inputError : ""}`}
-            name='impact'
-            value={form.impact}
-            onChange={handleChange}
-            placeholder='What impact will this research have?'
-            rows={7}
-            style={{ fontSize: "1.1rem" }}
-          />
-          {errors.impact && <p className={styles.errorMsg}>{errors.impact}</p>}
-        </div>
-
-        <div className={styles.field}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <label className={styles.label}>
-              Additional Details{" "}
-              <span style={{ color: "#aaa", fontWeight: 400 }}>
-                (optional)
-              </span>
-            </label>
-            <WordCount
-              count={countWords(form.details)}
-              limit={WORD_LIMITS.details}
-            />
-          </div>
-          <textarea
-            className={`${styles.input} ${styles.textarea}`}
-            name='details'
-            value={form.details}
-            onChange={handleChange}
-            placeholder='Any additional information...'
-            rows={3}
-            style={{ fontSize: "1.1rem" }}
-          />
-        </div>
-
-        <div className={styles.field}>
-          <label className={styles.label}>What Students Will Produce *</label>
+          <label className={styles.label}>What They Produced *</label>
           <select
-            className={`${styles.input} ${errors.deliverable ? styles.inputError : ""}`}
-            name='deliverable'
-            value={form.deliverable}
+            className={`${styles.input} ${errors.outputType ? styles.inputError : ""}`}
+            name='outputType'
+            value={form.outputType}
             onChange={handleChange}
             style={{ fontSize: "1.1rem" }}
           >
@@ -265,25 +194,55 @@ export default function ResearchForm({ research, onClose }) {
               </option>
             ))}
           </select>
-          {errors.deliverable && (
-            <p className={styles.errorMsg}>{errors.deliverable}</p>
+          {errors.outputType && (
+            <p className={styles.errorMsg}>{errors.outputType}</p>
           )}
         </div>
 
         <div className={styles.field}>
-          <label className={styles.label}>Seats *</label>
-          <input
-            className={`${styles.input} ${errors.seats ? styles.inputError : ""}`}
-            name='seats'
-            type='number'
-            min='1'
-            max='50'
-            value={form.seats}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <label className={styles.label}>Summary *</label>
+            <WordCount
+              count={countWords(form.summary)}
+              limit={WORD_LIMITS.summary}
+            />
+          </div>
+          <textarea
+            className={`${styles.input} ${styles.textarea} ${errors.summary ? styles.inputError : ""}`}
+            name='summary'
+            value={form.summary}
             onChange={handleChange}
-            placeholder='e.g. 2'
+            placeholder='What did the student do, and what did they find or build?'
+            rows={8}
             style={{ fontSize: "1.1rem" }}
           />
-          {errors.seats && <p className={styles.errorMsg}>{errors.seats}</p>}
+          {errors.summary && (
+            <p className={styles.errorMsg}>{errors.summary}</p>
+          )}
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label}>
+            Link to the Finished Work{" "}
+            <span style={{ color: "#aaa", fontWeight: 400 }}>(optional)</span>
+          </label>
+          <input
+            className={`${styles.input} ${errors.outputUrl ? styles.inputError : ""}`}
+            name='outputUrl'
+            value={form.outputUrl}
+            onChange={handleChange}
+            placeholder='https://... (paper, site, video, etc.)'
+            style={{ fontSize: "1.1rem" }}
+          />
+          {errors.outputUrl && (
+            <p className={styles.errorMsg}>{errors.outputUrl}</p>
+          )}
         </div>
 
         <div style={{ display: "flex", gap: 12 }}>
@@ -296,14 +255,14 @@ export default function ResearchForm({ research, onClose }) {
             {loading
               ? isEditing
                 ? "Saving..."
-                : "Creating..."
+                : "Publishing..."
               : saved
                 ? isEditing
                   ? "Saved! ✓"
-                  : "Created! ✓"
+                  : "Published! ✓"
                 : isEditing
                   ? "Save Changes"
-                  : "Create Research 🔬"}
+                  : "Publish to Showcase 🏆"}
           </button>
           {isEditing && onClose && (
             <button
