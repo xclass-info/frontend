@@ -41,13 +41,35 @@ function HomePage() {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
           }
         });
       },
       { threshold: 0.15 },
     );
-    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    const observeReveals = (root) => {
+      root.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+    };
+    observeReveals(document);
+
+    // Sections like Tutors/ResearchSection render their real .reveal cards
+    // only after their own Firestore fetch resolves, which happens after
+    // this initial scan - watch for those being added to the page too.
+    const mutationObserver = new MutationObserver((mutations) => {
+      for (const { addedNodes } of mutations) {
+        addedNodes.forEach((node) => {
+          if (node.nodeType !== 1) return;
+          if (node.classList?.contains("reveal")) observer.observe(node);
+          observeReveals(node);
+        });
+      }
+    });
+    mutationObserver.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      observer.disconnect();
+      mutationObserver.disconnect();
+    };
   }, []);
 
   return (

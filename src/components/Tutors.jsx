@@ -1,5 +1,5 @@
 // src/components/Tutors.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { db } from "../firebase";
 import { collection, onSnapshot } from "firebase/firestore";
 import styles from "./Tutors.module.css";
@@ -7,21 +7,35 @@ import { SkeletonCard } from "./Skeleton";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import { avatarUrl } from "../utils/avatar";
 
 export default function Tutors({ standalone = false }) {
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const sectionRef = useRef(null);
 
+  // Self-contained scroll-fade-in for this section's own .reveal elements -
+  // this component is used both embedded on the homepage (which sets up its
+  // own page-wide observer) and standalone at /tutors (which has no such
+  // observer), so it can't rely on a parent to make its cards visible.
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "teachers"), (snapshot) => {
-      const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-      console.log("Teachers loaded:", data);
-      setTeachers(data.filter((t) => !t.disabled));
-      setLoading(false);
-    });
-    return () => unsub();
-  }, []);
+    const root = sectionRef.current;
+    if (!root) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 },
+    );
+    root.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [loading, teachers]);
 
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "teachers"), (snapshot) => {
@@ -48,9 +62,9 @@ export default function Tutors({ standalone = false }) {
     return (
       <>
         {standalone && <Navbar />}
-        <section id='tutors' className={styles.section}>
+        <section id='tutors' ref={sectionRef} className={styles.section}>
           <div className={styles.inner}>
-            <div className={styles.header}>
+            <div className={`${styles.header} reveal`}>
               <h2 className={styles.title}>👩‍🏫 Meet Our Mentors</h2>
               <p className={styles.sub}>
                 Expert mentors ready to help you learn anything.
@@ -71,9 +85,9 @@ export default function Tutors({ standalone = false }) {
   return (
     <>
       {standalone && <Navbar />}
-      <section id='tutors' className={styles.section}>
+      <section id='tutors' ref={sectionRef} className={styles.section}>
         <div className={styles.inner}>
-          <div className={styles.header}>
+          <div className={`${styles.header} reveal`}>
             <h2 className={styles.title}>Meet Our Research Mentors</h2>
             <p className={styles.sub}>
               Join world-class researchers and explore cutting-edge research
@@ -90,23 +104,17 @@ export default function Tutors({ standalone = false }) {
               {teachers.map((teacher) => (
                 <div
                   key={teacher.id}
-                  className={styles.card}
+                  className={`${styles.card} reveal`}
                   onClick={() => navigate(`/teacher/${teacher.id}`)}
                   style={{ cursor: "pointer" }}
                 >
                   {/* Avatar */}
                   <div className={styles.avatarWrapper}>
-                    {teacher.photoURL ? (
-                      <img
-                        src={teacher.photoURL}
-                        alt={teacher.name}
-                        className={styles.avatar}
-                      />
-                    ) : (
-                      <div className={styles.avatarFallback}>
-                        {teacher.name?.charAt(0).toUpperCase() || "T"}
-                      </div>
-                    )}
+                    <img
+                      src={teacher.photoURL || avatarUrl(teacher.id)}
+                      alt={teacher.name}
+                      className={styles.avatar}
+                    />
                   </div>
 
                   <h1 style={{ margin: "0 0 8px", fontSize: 26 }}>

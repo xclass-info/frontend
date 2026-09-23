@@ -91,7 +91,7 @@ export default function ResearchPrograms() {
     <section style={{ padding: "80px 24px", background: "white" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: 48 }}>
+        <div className='reveal' style={{ textAlign: "center", marginBottom: 48 }}>
           <div
             style={{
               display: "inline-block",
@@ -146,6 +146,7 @@ export default function ResearchPrograms() {
           {programs.map((program) => (
             <div
               key={program.id}
+              className='reveal'
               onClick={() => navigate(`/programs/${program.id}`)}
               style={{
                 background: "white",

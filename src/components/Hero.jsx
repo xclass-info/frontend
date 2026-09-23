@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { db } from "../firebase";
 import { collection, onSnapshot } from "firebase/firestore";
 import styles from "./Hero.module.css";
+import { avatarUrl } from "../utils/avatar";
 
 function mentorTags(teacher) {
   const raw = [teacher.expertise, teacher.researchArea]
@@ -129,16 +130,12 @@ export default function Hero() {
             {/* Mentor card */}
             <div className={styles.terminal}>
               <div className={styles.termBar}>
-                {mentor.photoURL ? (
-                  <img
-                    src={mentor.photoURL}
-                    alt={mentor.name}
-                    className={styles.tutorAvatar}
-                    style={{ objectFit: "cover" }}
-                  />
-                ) : (
-                  <div className={styles.tutorAvatar}>🧑‍🔬</div>
-                )}
+                <img
+                  src={mentor.photoURL || avatarUrl(mentor.id)}
+                  alt={mentor.name}
+                  className={styles.tutorAvatar}
+                  style={{ objectFit: "cover" }}
+                />
                 <div style={{ minWidth: 0, flex: 1 }}>
                   <div className={styles.tutorName}>{mentor.name}</div>
                   <div
