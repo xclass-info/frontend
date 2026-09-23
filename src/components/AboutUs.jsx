@@ -16,7 +16,7 @@ export default function AboutUs() {
         }}
       >
         <h1 style={{ fontSize: "2.5rem", fontWeight: 700, marginBottom: 16 }}>
-          About HappyResearch
+          About xclass
         </h1>
         <p
           style={{
@@ -122,7 +122,7 @@ export default function AboutUs() {
               marginBottom: 16,
             }}
           >
-            That is why we created HappyResearch.org.
+            That is why we created xclass.
           </p>
           <p
             style={{
@@ -132,7 +132,7 @@ export default function AboutUs() {
               marginBottom: 16,
             }}
           >
-            HappyResearch brings together passionate mentors — professors,
+            xclass brings together passionate mentors — professors,
             researchers, and PhD — who genuinely care about guiding the next
             generation. Here, students can freely explore and apply to research
             projects that match their interests and dreams.
@@ -171,7 +171,7 @@ export default function AboutUs() {
             🎯 Our Mission
           </h2>
           <p style={{ fontSize: 15, color: "#555", lineHeight: 1.8 }}>
-            At HappyResearch, we believe every student deserves the opportunity
+            At xclass, we believe every student deserves the opportunity
             to experience real research — not just read about it in textbooks.
             Our mission is to bridge the gap between curious students and
             experienced researchers, creating meaningful mentorship experiences
@@ -257,7 +257,7 @@ export default function AboutUs() {
           </div>
         </div>
 
-        {/* Why HappyResearch */}
+        {/* Why xclass */}
         <div
           style={{
             background: "white",
@@ -268,7 +268,7 @@ export default function AboutUs() {
           }}
         >
           <h2 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: 20 }}>
-            💡 Why HappyResearch?
+            💡 Why xclass?
           </h2>
           {[
             {
@@ -358,7 +358,7 @@ export default function AboutUs() {
               textAlign: "center",
             }}
           >
-            🌟 HappyResearch by the Numbers
+            🌟 xclass by the Numbers
           </h2>
           <div
             style={{

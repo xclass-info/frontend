@@ -62,7 +62,7 @@ export default function Navbar() {
     <nav className={styles.nav}>
       {/* Logo */}
       <Link to='/' className={styles.logo}>
-        happy<span className={styles.logoClass}>Research</span>
+        <span className={styles.logoClass}>x</span>class
         {/* <span className={styles.logoInfo}>.org</span> */}
       </Link>
 

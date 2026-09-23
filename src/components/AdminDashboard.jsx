@@ -178,7 +178,7 @@ export default function AdminDashboard() {
       await addDoc(collection(db, addType), {
         ...addForm,
         teacherId: "admin",
-        teacherName: "HappyResearch Team",
+        teacherName: "xclass Team",
         createdAt: new Date(),
         ...(addType === "research" && { status: "published" }),
         ...(addType === "internships" && { status: "open", applicants: 0 }),

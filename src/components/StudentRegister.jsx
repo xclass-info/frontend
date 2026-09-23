@@ -139,7 +139,7 @@ export default function StudentRegister() {
             <>
               <h1 className={styles.title}>🎓 Student Sign Up</h1>
               <p className={styles.sub}>
-                Create your HappyResearch student account
+                Create your xclass student account
               </p>
 
               {error && <p className={styles.error}>{error}</p>}

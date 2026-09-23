@@ -100,7 +100,7 @@ const photos = [
 const videos = [
   {
     url: "https://www.youtube.com/embed/G1IM1_tz-qQ",
-    caption: "Introduction to HappyResearch",
+    caption: "Introduction to xclass",
   },
 ];
 

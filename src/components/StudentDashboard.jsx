@@ -178,7 +178,7 @@ export function StudentDashboardView({
       <div className={styles.page}>
         <div className={styles.header}>
           <div className={styles.headerLeft}>
-            <h1 className={styles.logo}>💻 HappyResearch</h1>
+            <h1 className={styles.logo}>💻 <span style={{ color: "#ffcb05" }}>x</span>class</h1>
             <p className={styles.welcome}>
               Welcome back, <strong>{student.name}</strong> 👋
             </p>
