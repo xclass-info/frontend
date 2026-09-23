@@ -126,7 +126,7 @@ export default function ShowcaseForm({ entry, onClose }) {
         </button>
       )}
       <h3 style={{ marginBottom: 4 }}>
-        {isEditing ? "🏆 Edit Showcase Entry" : "🏆 Add to Showcase"}
+        {isEditing ? "🏆 Edit Student Work Entry" : "🏆 Add to Student Work"}
       </h3>
       <p style={{ color: "#888", fontSize: 14, marginBottom: 24 }}>
         {isEditing
@@ -262,7 +262,7 @@ export default function ShowcaseForm({ entry, onClose }) {
                   : "Published! ✓"
                 : isEditing
                   ? "Save Changes"
-                  : "Publish to Showcase 🏆"}
+                  : "Publish to Student Work 🏆"}
           </button>
           {isEditing && onClose && (
             <button

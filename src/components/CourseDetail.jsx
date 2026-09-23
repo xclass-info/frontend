@@ -183,6 +183,24 @@ export default function CourseDetail() {
             </span>
           </div>
 
+          {course.gradeLevel && (
+            <span
+              style={{
+                display: "inline-block",
+                fontSize: 12,
+                fontWeight: 700,
+                color: "#00274c",
+                background: "#fff8dc",
+                border: "1px solid #ffcb05",
+                padding: "3px 12px",
+                borderRadius: 20,
+                marginBottom: 12,
+              }}
+            >
+              🎓 {course.gradeLevel}
+            </span>
+          )}
+
           <p style={{ fontSize: 15, color: "#888", margin: "0 0 8px" }}>
             👩‍🏫 Mentored by:{" "}
             {mentor ? (
@@ -197,6 +215,12 @@ export default function CourseDetail() {
             )}
             {" · "}💰 {course.price > 0 ? `$${course.price}` : "Free"}
           </p>
+
+          {course.prerequisites && (
+            <p style={{ fontSize: 14, color: "#888", margin: "0 0 16px" }}>
+              ✅ Prerequisites: {course.prerequisites}
+            </p>
+          )}
 
           {course.maxSeats ? (
             <div style={{ marginBottom: 24 }}>

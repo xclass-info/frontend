@@ -165,6 +165,24 @@ export default function CourseListing() {
                     </span>
                   </div>
 
+                  {c.gradeLevel && (
+                    <span
+                      style={{
+                        display: "inline-block",
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: "#00274c",
+                        background: "#fff8dc",
+                        border: "1px solid #ffcb05",
+                        padding: "2px 10px",
+                        borderRadius: 20,
+                        marginBottom: 10,
+                      }}
+                    >
+                      🎓 {c.gradeLevel}
+                    </span>
+                  )}
+
                   <p
                     style={{
                       fontSize: 13,
@@ -179,6 +197,12 @@ export default function CourseListing() {
                   >
                     {c.description}
                   </p>
+
+                  {c.prerequisites && (
+                    <p style={{ fontSize: 12, color: "#888", margin: "0 0 8px" }}>
+                      ✅ Prerequisites: {c.prerequisites}
+                    </p>
+                  )}
 
                   {c.lessons?.length > 0 && (
                     <p style={{ fontSize: 12, color: "#666", margin: "0 0 8px" }}>

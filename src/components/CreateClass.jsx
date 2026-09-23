@@ -3,6 +3,7 @@ import { auth, db } from "../firebase";
 import { collection, addDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import styles from "./TeacherAuth.module.css";
+import { GRADE_RANGE_OPTIONS } from "../utils/gradeRange";
 
 export default function CreateClass() {
   const navigate = useNavigate();
@@ -14,6 +15,8 @@ export default function CreateClass() {
     description: "",
     maxSeats: "",
     price: "", // ← added
+    gradeLevel: "",
+    prerequisites: "",
   });
   const [lessons, setLessons] = useState([]);
   const [newDate, setNewDate] = useState("");
@@ -36,6 +39,8 @@ export default function CreateClass() {
             description: data.description || "",
             maxSeats: data.maxSeats ?? "",
             price: data.price ?? "",
+            gradeLevel: data.gradeLevel || "",
+            prerequisites: data.prerequisites || "",
           });
           setLessons(data.lessons || []);
         }
@@ -106,6 +111,7 @@ export default function CreateClass() {
     const newErrors = {};
     if (!form.title.trim()) newErrors.title = "Required";
     if (!form.description.trim()) newErrors.description = "Required";
+    if (!form.gradeLevel) newErrors.gradeLevel = "Required";
     if (lessons.length === 0) newErrors.lessons = "Add at least one lesson";
     if (!form.maxSeats) newErrors.maxSeats = "Required";
     else if (isNaN(form.maxSeats) || Number(form.maxSeats) < 1)
@@ -133,6 +139,8 @@ export default function CreateClass() {
         lessons,
         maxSeats: Number(form.maxSeats),
         price: Number(form.price), // ← added
+        gradeLevel: form.gradeLevel,
+        prerequisites: form.prerequisites.trim() || null,
       };
       if (isEditing) {
         await updateDoc(doc(db, "classes", editCourseId), {
@@ -212,6 +220,44 @@ export default function CreateClass() {
             {errors.description && (
               <p className={styles.errorMsg}>{errors.description}</p>
             )}
+          </div>
+
+          {/* Grade level */}
+          <div className={styles.field}>
+            <label className={styles.label}>Recommended Grade Level</label>
+            <select
+              className={`${styles.input} ${errors.gradeLevel ? styles.inputError : ""}`}
+              name='gradeLevel'
+              value={form.gradeLevel}
+              onChange={handleChange}
+            >
+              <option value=''>Select a grade range</option>
+              {GRADE_RANGE_OPTIONS.map((g) => (
+                <option key={g} value={g}>
+                  {g}
+                </option>
+              ))}
+            </select>
+            {errors.gradeLevel && (
+              <p className={styles.errorMsg}>{errors.gradeLevel}</p>
+            )}
+          </div>
+
+          {/* Prerequisites */}
+          <div className={styles.field}>
+            <label className={styles.label}>
+              Prerequisites{" "}
+              <span style={{ color: "#aaa", fontWeight: 400 }}>
+                (optional)
+              </span>
+            </label>
+            <input
+              className={styles.input}
+              name='prerequisites'
+              value={form.prerequisites}
+              onChange={handleChange}
+              placeholder='e.g. Basic Python, Algebra 1'
+            />
           </div>
 
           {/* Lessons */}

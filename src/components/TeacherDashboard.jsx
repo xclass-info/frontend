@@ -210,7 +210,7 @@ export default function TeacherDashboard() {
   }
 
   async function deleteShowcaseEntry(id) {
-    if (!confirm("Remove this from the Showcase? This can't be undone."))
+    if (!confirm("Remove this from Student Work? This can't be undone."))
       return;
     try {
       await deleteDoc(doc(db, "showcase", id));
@@ -359,7 +359,7 @@ export default function TeacherDashboard() {
             { id: "research", label: "🔬 Research" },
             { id: "projects", label: "💡 Projects" },
             { id: "classes", label: "📚 Courses" },
-            { id: "showcase", label: "🏆 Showcase" },
+            { id: "showcase", label: "🏆 Student Work" },
             { id: "availability", label: "🗓 Availability" },
             { id: "bookings", label: "📬 Bookings" },
           ].map((tab) => (
@@ -443,6 +443,23 @@ export default function TeacherDashboard() {
                           </span>
                         </div>
                         <p className={styles.cardDesc}>{r.idea}</p>
+                        {r.gradeLevel && (
+                          <span
+                            style={{
+                              display: "inline-block",
+                              fontSize: 11,
+                              fontWeight: 700,
+                              color: "#00274c",
+                              background: "#fff8dc",
+                              border: "1px solid #ffcb05",
+                              padding: "2px 10px",
+                              borderRadius: 20,
+                              marginBottom: 6,
+                            }}
+                          >
+                            🎓 {r.gradeLevel}
+                          </span>
+                        )}
                         {r.deliverable && (
                           <p
                             style={{
@@ -555,6 +572,23 @@ export default function TeacherDashboard() {
                           </span>
                         </div>
                         <p className={styles.cardDesc}>{p.description}</p>
+                        {p.gradeLevel && (
+                          <span
+                            style={{
+                              display: "inline-block",
+                              fontSize: 11,
+                              fontWeight: 700,
+                              color: "#00274c",
+                              background: "#fff8dc",
+                              border: "1px solid #ffcb05",
+                              padding: "2px 10px",
+                              borderRadius: 20,
+                              marginBottom: 6,
+                            }}
+                          >
+                            🎓 {p.gradeLevel}
+                          </span>
+                        )}
                         {p.deliverable && (
                           <p
                             style={{
@@ -659,7 +693,35 @@ export default function TeacherDashboard() {
                         <option value='completed'>Completed</option>
                       </select>
                     </div>
+                    {cls.gradeLevel && (
+                      <span
+                        style={{
+                          display: "inline-block",
+                          fontSize: 11,
+                          fontWeight: 700,
+                          color: "#00274c",
+                          background: "#fff8dc",
+                          border: "1px solid #ffcb05",
+                          padding: "2px 10px",
+                          borderRadius: 20,
+                          marginBottom: 6,
+                        }}
+                      >
+                        🎓 {cls.gradeLevel}
+                      </span>
+                    )}
                     <p className={styles.cardDesc}>{cls.description}</p>
+                    {cls.prerequisites && (
+                      <p
+                        style={{
+                          fontSize: 12,
+                          color: "#888",
+                          margin: "0 0 6px",
+                        }}
+                      >
+                        ✅ Prerequisites: {cls.prerequisites}
+                      </p>
+                    )}
                     <div className={styles.cardMeta}>
                       {cls.lessons?.length > 0 ? (
                         <div
@@ -750,7 +812,7 @@ export default function TeacherDashboard() {
                 >
                   <div>
                     <h2 className={styles.sectionTitle} style={{ marginBottom: 4 }}>
-                      Your Showcase
+                      Your Student Work
                     </h2>
                     <p style={{ color: "#888", fontSize: 13, margin: 0 }}>
                       Finished student projects, shown publicly as proof of
@@ -764,7 +826,7 @@ export default function TeacherDashboard() {
                     }}
                     className={styles.createBtn}
                   >
-                    + Add to Showcase
+                    + Add to Student Work
                   </button>
                 </div>
                 {showcase.length === 0 ? (
@@ -781,7 +843,7 @@ export default function TeacherDashboard() {
                       }}
                       className={styles.createBtn}
                     >
-                      + Add your first showcase entry
+                      + Add your first Student Work entry
                     </button>
                   </div>
                 ) : (

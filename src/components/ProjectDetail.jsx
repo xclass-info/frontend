@@ -150,6 +150,24 @@ export default function ProjectDetail() {
             {project.title}
           </h1>
 
+          {project.gradeLevel && (
+            <span
+              style={{
+                display: "inline-block",
+                fontSize: 12,
+                fontWeight: 700,
+                color: "#00274c",
+                background: "#fff8dc",
+                border: "1px solid #ffcb05",
+                padding: "3px 12px",
+                borderRadius: 20,
+                marginBottom: 12,
+              }}
+            >
+              🎓 {project.gradeLevel}
+            </span>
+          )}
+
           <p style={{ fontSize: 15, color: "#888", margin: "0 0 8px" }}>
             👩‍🏫 Mentored by:{" "}
             {mentor ? (
@@ -174,6 +192,18 @@ export default function ProjectDetail() {
               }}
             >
               📦 You'll produce: {project.deliverable}
+            </p>
+          )}
+
+          {project.prerequisites && (
+            <p
+              style={{
+                fontSize: 14,
+                color: "#888",
+                margin: "0 0 16px",
+              }}
+            >
+              ✅ Prerequisites: {project.prerequisites}
             </p>
           )}
 

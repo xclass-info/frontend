@@ -151,6 +151,23 @@ function ResearchItem({ r, onRegister }) {
         <h4 style={{ margin: 0, fontSize: 15, color: "#333" }}>{r.title}</h4>
         <StatusBadge status={r.stage} />
       </div>
+      {r.gradeLevel && (
+        <span
+          style={{
+            display: "inline-block",
+            fontSize: 11,
+            fontWeight: 700,
+            color: "#00274c",
+            background: "#fff8dc",
+            border: "1px solid #ffcb05",
+            padding: "2px 10px",
+            borderRadius: 20,
+            marginBottom: 6,
+          }}
+        >
+          🎓 {r.gradeLevel}
+        </span>
+      )}
       <p
         style={{
           ...bodyStyle,
@@ -177,6 +194,11 @@ function ResearchItem({ r, onRegister }) {
           }}
         >
           📦 You'll produce: {r.deliverable}
+        </p>
+      )}
+      {r.prerequisites && (
+        <p style={{ fontSize: 12, color: "#888", margin: "0 0 4px" }}>
+          ✅ Prerequisites: {r.prerequisites}
         </p>
       )}
       <SeatsRow kind='research' item={r} onRegister={onRegister} />
@@ -714,6 +736,23 @@ export default function TeacherProfile() {
                     </h4>
                     {project.stage && <StatusBadge status={project.stage} />}
                   </div>
+                  {project.gradeLevel && (
+                    <span
+                      style={{
+                        display: "inline-block",
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: "#00274c",
+                        background: "#fff8dc",
+                        border: "1px solid #ffcb05",
+                        padding: "2px 10px",
+                        borderRadius: 20,
+                        marginBottom: 6,
+                      }}
+                    >
+                      🎓 {project.gradeLevel}
+                    </span>
+                  )}
                   {project.description && (
                     <ExpandableText
                       text={project.description}
@@ -735,6 +774,11 @@ export default function TeacherProfile() {
                       }}
                     >
                       📦 You'll produce: {project.deliverable}
+                    </p>
+                  )}
+                  {project.prerequisites && (
+                    <p style={{ fontSize: 12, color: "#888", margin: "6px 0 0" }}>
+                      ✅ Prerequisites: {project.prerequisites}
                     </p>
                   )}
                   <SeatsRow
@@ -802,6 +846,23 @@ export default function TeacherProfile() {
                     </h4>
                     <StatusBadge status={c.status || "registration"} />
                   </div>
+                  {c.gradeLevel && (
+                    <span
+                      style={{
+                        display: "inline-block",
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: "#00274c",
+                        background: "#fff8dc",
+                        border: "1px solid #ffcb05",
+                        padding: "2px 10px",
+                        borderRadius: 20,
+                        marginBottom: 6,
+                      }}
+                    >
+                      🎓 {c.gradeLevel}
+                    </span>
+                  )}
                   {c.description && (
                     <ExpandableText
                       text={c.description}
@@ -812,6 +873,17 @@ export default function TeacherProfile() {
                         lineHeight: 1.6,
                       }}
                     />
+                  )}
+                  {c.prerequisites && (
+                    <p
+                      style={{
+                        fontSize: 12,
+                        color: "#888",
+                        margin: "0 0 8px",
+                      }}
+                    >
+                      ✅ Prerequisites: {c.prerequisites}
+                    </p>
                   )}
                   <div
                     style={{

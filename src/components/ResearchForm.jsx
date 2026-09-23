@@ -10,6 +10,7 @@ import {
 } from "firebase/firestore";
 import styles from "./TeacherAuth.module.css";
 import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
+import { GRADE_RANGE_OPTIONS } from "../utils/gradeRange";
 
 const WORD_LIMITS = { title: 100, idea: 500, impact: 300, details: 300 };
 
@@ -36,6 +37,8 @@ export default function ResearchForm({ research, onClose }) {
     seats: research?.seats ?? "",
     type: research?.type || "exploration",
     deliverable: research?.deliverable || "",
+    gradeLevel: research?.gradeLevel || "",
+    prerequisites: research?.prerequisites || "",
   });
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -55,6 +58,7 @@ export default function ResearchForm({ research, onClose }) {
     if (!form.idea.trim()) newErrors.idea = "Required";
     if (!form.impact.trim()) newErrors.impact = "Required";
     if (!form.deliverable) newErrors.deliverable = "Required";
+    if (!form.gradeLevel) newErrors.gradeLevel = "Required";
     if (form.seats === "") newErrors.seats = "Required";
     else if (!Number.isInteger(Number(form.seats)) || Number(form.seats) < 1)
       newErrors.seats = "Must be a whole number, at least 1";
@@ -81,6 +85,8 @@ export default function ResearchForm({ research, onClose }) {
         seats: Number(form.seats),
         type: form.type,
         deliverable: form.deliverable,
+        gradeLevel: form.gradeLevel,
+        prerequisites: form.prerequisites.trim() || null,
       };
       if (isEditing) {
         await updateDoc(doc(db, "research", research.id), {
@@ -268,6 +274,42 @@ export default function ResearchForm({ research, onClose }) {
           {errors.deliverable && (
             <p className={styles.errorMsg}>{errors.deliverable}</p>
           )}
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label}>Recommended Grade Level *</label>
+          <select
+            className={`${styles.input} ${errors.gradeLevel ? styles.inputError : ""}`}
+            name='gradeLevel'
+            value={form.gradeLevel}
+            onChange={handleChange}
+            style={{ fontSize: "1.1rem" }}
+          >
+            <option value=''>Select a grade range</option>
+            {GRADE_RANGE_OPTIONS.map((g) => (
+              <option key={g} value={g}>
+                {g}
+              </option>
+            ))}
+          </select>
+          {errors.gradeLevel && (
+            <p className={styles.errorMsg}>{errors.gradeLevel}</p>
+          )}
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label}>
+            Prerequisites{" "}
+            <span style={{ color: "#aaa", fontWeight: 400 }}>(optional)</span>
+          </label>
+          <input
+            className={styles.input}
+            name='prerequisites'
+            value={form.prerequisites}
+            onChange={handleChange}
+            placeholder='e.g. Basic Python, Algebra 1'
+            style={{ fontSize: "1.1rem" }}
+          />
         </div>
 
         <div className={styles.field}>

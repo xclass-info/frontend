@@ -77,23 +77,17 @@ export default function Navbar() {
         </li> */}
 
         <li>
+          <Link to='/courses'>Courses</Link>
+        </li>
+        <li>
+          <Link to='/projects'>Projects</Link>
+        </li>
+        <li>
           <Link to='/research'>Research</Link>
         </li>
         <li>
-          <Link to='/projects'>Project</Link>
+          <Link to='/showcase'>Student Work</Link>
         </li>
-        <li>
-          <Link to='/courses'>Course</Link>
-        </li>
-        <li>
-          <Link to='/showcase'>Showcase</Link>
-        </li>
-
-        {/* <li>
-          <a onClick={() => scrollTo("tutors")} style={{ cursor: "pointer" }}>
-            👩‍🏫 Mentor
-          </a>
-        </li> */}
         <li>
           <Link to='/tutors'>Mentor</Link>
         </li>
@@ -151,16 +145,16 @@ export default function Navbar() {
           </li> */}
 
           <li>
+            <Link to='/courses'>📚 Courses</Link>
+          </li>
+          <li>
+            <Link to='/projects'>💡 Projects</Link>
+          </li>
+          <li>
             <Link to='/research'>🔬 Research</Link>
           </li>
           <li>
-            <Link to='/projects'>💡 Project</Link>
-          </li>
-          <li>
-            <Link to='/courses'>📚 Course</Link>
-          </li>
-          <li>
-            <Link to='/showcase'>🏆 Showcase</Link>
+            <Link to='/showcase'>🏆 Student Work</Link>
           </li>
 
           <li>

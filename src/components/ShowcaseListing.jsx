@@ -94,7 +94,7 @@ export default function ShowcaseListing() {
       >
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <h1 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: 8 }}>
-            🏆 Student Showcase
+            🏆 Student Work
           </h1>
           <p style={{ color: "#666", fontSize: "1rem", maxWidth: 600, margin: "0 auto" }}>
             Real projects our students have finished with their mentors - not

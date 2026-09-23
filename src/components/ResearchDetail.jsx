@@ -153,6 +153,24 @@ export default function ResearchDetail() {
             {research.title}
           </h1>
 
+          {research.gradeLevel && (
+            <span
+              style={{
+                display: "inline-block",
+                fontSize: 12,
+                fontWeight: 700,
+                color: "#00274c",
+                background: "#fff8dc",
+                border: "1px solid #ffcb05",
+                padding: "3px 12px",
+                borderRadius: 20,
+                marginBottom: 12,
+              }}
+            >
+              🎓 {research.gradeLevel}
+            </span>
+          )}
+
           <p style={{ fontSize: 15, color: "#888", margin: "0 0 8px" }}>
             👩‍🏫 Mentored by:{" "}
             {mentor ? (
@@ -177,6 +195,18 @@ export default function ResearchDetail() {
               }}
             >
               📦 You'll produce: {research.deliverable}
+            </p>
+          )}
+
+          {research.prerequisites && (
+            <p
+              style={{
+                fontSize: 14,
+                color: "#888",
+                margin: "0 0 16px",
+              }}
+            >
+              ✅ Prerequisites: {research.prerequisites}
             </p>
           )}
 

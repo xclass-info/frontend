@@ -174,6 +174,24 @@ export default function ResearchListing() {
                   {r.title}
                 </h3>
 
+                {r.gradeLevel && (
+                  <span
+                    style={{
+                      display: "inline-block",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: "#00274c",
+                      background: "#fff8dc",
+                      border: "1px solid #ffcb05",
+                      padding: "2px 10px",
+                      borderRadius: 20,
+                      marginBottom: 12,
+                    }}
+                  >
+                    🎓 {r.gradeLevel}
+                  </span>
+                )}
+
                 <div style={{ marginBottom: 12 }}>
                   <p
                     style={{
@@ -242,6 +260,18 @@ export default function ResearchListing() {
                     }}
                   >
                     📦 You'll produce: {r.deliverable}
+                  </p>
+                )}
+
+                {r.prerequisites && (
+                  <p
+                    style={{
+                      fontSize: 12,
+                      color: "#888",
+                      margin: "0 0 8px",
+                    }}
+                  >
+                    ✅ Prerequisites: {r.prerequisites}
                   </p>
                 )}
 
