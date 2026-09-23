@@ -144,10 +144,10 @@ export default function ContactUs() {
                 Website
               </p>
               <a
-                href='https://happyresearch.org'
+                href='https://happyclass.net'
                 style={{ fontSize: 15, color: "#00274c", fontWeight: 600 }}
               >
-                happyresearch.org
+                happyclass.net
               </a>
             </div>
           </div>

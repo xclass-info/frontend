@@ -11,7 +11,7 @@ import styles from "./TeacherAuth.module.css";
 import Footer from "./Footer";
 import { GRADE_OPTIONS } from "../utils/grades";
 
-const CONTINUE_URL = "https://happyresearch.org/#/student/login";
+const CONTINUE_URL = "https://happyclass.net/#/student/login";
 
 export default function StudentRegister() {
   const navigate = useNavigate();

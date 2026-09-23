@@ -74,7 +74,7 @@ export default function TeacherLogin() {
     setResetLoading(true);
     try {
       await sendPasswordResetEmail(auth, form.email, {
-        url: "https://happyresearch.org/#/teacher/login",
+        url: "https://happyclass.net/#/teacher/login",
         handleCodeInApp: false,
       });
       setResetSent(true);
@@ -100,7 +100,7 @@ export default function TeacherLogin() {
         form.password,
       );
       await sendEmailVerification(user, {
-        url: "https://happyresearch.org/#/teacher/login",
+        url: "https://happyclass.net/#/teacher/login",
         handleCodeInApp: false,
       });
       await signOut(auth);

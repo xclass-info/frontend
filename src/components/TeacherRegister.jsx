@@ -46,7 +46,7 @@ export default function TeacherRegister() {
 
       // Send verification email
       await sendEmailVerification(user, {
-        url: "https://happyresearch.org/#/teacher/login",
+        url: "https://happyclass.net/#/teacher/login",
         handleCodeInApp: false,
       });
 
