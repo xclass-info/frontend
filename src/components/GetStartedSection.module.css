@@ -62,30 +62,6 @@
   margin: 0 0 24px;
 }
 
-.pillRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.pill {
-  padding: 10px 18px;
-  border-radius: 50px;
-  background: var(--surface);
-  border: 2px solid var(--border);
-  color: var(--text);
-  font-weight: 700;
-  font-size: 14px;
-  text-decoration: none;
-  transition: all 0.15s;
-}
-
-.pill:hover {
-  border-color: var(--blue);
-  background: white;
-  transform: translateY(-2px);
-}
-
 .requestBtn {
   padding: 14px 32px;
   border-radius: 50px;

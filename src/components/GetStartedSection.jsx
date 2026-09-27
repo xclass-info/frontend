@@ -3,19 +3,13 @@
 // (Courses/1-1 Learning/Projects/Research), or describe what you need and
 // let us follow up - for visitors who'd rather not self-serve.
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import styles from "./GetStartedSection.module.css";
 import RequestHelpModal from "./RequestHelpModal";
-
-const RESOURCES = [
-  { label: "📚 Courses", to: "/courses" },
-  { label: "🧑‍🏫 1-1 Learning", to: "/tutors" },
-  { label: "💡 Projects", to: "/projects" },
-  { label: "🔬 Research", to: "/research" },
-];
+import ExploreResourcesModal from "./ExploreResourcesModal";
 
 export default function GetStartedSection() {
   const [showRequestForm, setShowRequestForm] = useState(false);
+  const [showExploreOptions, setShowExploreOptions] = useState(false);
 
   return (
     <section className={styles.section}>
@@ -39,13 +33,12 @@ export default function GetStartedSection() {
               Browse courses, 1-on-1 mentor sessions, hands-on projects, and
               research opportunities.
             </p>
-            <div className={styles.pillRow}>
-              {RESOURCES.map((r) => (
-                <Link key={r.to} to={r.to} className={styles.pill}>
-                  {r.label}
-                </Link>
-              ))}
-            </div>
+            <button
+              className={styles.requestBtn}
+              onClick={() => setShowExploreOptions(true)}
+            >
+              Explore →
+            </button>
           </div>
 
           <div className={`${styles.card} reveal`}>
@@ -68,6 +61,9 @@ export default function GetStartedSection() {
         </div>
       </div>
 
+      {showExploreOptions && (
+        <ExploreResourcesModal onClose={() => setShowExploreOptions(false)} />
+      )}
       {showRequestForm && (
         <RequestHelpModal onClose={() => setShowRequestForm(false)} />
       )}
