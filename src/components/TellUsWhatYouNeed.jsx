@@ -1,7 +1,8 @@
 // src/components/TellUsWhatYouNeed.jsx
-// Full page version of "Tell us what you need" - a free-text (+ optional
-// photo) request that gets emailed straight to the team, for visitors who
-// don't want to browse Courses/Projects/Research/1-1 themselves.
+// Full page version of "On-demand Learning" (formerly "Tell us what you
+// need") - a free-text (+ optional photo) request that gets emailed
+// straight to the team, for visitors who don't want to browse
+// Courses/Projects/Research/1-1 themselves.
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import emailjs from "@emailjs/browser";
@@ -84,7 +85,7 @@ export default function TellUsWhatYouNeed() {
         {
           from_name: form.name,
           from_email: form.email,
-          subject: "New request: Tell us what you need",
+          subject: "New request: On-demand Learning",
           message:
             form.details.trim() +
             (imageUrl ? `\n\nAttached image: ${imageUrl}` : ""),
@@ -134,7 +135,7 @@ export default function TellUsWhatYouNeed() {
               letterSpacing: "0.05em",
             }}
           >
-            💬 Tell Us What You Need
+            💬 On-demand Learning
           </div>
           <h1 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: 8 }}>
             Not sure where to start?

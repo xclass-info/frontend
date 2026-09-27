@@ -42,7 +42,7 @@ export default function GetStartedSection() {
             <div className={styles.iconBox} style={{ background: "#ff9f1c22", color: "#ff9f1c" }}>
               💬
             </div>
-            <h3 className={styles.cardTitle}>Tell Us What You Need</h3>
+            <h3 className={styles.cardTitle}>On-demand Learning</h3>
             <p className={styles.cardDesc}>
               Not sure where to start? Describe what you need help with -
               even attach a photo of your homework or project - and we'll
