@@ -30,7 +30,7 @@
 }
 
 .inner {
-  max-width: 900px;
+  max-width: 1300px;
   margin: 0 auto;
   position: relative;
 }
@@ -43,12 +43,49 @@
 
 .top .section-sub {
   margin: 0 auto;
+  max-width: 560px;
+}
+
+.wideRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+}
+
+.sidePhoto {
+  flex: 0 0 200px;
+  width: 200px;
+  height: 260px;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.14);
+  animation: fadeInUp 0.8s ease both;
+  display: none;
+}
+
+.sidePhotoLeft {
+  transform: rotate(-4deg);
+}
+
+.sidePhotoRight {
+  transform: rotate(4deg);
+  animation-delay: 0.15s;
 }
 
 .grid {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 900px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 24px;
+}
+
+@media (min-width: 980px) {
+  .sidePhoto {
+    display: block;
+  }
 }
 
 .bigButton {
@@ -93,7 +130,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .top,
-  .bigButton {
+  .bigButton,
+  .sidePhoto {
     animation: none;
   }
 }

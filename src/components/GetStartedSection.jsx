@@ -20,22 +20,36 @@ export default function GetStartedSection() {
           </p>
         </div>
 
-        <div className={styles.grid}>
-          <Link
-            to='/explore'
-            className={styles.bigButton}
-            style={{ "--btn-accent": "#4a8fe2" }}
-          >
-            🔎 Explore Learning Resources
-          </Link>
+        <div className={styles.wideRow}>
+          <img
+            src='/landing/projects.jpg'
+            alt=''
+            className={`${styles.sidePhoto} ${styles.sidePhotoLeft}`}
+          />
 
-          <Link
-            to='/tell-us-what-you-need'
-            className={styles.bigButton}
-            style={{ "--btn-accent": "#ff9f1c" }}
-          >
-            💬 On-demand Learning
-          </Link>
+          <div className={styles.grid}>
+            <Link
+              to='/explore'
+              className={styles.bigButton}
+              style={{ "--btn-accent": "#4a8fe2" }}
+            >
+              🔎 Explore Learning Resources
+            </Link>
+
+            <Link
+              to='/tell-us-what-you-need'
+              className={styles.bigButton}
+              style={{ "--btn-accent": "#ff9f1c" }}
+            >
+              💬 On-demand Learning
+            </Link>
+          </div>
+
+          <img
+            src='/landing/courses.jpg'
+            alt=''
+            className={`${styles.sidePhoto} ${styles.sidePhotoRight}`}
+          />
         </div>
       </div>
     </section>
