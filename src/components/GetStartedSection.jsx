@@ -2,14 +2,10 @@
 // Homepage entry point offering two paths: browse the structured content
 // (Courses/1-1 Learning/Projects/Research), or describe what you need and
 // let us follow up - for visitors who'd rather not self-serve.
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "./GetStartedSection.module.css";
-import RequestHelpModal from "./RequestHelpModal";
 
 export default function GetStartedSection() {
-  const [showRequestForm, setShowRequestForm] = useState(false);
-
   return (
     <section className={styles.section}>
       <div className={styles.inner}>
@@ -47,19 +43,12 @@ export default function GetStartedSection() {
               even attach a photo of your homework or project - and we'll
               point you in the right direction.
             </p>
-            <button
-              className={styles.requestBtn}
-              onClick={() => setShowRequestForm(true)}
-            >
+            <Link to='/tell-us-what-you-need' className={styles.requestBtn}>
               Get Started →
-            </button>
+            </Link>
           </div>
         </div>
       </div>
-
-      {showRequestForm && (
-        <RequestHelpModal onClose={() => setShowRequestForm(false)} />
-      )}
     </section>
   );
 }
