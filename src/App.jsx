@@ -21,6 +21,7 @@ import ProjectDetail from "./components/ProjectDetail";
 import CourseListing from "./components/CourseListing";
 import CourseDetail from "./components/CourseDetail";
 import ShowcaseListing from "./components/ShowcaseListing";
+import ExploreResources from "./components/ExploreResources";
 import StudentLogin from "./components/StudentLogin";
 import StudentRegister from "./components/StudentRegister";
 import StudentDashboard from "./components/StudentDashboard";
@@ -115,6 +116,7 @@ export default function App() {
         <Route path='/courses' element={<CourseListing />} />
         <Route path='/courses/:courseId' element={<CourseDetail />} />
         <Route path='/showcase' element={<ShowcaseListing />} />
+        <Route path='/explore' element={<ExploreResources />} />
         <Route path='/internship' element={<InternshipListing />} />
         <Route path='/about' element={<AboutUs />} />
         <Route path='/contact' element={<ContactUs />} />
