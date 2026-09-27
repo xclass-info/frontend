@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import GetStartedSection from "./components/GetStartedSection";
 import HowItWorks from "./components/HowItWorks";
+import RealWorkSection from "./components/RealWorkSection";
 import Tutors from "./components/Tutors";
 import Testimonials from "./components/Testimonials";
 import Footer from "./components/Footer";
@@ -81,6 +82,7 @@ function HomePage() {
       <GetStartedSection />
       <Hero />
       <HowItWorks />
+      <RealWorkSection />
       <ResearchPrograms />
       <ResearchSection />
       <Tutors />
