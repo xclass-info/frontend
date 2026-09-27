@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
+import GetStartedSection from "./components/GetStartedSection";
 import HowItWorks from "./components/HowItWorks";
 import Tutors from "./components/Tutors";
 import Testimonials from "./components/Testimonials";
@@ -76,6 +77,7 @@ function HomePage() {
     <>
       <Navbar />
       <Hero />
+      <GetStartedSection />
       <HowItWorks />
       <ResearchPrograms />
       <ResearchSection />
