@@ -1,5 +1,7 @@
 .section {
-  padding: 96px 6%;
+  /* Sits first on the page, right under the fixed navbar - top padding
+     matches Hero's clearance instead of the usual mid-page spacing. */
+  padding: 140px 6% 80px;
   background: var(--bg);
 }
 
