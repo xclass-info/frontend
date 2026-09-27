@@ -30,14 +30,14 @@
 }
 
 .inner {
-  max-width: 1100px;
+  max-width: 900px;
   margin: 0 auto;
   position: relative;
 }
 
 .top {
   text-align: center;
-  margin-bottom: 56px;
+  margin-bottom: 48px;
   animation: fadeInUp 0.7s ease both;
 }
 
@@ -47,113 +47,37 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 28px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
 }
 
-.card {
-  background: var(--card);
-  border: 2.5px solid var(--border);
+.bigButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 120px;
+  padding: 24px 32px;
   border-radius: var(--radius-lg);
-  padding: 40px 32px;
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  background: var(--card);
+  border: 2.5px solid var(--btn-accent, var(--border));
+  color: var(--text);
+  font-size: 1.25rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
   animation: fadeInUp 0.7s ease both;
   animation-delay: 0.15s;
 }
 
-.card:nth-child(2) {
+.bigButton:nth-child(2) {
   animation-delay: 0.3s;
 }
 
-.card:hover {
-  border-color: var(--coral);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+.bigButton:hover {
   transform: translateY(-4px);
-}
-
-.card:hover .iconBox {
-  transform: scale(1.12) rotate(-6deg);
-}
-
-.iconBox {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26px;
-  margin-bottom: 20px;
-  transition: transform 0.25s ease;
-  animation: floatIcon 3.2s ease-in-out infinite;
-}
-
-.card:nth-child(2) .iconBox {
-  animation-delay: 0.6s;
-}
-
-.cardTitle {
-  font-size: 1.3rem;
-  font-weight: 800;
-  margin: 0 0 10px;
-  color: var(--text);
-}
-
-.cardDesc {
-  color: var(--muted);
-  font-size: 15px;
-  line-height: 1.7;
-  margin: 0 0 24px;
-}
-
-.requestBtn {
-  display: inline-block;
-  padding: 14px 32px;
-  border-radius: 50px;
-  border: none;
-  background: var(--primary, #00274c);
-  color: white;
-  font-weight: 800;
-  font-size: 15px;
-  text-decoration: none;
-  cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-
-.requestBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(0, 39, 76, 0.25);
-}
-
-.teamRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 18px;
-}
-
-.teamAvatars {
-  display: flex;
-}
-
-.teamAvatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 2px solid var(--card);
-  background: #fff8dc;
-  object-fit: cover;
-  margin-left: -10px;
-}
-
-.teamAvatar:first-child {
-  margin-left: 0;
-}
-
-.teamNote {
-  font-size: 13px;
-  color: var(--muted);
-  font-weight: 600;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+  background: color-mix(in srgb, var(--btn-accent) 8%, var(--card));
 }
 
 @keyframes fadeInUp {
@@ -167,20 +91,9 @@
   }
 }
 
-@keyframes floatIcon {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .top,
-  .card,
-  .iconBox {
+  .bigButton {
     animation: none;
   }
 }
