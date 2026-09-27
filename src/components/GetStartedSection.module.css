@@ -3,16 +3,42 @@
      matches Hero's clearance instead of the usual mid-page spacing. */
   padding: 140px 6% 80px;
   background: var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+
+.blob1 {
+  position: absolute;
+  top: -10%;
+  right: -8%;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(74, 143, 226, 0.16), transparent);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.blob2 {
+  position: absolute;
+  bottom: -15%;
+  left: -8%;
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, rgba(255, 159, 28, 0.14), transparent);
+  border-radius: 50%;
+  pointer-events: none;
 }
 
 .inner {
   max-width: 1100px;
   margin: 0 auto;
+  position: relative;
 }
 
 .top {
   text-align: center;
   margin-bottom: 56px;
+  animation: fadeInUp 0.7s ease both;
 }
 
 .top .section-sub {
@@ -31,12 +57,22 @@
   border-radius: var(--radius-lg);
   padding: 40px 32px;
   transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  animation: fadeInUp 0.7s ease both;
+  animation-delay: 0.15s;
+}
+
+.card:nth-child(2) {
+  animation-delay: 0.3s;
 }
 
 .card:hover {
   border-color: var(--coral);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
   transform: translateY(-4px);
+}
+
+.card:hover .iconBox {
+  transform: scale(1.12) rotate(-6deg);
 }
 
 .iconBox {
@@ -48,6 +84,12 @@
   justify-content: center;
   font-size: 26px;
   margin-bottom: 20px;
+  transition: transform 0.25s ease;
+  animation: floatIcon 3.2s ease-in-out infinite;
+}
+
+.card:nth-child(2) .iconBox {
+  animation-delay: 0.6s;
 }
 
 .cardTitle {
@@ -81,4 +123,64 @@
 .requestBtn:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 24px rgba(0, 39, 76, 0.25);
+}
+
+.teamRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.teamAvatars {
+  display: flex;
+}
+
+.teamAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--card);
+  background: #fff8dc;
+  object-fit: cover;
+  margin-left: -10px;
+}
+
+.teamAvatar:first-child {
+  margin-left: 0;
+}
+
+.teamNote {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes floatIcon {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .top,
+  .card,
+  .iconBox {
+    animation: none;
+  }
 }
