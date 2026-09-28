@@ -52,6 +52,8 @@ export default function Tutors({ standalone = false }) {
   const [search, setSearch] = useState("");
   const [selectedDegrees, setSelectedDegrees] = useState([]);
   const [selectedGenders, setSelectedGenders] = useState([]);
+  const [selectedMajors, setSelectedMajors] = useState([]);
+  const [selectedResearchAreas, setSelectedResearchAreas] = useState([]);
   const [projectsOnly, setProjectsOnly] = useState(false);
   const [sortBy, setSortBy] = useState("featured");
 
@@ -93,6 +95,16 @@ export default function Tutors({ standalone = false }) {
     [teachers],
   );
 
+  const majorOptions = useMemo(
+    () => [...new Set(teachers.map((t) => t.major).filter(Boolean))].sort(),
+    [teachers],
+  );
+
+  const researchAreaOptions = useMemo(
+    () => [...new Set(teachers.map((t) => t.researchArea).filter(Boolean))].sort(),
+    [teachers],
+  );
+
   function toggleValue(list, setList, value) {
     setList(
       list.includes(value) ? list.filter((v) => v !== value) : [...list, value],
@@ -103,6 +115,8 @@ export default function Tutors({ standalone = false }) {
     setSearch("");
     setSelectedDegrees([]);
     setSelectedGenders([]);
+    setSelectedMajors([]);
+    setSelectedResearchAreas([]);
     setProjectsOnly(false);
     setSortBy("featured");
   }
@@ -111,13 +125,22 @@ export default function Tutors({ standalone = false }) {
     const q = search.trim().toLowerCase();
     let list = teachers.filter((t) => {
       if (q) {
-        const haystack = `${t.name || ""} ${t.expertise || ""} ${t.bio || ""} ${t.major || ""}`.toLowerCase();
+        const haystack = `${t.name || ""} ${t.expertise || ""} ${t.bio || ""} ${t.major || ""} ${t.researchArea || ""}`.toLowerCase();
         if (!haystack.includes(q)) return false;
       }
       if (selectedDegrees.length > 0 && !selectedDegrees.includes(t.degree)) {
         return false;
       }
       if (selectedGenders.length > 0 && !selectedGenders.includes(t.gender)) {
+        return false;
+      }
+      if (selectedMajors.length > 0 && !selectedMajors.includes(t.major)) {
+        return false;
+      }
+      if (
+        selectedResearchAreas.length > 0 &&
+        !selectedResearchAreas.includes(t.researchArea)
+      ) {
         return false;
       }
       if (projectsOnly && !(t.projects && t.projects.length > 0)) {
@@ -134,7 +157,16 @@ export default function Tutors({ standalone = false }) {
     });
 
     return list;
-  }, [teachers, search, selectedDegrees, selectedGenders, projectsOnly, sortBy]);
+  }, [
+    teachers,
+    search,
+    selectedDegrees,
+    selectedGenders,
+    selectedMajors,
+    selectedResearchAreas,
+    projectsOnly,
+    sortBy,
+  ]);
 
   function renderCard(teacher) {
     return (
@@ -389,6 +421,62 @@ export default function Tutors({ standalone = false }) {
                 {g}
               </label>
             ))}
+
+            {majorOptions.length > 0 && (
+              <>
+                <p style={filterLabel}>Major</p>
+                <div
+                  style={{
+                    maxHeight: 180,
+                    overflowY: "auto",
+                    paddingRight: 4,
+                  }}
+                >
+                  {majorOptions.map((m) => (
+                    <label key={m} style={checkboxRow}>
+                      <input
+                        type='checkbox'
+                        checked={selectedMajors.includes(m)}
+                        onChange={() =>
+                          toggleValue(selectedMajors, setSelectedMajors, m)
+                        }
+                      />
+                      {m}
+                    </label>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {researchAreaOptions.length > 0 && (
+              <>
+                <p style={filterLabel}>Research Area</p>
+                <div
+                  style={{
+                    maxHeight: 180,
+                    overflowY: "auto",
+                    paddingRight: 4,
+                  }}
+                >
+                  {researchAreaOptions.map((r) => (
+                    <label key={r} style={checkboxRow}>
+                      <input
+                        type='checkbox'
+                        checked={selectedResearchAreas.includes(r)}
+                        onChange={() =>
+                          toggleValue(
+                            selectedResearchAreas,
+                            setSelectedResearchAreas,
+                            r,
+                          )
+                        }
+                      />
+                      {r}
+                    </label>
+                  ))}
+                </div>
+              </>
+            )}
 
             <p style={filterLabel}>Availability</p>
             <label style={checkboxRow}>
