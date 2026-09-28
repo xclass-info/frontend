@@ -58,6 +58,24 @@ const TESTIMONIALS = [
   },
 ];
 
+function Card({ t }) {
+  return (
+    <div className={`${styles.card} ${t.featured ? styles.featured : ""}`}>
+      <div className={styles.stars}>★★★★★</div>
+      <blockquote>{t.quote}</blockquote>
+      <div className={styles.author}>
+        <div className={styles.avatar} style={{ background: t.gradient }}>
+          {t.initials}
+        </div>
+        <div>
+          <span className={styles.name}>{t.name}</span>
+          <span className={styles.info}>{t.info}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Testimonials() {
   return (
     <section id='testimonials' className={styles.section}>
@@ -71,25 +89,16 @@ export default function Testimonials() {
           HappyClass.
         </p>
       </div>
-      <div className={styles.grid}>
-        {TESTIMONIALS.map((t) => (
-          <div
-            key={t.name}
-            className={`${styles.card} ${t.featured ? styles.featured : ""} reveal`}
-          >
-            <div className={styles.stars}>★★★★★</div>
-            <blockquote>{t.quote}</blockquote>
-            <div className={styles.author}>
-              <div className={styles.avatar} style={{ background: t.gradient }}>
-                {t.initials}
-              </div>
-              <div>
-                <span className={styles.name}>{t.name}</span>
-                <span className={styles.info}>{t.info}</span>
-              </div>
-            </div>
-          </div>
-        ))}
+
+      <div className={`${styles.marqueeWrap} reveal`}>
+        <div className={styles.track}>
+          {TESTIMONIALS.map((t) => (
+            <Card key={`a-${t.name}`} t={t} />
+          ))}
+          {TESTIMONIALS.map((t) => (
+            <Card key={`b-${t.name}`} t={t} />
+          ))}
+        </div>
       </div>
     </section>
   );
