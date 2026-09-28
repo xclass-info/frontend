@@ -84,6 +84,7 @@ export default function Navbar() {
               <Link to='/courses'>📚 Courses</Link>
               <Link to='/projects'>💡 Projects</Link>
               <Link to='/research'>🔬 Research</Link>
+              <Link to='/tell-us-what-you-need'>💬 On-demand Learning</Link>
             </div>
           </div>
         </li>
@@ -157,6 +158,9 @@ export default function Navbar() {
           </li>
           <li>
             <Link to='/research'>🔬 Research</Link>
+          </li>
+          <li>
+            <Link to='/tell-us-what-you-need'>💬 On-demand Learning</Link>
           </li>
           <li>
             <Link to='/showcase'>🏆 Student Work</Link>
