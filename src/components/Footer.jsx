@@ -27,7 +27,7 @@ export default function Footer() {
               fontFamily: "Fredoka One, cursive",
             }}
           >
-            happy<span style={{ color: "#ffcb05" }}>Class</span>
+            happy<span style={{ color: "#ffcb05" }}>Research</span>
           </Link>
           <p
             style={{
@@ -231,7 +231,7 @@ export default function Footer() {
         }}
       >
         <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, margin: 0 }}>
-          © 2026 HappyClass — All rights reserved
+          © 2026 HappyResearch — All rights reserved
         </p>
         <div style={{ display: "flex", gap: 20 }}>
           <a

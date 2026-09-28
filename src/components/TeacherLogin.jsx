@@ -74,7 +74,7 @@ export default function TeacherLogin() {
     setResetLoading(true);
     try {
       await sendPasswordResetEmail(auth, form.email, {
-        url: "https://happyclass.net/#/teacher/login",
+        url: "https://happyresearch.org/#/teacher/login",
         handleCodeInApp: false,
       });
       setResetSent(true);
@@ -100,7 +100,7 @@ export default function TeacherLogin() {
         form.password,
       );
       await sendEmailVerification(user, {
-        url: "https://happyclass.net/#/teacher/login",
+        url: "https://happyresearch.org/#/teacher/login",
         handleCodeInApp: false,
       });
       await signOut(auth);
@@ -123,7 +123,7 @@ export default function TeacherLogin() {
             ✕
           </button>
           <h1 className={styles.title}>👩‍🏫 Mentor Login</h1>
-          <p className={styles.sub}>Welcome back to HappyClass</p>
+          <p className={styles.sub}>Welcome back to HappyResearch</p>
 
           {error && <p className={styles.error}>{error}</p>}
 

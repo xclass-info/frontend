@@ -46,7 +46,7 @@ export default function TeacherRegister() {
 
       // Send verification email
       await sendEmailVerification(user, {
-        url: "https://happyclass.net/#/teacher/login",
+        url: "https://happyresearch.org/#/teacher/login",
         handleCodeInApp: false,
       });
 
@@ -109,7 +109,7 @@ export default function TeacherRegister() {
             <>
               <h1 className={styles.title}>👩‍🏫 Mentor Register</h1>
               <p className={styles.sub}>
-                Create your HappyClass mentor account
+                Create your HappyResearch mentor account
               </p>
 
               {error && <p className={styles.error}>{error}</p>}

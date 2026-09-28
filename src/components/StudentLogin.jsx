@@ -11,7 +11,7 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import styles from "./TeacherAuth.module.css";
 import Footer from "./Footer";
 
-const CONTINUE_URL = "https://happyclass.net/#/student/login";
+const CONTINUE_URL = "https://happyresearch.org/#/student/login";
 
 export default function StudentLogin() {
   const navigate = useNavigate();
@@ -143,7 +143,7 @@ export default function StudentLogin() {
             ✕
           </button>
           <h1 className={styles.title}>🎓 Student Login</h1>
-          <p className={styles.sub}>Welcome back to HappyClass</p>
+          <p className={styles.sub}>Welcome back to HappyResearch</p>
 
           {location.state?.from && (
             <p style={notice}>Log in to finish registering.</p>

@@ -13,6 +13,8 @@
 }
 
 .logo {
+  flex-shrink: 0;
+  margin-right: 12px;
   font-family: "Fredoka One", cursive;
   font-size: 1.5rem;
   font-weight: 400;
@@ -128,7 +130,7 @@
   color: #ffcb05;
 }
 
-@media (max-width: 1180px) {
+@media (max-width: 1440px) {
   .links {
     display: none;
   }
