@@ -9,8 +9,6 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import InitialsAvatar from "./InitialsAvatar";
 
-const GENDER_OPTIONS = ["Male", "Female"];
-
 const SORT_OPTIONS = [
   { value: "featured", label: "Featured" },
   { value: "name", label: "Name (A-Z)" },
@@ -51,10 +49,8 @@ export default function Tutors({ standalone = false }) {
 
   const [search, setSearch] = useState("");
   const [selectedDegrees, setSelectedDegrees] = useState([]);
-  const [selectedGenders, setSelectedGenders] = useState([]);
   const [selectedMajors, setSelectedMajors] = useState([]);
   const [selectedResearchAreas, setSelectedResearchAreas] = useState([]);
-  const [projectsOnly, setProjectsOnly] = useState(false);
   const [sortBy, setSortBy] = useState("featured");
 
   // Self-contained scroll-fade-in for this section's own .reveal elements -
@@ -114,10 +110,8 @@ export default function Tutors({ standalone = false }) {
   function clearFilters() {
     setSearch("");
     setSelectedDegrees([]);
-    setSelectedGenders([]);
     setSelectedMajors([]);
     setSelectedResearchAreas([]);
-    setProjectsOnly(false);
     setSortBy("featured");
   }
 
@@ -131,9 +125,6 @@ export default function Tutors({ standalone = false }) {
       if (selectedDegrees.length > 0 && !selectedDegrees.includes(t.degree)) {
         return false;
       }
-      if (selectedGenders.length > 0 && !selectedGenders.includes(t.gender)) {
-        return false;
-      }
       if (selectedMajors.length > 0 && !selectedMajors.includes(t.major)) {
         return false;
       }
@@ -141,9 +132,6 @@ export default function Tutors({ standalone = false }) {
         selectedResearchAreas.length > 0 &&
         !selectedResearchAreas.includes(t.researchArea)
       ) {
-        return false;
-      }
-      if (projectsOnly && !(t.projects && t.projects.length > 0)) {
         return false;
       }
       return true;
@@ -161,10 +149,8 @@ export default function Tutors({ standalone = false }) {
     teachers,
     search,
     selectedDegrees,
-    selectedGenders,
     selectedMajors,
     selectedResearchAreas,
-    projectsOnly,
     sortBy,
   ]);
 
@@ -408,20 +394,6 @@ export default function Tutors({ standalone = false }) {
               </>
             )}
 
-            <p style={filterLabel}>Gender</p>
-            {GENDER_OPTIONS.map((g) => (
-              <label key={g} style={checkboxRow}>
-                <input
-                  type='checkbox'
-                  checked={selectedGenders.includes(g)}
-                  onChange={() =>
-                    toggleValue(selectedGenders, setSelectedGenders, g)
-                  }
-                />
-                {g}
-              </label>
-            ))}
-
             {majorOptions.length > 0 && (
               <>
                 <p style={filterLabel}>Major</p>
@@ -477,16 +449,6 @@ export default function Tutors({ standalone = false }) {
                 </div>
               </>
             )}
-
-            <p style={filterLabel}>Availability</p>
-            <label style={checkboxRow}>
-              <input
-                type='checkbox'
-                checked={projectsOnly}
-                onChange={(e) => setProjectsOnly(e.target.checked)}
-              />
-              Has project ideas
-            </label>
           </aside>
 
           {/* Main content */}
