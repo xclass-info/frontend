@@ -50,6 +50,93 @@
   color: #ffcb05;
 }
 
+.dropdown {
+  position: relative;
+}
+
+.dropdownTrigger {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.05rem;
+  font-weight: 700;
+  transition: color 0.2s;
+}
+
+.dropdown:hover .dropdownTrigger {
+  color: #ffcb05;
+}
+
+.dropdownCaret {
+  font-size: 0.7rem;
+  transition: transform 0.2s;
+}
+
+.dropdown:hover .dropdownCaret {
+  transform: rotate(180deg);
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  padding-top: 14px;
+  margin: 0;
+  list-style: none;
+  min-width: 180px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.15s,
+    transform 0.15s,
+    visibility 0.15s;
+}
+
+.dropdown:hover .dropdownMenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdownMenuInner {
+  background: #00274c;
+  border: 1px solid rgba(255, 203, 5, 0.3);
+  border-radius: 12px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+}
+
+.dropdownMenu a {
+  display: block;
+  padding: 10px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.dropdownMenu a:hover {
+  background: rgba(255, 203, 5, 0.14);
+  color: #ffcb05;
+}
+
+.mobileGroupLabel {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0;
+}
+
 .navRight {
   display: flex;
   align-items: center;
@@ -130,7 +217,7 @@
   color: #ffcb05;
 }
 
-@media (max-width: 1440px) {
+@media (max-width: 1260px) {
   .links {
     display: none;
   }

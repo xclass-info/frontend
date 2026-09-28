@@ -8,7 +8,6 @@ import { doc, getDoc } from "firebase/firestore";
 // Replace with this:
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const [researchOpen, setResearchOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const [student, setStudent] = useState(null);
@@ -76,14 +75,17 @@ export default function Navbar() {
           <Link to='/internship'>Internship</Link>
         </li> */}
 
-        <li>
-          <Link to='/courses'>Courses</Link>
-        </li>
-        <li>
-          <Link to='/projects'>Projects</Link>
-        </li>
-        <li>
-          <Link to='/research'>Research</Link>
+        <li className={styles.dropdown}>
+          <span className={styles.dropdownTrigger}>
+            Programs <span className={styles.dropdownCaret}>▾</span>
+          </span>
+          <div className={styles.dropdownMenu}>
+            <div className={styles.dropdownMenuInner}>
+              <Link to='/courses'>📚 Courses</Link>
+              <Link to='/projects'>💡 Projects</Link>
+              <Link to='/research'>🔬 Research</Link>
+            </div>
+          </div>
         </li>
         <li>
           <Link to='/showcase'>Student Work</Link>
@@ -144,6 +146,9 @@ export default function Navbar() {
             <Link to='/internship'>🧪 Internship</Link>
           </li> */}
 
+          <li>
+            <p className={styles.mobileGroupLabel}>Programs</p>
+          </li>
           <li>
             <Link to='/courses'>📚 Courses</Link>
           </li>
