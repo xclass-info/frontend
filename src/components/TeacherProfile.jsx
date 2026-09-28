@@ -16,7 +16,7 @@ import Footer from "./Footer";
 import { lessonWeekday, safeUrl } from "../utils/format";
 import { SeatsRow, RegisterModal } from "./RegisterControls";
 import { useStudentAuth } from "../utils/useStudentAuth";
-import { avatarUrl } from "../utils/avatar";
+import InitialsAvatar from "./InitialsAvatar";
 
 const cardStyle = {
   background: "white",
@@ -463,17 +463,30 @@ export default function TeacherProfile() {
         >
           {/* Left — Avatar */}
           <div style={{ flex: "0 0 30%" }}>
-            <img
-              src={teacher.photoURL || avatarUrl(teacher.id)}
-              alt={teacher.name}
-              style={{
-                width: "100%",
-                aspectRatio: "1/1",
-                borderRadius: 16,
-                objectFit: "cover",
-                background: "#fff8dc",
-              }}
-            />
+            {teacher.photoURL ? (
+              <img
+                src={teacher.photoURL}
+                alt={teacher.name}
+                style={{
+                  width: "100%",
+                  aspectRatio: "1/1",
+                  borderRadius: 16,
+                  objectFit: "cover",
+                  background: "#fff8dc",
+                }}
+              />
+            ) : (
+              <InitialsAvatar
+                name={teacher.name}
+                seed={teacher.id}
+                fontSize='3rem'
+                style={{
+                  width: "100%",
+                  aspectRatio: "1/1",
+                  borderRadius: 16,
+                }}
+              />
+            )}
           </div>
           {/* Right — Info */}
           <div style={{ flex: 1, minWidth: 260 }}>

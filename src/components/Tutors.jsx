@@ -7,7 +7,7 @@ import { SkeletonCard } from "./Skeleton";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import { avatarUrl } from "../utils/avatar";
+import InitialsAvatar from "./InitialsAvatar";
 
 const GENDER_OPTIONS = ["Male", "Female"];
 
@@ -146,11 +146,20 @@ export default function Tutors({ standalone = false }) {
       >
         {/* Avatar */}
         <div className={styles.avatarWrapper}>
-          <img
-            src={teacher.photoURL || avatarUrl(teacher.id)}
-            alt={teacher.name}
-            className={styles.avatar}
-          />
+          {teacher.photoURL ? (
+            <img
+              src={teacher.photoURL}
+              alt={teacher.name}
+              className={styles.avatar}
+            />
+          ) : (
+            <InitialsAvatar
+              name={teacher.name}
+              seed={teacher.id}
+              className={styles.avatar}
+              fontSize='2.5rem'
+            />
+          )}
         </div>
 
         <h1 style={{ margin: "0 0 8px", fontSize: 26 }}>
