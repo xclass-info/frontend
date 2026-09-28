@@ -52,6 +52,7 @@ export default function Tutors({ standalone = false }) {
   const [selectedMajors, setSelectedMajors] = useState([]);
   const [selectedResearchAreas, setSelectedResearchAreas] = useState([]);
   const [sortBy, setSortBy] = useState("featured");
+  const [visibleCount, setVisibleCount] = useState(20);
 
   // Self-contained scroll-fade-in for this section's own .reveal elements -
   // this component is used both embedded on the homepage (which sets up its
@@ -153,6 +154,14 @@ export default function Tutors({ standalone = false }) {
     selectedResearchAreas,
     sortBy,
   ]);
+
+  // Reset pagination back to the first page whenever the filtered set changes,
+  // so "Show more" doesn't leave a stale page depth after a new search/filter.
+  useEffect(() => {
+    setVisibleCount(20);
+  }, [search, selectedDegrees, selectedMajors, selectedResearchAreas, sortBy]);
+
+  const visibleTeachers = filteredTeachers.slice(0, visibleCount);
 
   function renderCard(teacher) {
     return (
@@ -531,9 +540,31 @@ export default function Tutors({ standalone = false }) {
                 </button>
               </div>
             ) : (
-              <div className={styles.grid}>
-                {filteredTeachers.map(renderCard)}
-              </div>
+              <>
+                <div className={styles.grid}>
+                  {visibleTeachers.map(renderCard)}
+                </div>
+                {visibleCount < filteredTeachers.length && (
+                  <div style={{ textAlign: "center", marginTop: 32 }}>
+                    <button
+                      onClick={() => setVisibleCount((c) => c + 20)}
+                      style={{
+                        padding: "12px 32px",
+                        borderRadius: 10,
+                        border: "2px solid #00274c",
+                        background: "white",
+                        color: "#00274c",
+                        fontSize: 14,
+                        fontWeight: 700,
+                        cursor: "pointer",
+                      }}
+                    >
+                      Show more (
+                      {filteredTeachers.length - visibleCount} more)
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
