@@ -328,7 +328,31 @@ export default function Tutors({ standalone = false }) {
               <p>😴 No tutors registered yet. Check back soon!</p>
             </div>
           ) : (
-            <div className={styles.grid}>{teachers.map(renderCard)}</div>
+            <>
+              <div className={styles.grid}>
+                {visibleTeachers.map(renderCard)}
+              </div>
+              {visibleCount < filteredTeachers.length && (
+                <div style={{ textAlign: "center", marginTop: 32 }}>
+                  <button
+                    onClick={() => setVisibleCount((c) => c + 20)}
+                    style={{
+                      padding: "12px 32px",
+                      borderRadius: 10,
+                      border: "2px solid #00274c",
+                      background: "white",
+                      color: "#00274c",
+                      fontSize: 14,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Show more (
+                    {filteredTeachers.length - visibleCount} more)
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>
