@@ -7,13 +7,6 @@ import Footer from "./Footer";
 
 const OPTIONS = [
   {
-    to: "/courses",
-    icon: "📚",
-    color: "#4a8fe2",
-    label: "Courses",
-    desc: "Live online courses taught by our mentors, from beginner intros to exam prep.",
-  },
-  {
     to: "/tutors",
     icon: "🧑‍🏫",
     color: "#ff6ba8",

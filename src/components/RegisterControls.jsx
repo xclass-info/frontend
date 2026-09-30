@@ -1,6 +1,6 @@
 // src/components/RegisterControls.jsx
-// Shared "Register now" button + signup modal for research, projects and
-// courses. Used on the mentor profile page and on the research detail page.
+// Shared "Register now" button + signup modal for research and projects.
+// Used on the mentor profile page and on the research detail page.
 import { useState } from "react";
 import { seatsStatus } from "../utils/format";
 import { seatsLeft, totalSeats, registerForItem } from "../utils/registration";
@@ -58,7 +58,6 @@ export function RegisterModal({ kind, item, student, onClose, onRegistered }) {
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
-  const isPaidCourse = kind === "course" && item.price > 0;
 
   async function submit() {
     setSubmitting(true);
@@ -110,8 +109,7 @@ export function RegisterModal({ kind, item, student, onClose, onRegistered }) {
             <p style={{ fontSize: 48 }}>✅</p>
             <h3>You're registered!</h3>
             <p style={{ color: "#888", marginBottom: 20 }}>
-              The mentor will be in touch at {student.email}
-              {isPaidCourse ? " about payment" : ""}.
+              The mentor will be in touch at {student.email}.
             </p>
             <button
               onClick={onClose}
@@ -151,22 +149,6 @@ export function RegisterModal({ kind, item, student, onClose, onRegistered }) {
                 ✕
               </button>
             </div>
-
-            {isPaidCourse && (
-              <p
-                style={{
-                  fontSize: 13,
-                  color: "#92400e",
-                  background: "rgba(217,119,6,0.08)",
-                  padding: "10px 12px",
-                  borderRadius: 8,
-                  margin: "0 0 16px",
-                }}
-              >
-                This course costs ${item.price}. No payment is taken now - the
-                mentor will contact you to arrange it.
-              </p>
-            )}
 
             <div
               style={{

@@ -81,7 +81,6 @@ export default function Navbar() {
           </span>
           <div className={styles.dropdownMenu}>
             <div className={styles.dropdownMenuInner}>
-              <Link to='/courses'>📚 Courses</Link>
               <Link to='/projects'>💡 Projects</Link>
               <Link to='/research'>🔬 Research</Link>
               <Link to='/tell-us-what-you-need'>💬 On-demand Learning</Link>
@@ -149,9 +148,6 @@ export default function Navbar() {
 
           <li>
             <p className={styles.mobileGroupLabel}>Programs</p>
-          </li>
-          <li>
-            <Link to='/courses'>📚 Courses</Link>
           </li>
           <li>
             <Link to='/projects'>💡 Projects</Link>

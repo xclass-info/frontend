@@ -13,7 +13,7 @@ import {
 } from "firebase/firestore";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import { lessonWeekday, safeUrl } from "../utils/format";
+import { safeUrl } from "../utils/format";
 import { SeatsRow, RegisterModal } from "./RegisterControls";
 import { useStudentAuth } from "../utils/useStudentAuth";
 import InitialsAvatar from "./InitialsAvatar";
@@ -75,8 +75,8 @@ function StatusBadge({ status }) {
   );
 }
 
-// Long descriptions are clamped with a Show more toggle so one course or
-// project doesn't push everything else off the page.
+// Long descriptions are clamped with a Show more toggle so one research
+// post or project doesn't push everything else off the page.
 function ExpandableText({ text, style }) {
   const [open, setOpen] = useState(false);
   const isLong = text.length > 280;
@@ -119,7 +119,7 @@ function ExpandableText({ text, style }) {
   );
 }
 
-// Research cards expand in place (like Show more on projects/courses)
+// Research cards expand in place (like Show more on projects)
 // instead of navigating away.
 function ResearchItem({ r, onRegister }) {
   const [open, setOpen] = useState(false);
@@ -270,7 +270,6 @@ export default function TeacherProfile() {
   const [showBooking, setShowBooking] = useState(false);
   const [research, setResearch] = useState([]);
   const [projects, setProjects] = useState([]);
-  const [courses, setCourses] = useState([]);
   const [registering, setRegistering] = useState(null);
 
   useEffect(() => {
@@ -307,14 +306,12 @@ export default function TeacherProfile() {
       const toList = (snap) =>
         snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort(newestFirst);
       try {
-        const [r, p, c] = await Promise.all([
+        const [r, p] = await Promise.all([
           byTeacher("research"),
           byTeacher("projects"),
-          byTeacher("classes"),
         ]);
         setResearch(toList(r).filter((x) => x.status === "published"));
         setProjects(toList(p));
-        setCourses(toList(c));
       } catch (err) {
         console.error(err);
       }
@@ -340,7 +337,6 @@ export default function TeacherProfile() {
       );
     if (kind === "research") setResearch(bump);
     else if (kind === "project") setProjects(bump);
-    else setCourses(bump);
   }
 
   function validate() {
@@ -832,102 +828,6 @@ export default function TeacherProfile() {
                       />
                     </div>
                   )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Courses */}
-        {courses.length > 0 && (
-          <div style={cardStyle}>
-            <h3 style={sectionTitle}>📚 Courses</h3>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {courses.map((c) => (
-                <div key={c.id} style={itemStyle}>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "flex-start",
-                      gap: 12,
-                      marginBottom: 6,
-                    }}
-                  >
-                    <h4 style={{ margin: 0, fontSize: 15, color: "#333" }}>
-                      {c.title}
-                    </h4>
-                    <StatusBadge status={c.status || "registration"} />
-                  </div>
-                  {c.gradeLevel && (
-                    <span
-                      style={{
-                        display: "inline-block",
-                        fontSize: 11,
-                        fontWeight: 700,
-                        color: "#00274c",
-                        background: "#fff8dc",
-                        border: "1px solid #ffcb05",
-                        padding: "2px 10px",
-                        borderRadius: 20,
-                        marginBottom: 6,
-                      }}
-                    >
-                      🎓 {c.gradeLevel}
-                    </span>
-                  )}
-                  {c.description && (
-                    <ExpandableText
-                      text={c.description}
-                      style={{
-                        margin: "0 0 10px",
-                        fontSize: 13,
-                        color: "#666",
-                        lineHeight: 1.6,
-                      }}
-                    />
-                  )}
-                  {c.prerequisites && (
-                    <p
-                      style={{
-                        fontSize: 12,
-                        color: "#888",
-                        margin: "0 0 8px",
-                      }}
-                    >
-                      ✅ Prerequisites: {c.prerequisites}
-                    </p>
-                  )}
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 2,
-                      fontSize: 13,
-                      color: "#555",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {c.lessons?.length > 0 ? (
-                      c.lessons.map((l) => (
-                        <span key={l.date}>
-                          📅 {l.date} ({lessonWeekday(l.date)}) · {l.startTime}–
-                          {l.endTime}
-                        </span>
-                      ))
-                    ) : (
-                      <span>
-                        📅 {c.date || c.dates?.join(", ")}
-                        {c.startTime && ` · ${c.startTime}–${c.endTime}`}
-                      </span>
-                    )}
-                    <SeatsRow
-                      kind='course'
-                      item={c}
-                      onRegister={openRegister}
-                      extra={` · 💰 ${c.price > 0 ? `$${c.price}` : "Free"}`}
-                    />
-                  </div>
                 </div>
               ))}
             </div>

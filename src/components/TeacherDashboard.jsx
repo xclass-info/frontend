@@ -22,7 +22,7 @@ import ProjectForm from "./ProjectForm";
 import ShowcaseForm from "./ShowcaseForm";
 
 import Footer from "./Footer";
-import { lessonWeekday, safeUrl } from "../utils/format";
+import { safeUrl } from "../utils/format";
 import RegistrationList from "./RegistrationList";
 
 function profileFromTeacherData(data) {
@@ -43,7 +43,6 @@ export default function TeacherDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   const [teacher, setTeacher] = useState(null);
-  const [classes, setClasses] = useState([]);
   const [research, setResearch] = useState([]);
   const [showResearchForm, setShowResearchForm] = useState(false);
   const [editingResearch, setEditingResearch] = useState(null);
@@ -54,7 +53,7 @@ export default function TeacherDashboard() {
   const [showShowcaseForm, setShowShowcaseForm] = useState(false);
   const [editingShowcase, setEditingShowcase] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState(location.state?.tab || "classes");
+  const [activeTab, setActiveTab] = useState(location.state?.tab || "research");
 
   // Profile form state
   const [profile, setProfile] = useState({
@@ -91,21 +90,13 @@ export default function TeacherDashboard() {
         );
       }
 
-      const q = query(
-        collection(db, "classes"),
-        where("teacherId", "==", user.uid),
-      );
-      const unsubscribeClasses = onSnapshot(q, (snapshot) => {
-        setClasses(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
-        setLoading(false);
-      });
-
       const researchQuery = query(
         collection(db, "research"),
         where("teacherId", "==", user.uid),
       );
       const unsubscribeResearch = onSnapshot(researchQuery, (snapshot) => {
         setResearch(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+        setLoading(false);
       });
 
       const projectsQuery = query(
@@ -125,7 +116,6 @@ export default function TeacherDashboard() {
       });
 
       return () => {
-        unsubscribeClasses();
         unsubscribeResearch();
         unsubscribeProjects();
         unsubscribeShowcase();
@@ -148,25 +138,6 @@ export default function TeacherDashboard() {
   async function handleLogout() {
     await signOut(auth);
     navigate("/teacher/login");
-  }
-
-  async function updateCourseStatus(id, status) {
-    try {
-      await updateDoc(doc(db, "classes", id), { status });
-    } catch (err) {
-      console.error(err);
-      alert("Failed to update status. Please try again.");
-    }
-  }
-
-  async function deleteCourse(id) {
-    if (!confirm("Delete this course? This can't be undone.")) return;
-    try {
-      await deleteDoc(doc(db, "classes", id));
-    } catch (err) {
-      console.error(err);
-      alert("Failed to delete. Please try again.");
-    }
   }
 
   async function deleteResearch(id) {
@@ -358,7 +329,6 @@ export default function TeacherDashboard() {
           {[
             { id: "research", label: "🔬 Research" },
             { id: "projects", label: "💡 Projects" },
-            { id: "classes", label: "📚 Courses" },
             { id: "showcase", label: "🏆 Student Work" },
             { id: "availability", label: "🗓 Availability" },
             { id: "bookings", label: "📬 Bookings" },
@@ -640,152 +610,6 @@ export default function TeacherDashboard() {
                   </div>
                 )}
               </>
-            )}
-          </div>
-        )}
-        {/* ── Classes Tab ── */}
-        {activeTab === "classes" && (
-          <div className={styles.section}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 16,
-              }}
-            >
-              <h2 className={styles.sectionTitle} style={{ marginBottom: 0 }}>
-                Your Courses
-              </h2>
-              <Link to='/teacher/create-class' className={styles.createBtn}>
-                + Create Course
-              </Link>
-            </div>
-            {classes.length === 0 ? (
-              <div className={styles.empty}>
-                <p>🎒 No courses yet!</p>
-                <Link to='/teacher/create-class' className={styles.createBtn}>
-                  + Create your first course
-                </Link>
-              </div>
-            ) : (
-              <div className={styles.grid}>
-                {classes.map((cls) => (
-                  <div key={cls.id} className={styles.card}>
-                    <div className={styles.cardTop}>
-                      <h3 className={styles.cardTitle}>{cls.title}</h3>
-                      <select
-                        value={cls.status || "registration"}
-                        onChange={(e) =>
-                          updateCourseStatus(cls.id, e.target.value)
-                        }
-                        className={`${styles.badge} ${
-                          cls.status === "completed"
-                            ? styles.completed
-                            : cls.status === "active"
-                              ? styles.active
-                              : styles.registration
-                        }`}
-                        style={{ cursor: "pointer" }}
-                      >
-                        <option value='registration'>Registration</option>
-                        <option value='active'>Active</option>
-                        <option value='completed'>Completed</option>
-                      </select>
-                    </div>
-                    {cls.gradeLevel && (
-                      <span
-                        style={{
-                          display: "inline-block",
-                          fontSize: 11,
-                          fontWeight: 700,
-                          color: "#00274c",
-                          background: "#fff8dc",
-                          border: "1px solid #ffcb05",
-                          padding: "2px 10px",
-                          borderRadius: 20,
-                          marginBottom: 6,
-                        }}
-                      >
-                        🎓 {cls.gradeLevel}
-                      </span>
-                    )}
-                    <p className={styles.cardDesc}>{cls.description}</p>
-                    {cls.prerequisites && (
-                      <p
-                        style={{
-                          fontSize: 12,
-                          color: "#888",
-                          margin: "0 0 6px",
-                        }}
-                      >
-                        ✅ Prerequisites: {cls.prerequisites}
-                      </p>
-                    )}
-                    <div className={styles.cardMeta}>
-                      {cls.lessons?.length > 0 ? (
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: 2,
-                          }}
-                        >
-                          {cls.lessons.map((l) => (
-                            <span key={l.date}>
-                              📅 {l.date} ({lessonWeekday(l.date)}) ·{" "}
-                              {l.startTime}–{l.endTime}
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <span>
-                          📅 {cls.date || cls.dates?.join(", ")}
-                          {cls.startTime &&
-                            ` · ${cls.startTime}–${cls.endTime}`}
-                        </span>
-                      )}
-                      <span>
-                        👥 {cls.enrolledCount || 0} / {cls.maxSeats} seats
-                      </span>
-                    </div>
-                    <RegistrationList itemId={cls.id} />
-                    <div className={styles.cardFooter}>
-                      <Link
-                        to={`/classroom/${cls.id}`}
-                        className={styles.joinBtn}
-                      >
-                        🎥 Start Class
-                      </Link>
-                      <button
-                        className={styles.copyBtn}
-                        onClick={() => {
-                          navigator.clipboard.writeText(
-                            `${window.location.origin}/#/classroom/${cls.id}`,
-                          );
-                          alert("Link copied!");
-                        }}
-                      >
-                        📋 Copy Link
-                      </button>
-                      <Link
-                        to='/teacher/create-class'
-                        state={{ editCourseId: cls.id }}
-                        className={styles.copyBtn}
-                      >
-                        ✏️ Edit
-                      </Link>
-                      <button
-                        className={styles.copyBtn}
-                        onClick={() => deleteCourse(cls.id)}
-                        style={{ color: "#e74c3c" }}
-                      >
-                        🗑️ Delete
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
             )}
           </div>
         )}

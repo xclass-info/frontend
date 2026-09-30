@@ -11,7 +11,6 @@ import { db } from "../firebase";
 const ITEM_COLLECTION = {
   research: "research",
   project: "projects",
-  course: "classes",
 };
 
 // Everything the student dashboard lists: the student's registrations, each

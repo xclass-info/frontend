@@ -1,4 +1,4 @@
-// Recommended grade band for a research post, project or course - shown as
+// Recommended grade band for a research post or project - shown as
 // a label on every program so parents can tell at a glance if it fits their
 // student. Distinct from utils/grades.js (a single grade, used on a
 // student's own profile) since a program targets a range, not one grade.

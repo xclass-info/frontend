@@ -1,5 +1,5 @@
 // src/components/RegistrationList.jsx
-// Mentor-side: who has registered for a research / project / course.
+// Mentor-side: who has registered for a research post / project.
 import { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, query, where, onSnapshot } from "firebase/firestore";

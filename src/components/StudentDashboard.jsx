@@ -1,5 +1,5 @@
 // src/components/StudentDashboard.jsx
-// A logged-in student's dashboard: profile, plus the courses, projects and
+// A logged-in student's dashboard: profile, plus the projects and
 // research they've registered for. Laid out like the mentor dashboard.
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
@@ -9,23 +9,16 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import styles from "./TeacherDashboard.module.css";
 import Footer from "./Footer";
 import { formatMentorName } from "../utils/mentorName";
-import { lessonWeekday } from "../utils/format";
 import { GRADE_OPTIONS } from "../utils/grades";
 import { loadStudentRegistrations } from "../utils/studentData";
 
 const TABS = [
   { id: "profile", label: "👤 Profile" },
-  { id: "course", label: "📚 Courses" },
   { id: "project", label: "💡 Projects" },
   { id: "research", label: "🔬 Research" },
 ];
 
 const EMPTY = {
-  course: {
-    text: "📚 You haven't registered for any courses yet.",
-    to: "/tutors",
-    cta: "Meet our mentors",
-  },
   project: {
     text: "💡 You haven't registered for any projects yet.",
     to: "/tutors",
@@ -46,11 +39,6 @@ const clamp = (lines) => ({
 });
 
 function badgeFor(kind, item) {
-  if (kind === "course") {
-    if (item.status === "completed") return [styles.completed, "Completed"];
-    if (item.status === "active") return [styles.active, "Active"];
-    return [styles.registration, "Registration"];
-  }
   return item.stage === "completed"
     ? [styles.draft, "Completed"]
     : [styles.active, "Active"];
@@ -81,16 +69,6 @@ function RegistrationCard({ row }) {
       )}
 
       <div className={styles.cardMeta}>
-        {reg.kind === "course" && item?.lessons?.length > 0 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {item.lessons.map((l) => (
-              <span key={l.date}>
-                📅 {l.date} ({lessonWeekday(l.date)}) · {l.startTime}–
-                {l.endTime}
-              </span>
-            ))}
-          </div>
-        )}
         <span>
           ✅ Registered{" "}
           {reg.createdAt?.toDate ? reg.createdAt.toDate().toLocaleDateString() : ""}
@@ -398,7 +376,6 @@ export function StudentDashboardView({
         {activeTab !== "profile" && (
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>
-              {activeTab === "course" && "Your Courses"}
               {activeTab === "project" && "Your Projects"}
               {activeTab === "research" && "Your Research"}
             </h2>

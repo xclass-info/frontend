@@ -2,7 +2,7 @@
 // Full page version of "On-demand Learning" (formerly "Tell us what you
 // need") - a free-text (+ optional photo) request that gets emailed
 // straight to the team, for visitors who don't want to browse
-// Courses/Projects/Research/1-1 themselves.
+// Projects/Research/1-1 themselves.
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import emailjs from "@emailjs/browser";
@@ -241,7 +241,7 @@ export default function TellUsWhatYouNeed() {
                 What do you need help with?
               </label>
               <textarea
-                placeholder="A course, a project idea, homework, exam prep, anything"
+                placeholder="A project idea, homework help, exam prep, anything"
                 name="details"
                 value={form.details}
                 onChange={handleChange}

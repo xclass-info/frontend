@@ -2,11 +2,10 @@ import { doc, collection, runTransaction } from "firebase/firestore";
 import { db } from "../firebase";
 
 // Which Firestore collection holds each kind of item, and which field is its
-// total seat count (courses predate research/projects and use maxSeats).
+// total seat count.
 const KINDS = {
   research: { collection: "research", seatsField: "seats" },
   project: { collection: "projects", seatsField: "seats" },
-  course: { collection: "classes", seatsField: "maxSeats" },
 };
 
 // null means the item has no seat count, so it can't be registered for.

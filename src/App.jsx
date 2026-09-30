@@ -9,7 +9,6 @@ import Footer from "./components/Footer";
 import TeacherRegister from "./components/TeacherRegister";
 import TeacherLogin from "./components/TeacherLogin";
 import TeacherDashboard from "./components/TeacherDashboard";
-import CreateClass from "./components/CreateClass";
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
 import AdminDashboard from "./components/AdminDashboard";
@@ -18,8 +17,6 @@ import ResearchListing from "./components/ResearchListing";
 import ResearchDetail from "./components/ResearchDetail";
 import ProjectListing from "./components/ProjectListing";
 import ProjectDetail from "./components/ProjectDetail";
-import CourseListing from "./components/CourseListing";
-import CourseDetail from "./components/CourseDetail";
 import ShowcaseListing from "./components/ShowcaseListing";
 import ExploreResources from "./components/ExploreResources";
 import TellUsWhatYouNeed from "./components/TellUsWhatYouNeed";
@@ -107,15 +104,12 @@ export default function App() {
         <Route path='/teacher/register' element={<TeacherRegister />} />
         <Route path='/teacher/login' element={<TeacherLogin />} />
         <Route path='/teacher/dashboard' element={<TeacherDashboard />} />
-        <Route path='/teacher/create-class' element={<CreateClass />} />
         <Route path='/admin' element={<AdminDashboard />} />
         <Route path='/teacher/:teacherId' element={<TeacherProfile />} />
         <Route path='/research' element={<ResearchListing />} />
         <Route path='/research/:researchId' element={<ResearchDetail />} />
         <Route path='/projects' element={<ProjectListing />} />
         <Route path='/projects/:projectId' element={<ProjectDetail />} />
-        <Route path='/courses' element={<CourseListing />} />
-        <Route path='/courses/:courseId' element={<CourseDetail />} />
         <Route path='/showcase' element={<ShowcaseListing />} />
         <Route path='/explore' element={<ExploreResources />} />
         <Route path='/tell-us-what-you-need' element={<TellUsWhatYouNeed />} />

@@ -1,7 +1,7 @@
 // src/components/GetStartedSection.jsx
 // Homepage entry point offering two paths: browse the structured content
-// (Courses/1-1 Learning/Projects/Research), or describe what you need and
-// let us follow up - for visitors who'd rather not self-serve.
+// (1-1 Learning/Projects/Research), or describe what you need and let us
+// follow up - for visitors who'd rather not self-serve.
 import { Link } from "react-router-dom";
 import styles from "./GetStartedSection.module.css";
 
