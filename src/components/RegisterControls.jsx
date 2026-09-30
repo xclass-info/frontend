@@ -5,25 +5,30 @@ import { useState } from "react";
 import { seatsStatus } from "../utils/format";
 import { seatsLeft, totalSeats, registerForItem } from "../utils/registration";
 
-// Seat count plus a Register now button while seats remain.
+// Seat count plus a Register now button while seats remain. Research posts
+// only ever have a single seat, so the count is redundant there - just the
+// button shows.
 export function SeatsRow({ kind, item, onRegister, extra }) {
   const left = seatsLeft(kind, item);
   if (left === null) return null;
+  const showCount = kind !== "research";
   return (
     <div
       style={{
         display: "flex",
-        justifyContent: "space-between",
+        justifyContent: showCount ? "space-between" : "flex-end",
         alignItems: "center",
         gap: 12,
         flexWrap: "wrap",
         marginTop: 10,
       }}
     >
-      <span style={{ fontSize: 14, color: "#555", fontWeight: 600 }}>
-        👥 {seatsStatus(totalSeats(kind, item), item.enrolledCount)}
-        {extra}
-      </span>
+      {showCount && (
+        <span style={{ fontSize: 14, color: "#555", fontWeight: 600 }}>
+          👥 {seatsStatus(totalSeats(kind, item), item.enrolledCount)}
+          {extra}
+        </span>
+      )}
       {left > 0 && (
         <button
           onClick={() => onRegister(kind, item)}

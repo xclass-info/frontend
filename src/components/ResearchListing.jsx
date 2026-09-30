@@ -7,7 +7,6 @@ import { SkeletonClassCard } from "./Skeleton";
 import { useNavigate, Link } from "react-router-dom";
 import Footer from "./Footer";
 import { formatMentorName } from "../utils/mentorName";
-import { seatsStatus } from "../utils/format";
 import { GRADE_RANGE_OPTIONS } from "../utils/gradeRange";
 import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
 
@@ -495,19 +494,6 @@ export default function ResearchListing() {
                         ✅ Prerequisites: {r.prerequisites}
                       </p>
                     )}
-
-                    {r.seats ? (
-                      <p
-                        style={{
-                          fontSize: 12,
-                          color: "#555",
-                          fontWeight: 600,
-                          margin: "0 0 12px",
-                        }}
-                      >
-                        👥 {seatsStatus(r.seats, r.enrolledCount)}
-                      </p>
-                    ) : null}
 
                     <div
                       style={{

@@ -442,13 +442,6 @@ export default function TeacherDashboard() {
                             📦 {r.deliverable}
                           </p>
                         )}
-                        {r.seats ? (
-                          <div className={styles.cardMeta}>
-                            <span>
-                              👥 {r.enrolledCount || 0} / {r.seats} seats
-                            </span>
-                          </div>
-                        ) : null}
                         <RegistrationList itemId={r.id} />
                         <div className={styles.cardFooter}>
                           <button
