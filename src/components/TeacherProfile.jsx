@@ -119,9 +119,30 @@ function ExpandableText({ text, style }) {
   );
 }
 
+// A Polygence-style trailing "Keywords: a, b, c" line, built from whatever
+// real topic/metadata fields are available - grade level, deliverable type,
+// and the mentor's own subject tags - rather than invented keywords.
+function KeywordsLine({ items }) {
+  const list = [...new Set(items.filter(Boolean))];
+  if (list.length === 0) return null;
+  return (
+    <p
+      style={{
+        fontSize: 12,
+        color: "#888",
+        margin: "10px 0 0",
+        lineHeight: 1.6,
+      }}
+    >
+      <span style={{ fontWeight: 700, color: "#555" }}>Keywords: </span>
+      {list.join(", ")}
+    </p>
+  );
+}
+
 // Research cards expand in place (like Show more on projects)
 // instead of navigating away.
-function ResearchItem({ r, onRegister }) {
+function ResearchItem({ r, onRegister, expertiseTags }) {
   const [open, setOpen] = useState(false);
   const labelStyle = {
     margin: "0 0 4px",
@@ -151,23 +172,6 @@ function ResearchItem({ r, onRegister }) {
         <h4 style={{ margin: 0, fontSize: 15, color: "#333" }}>{r.title}</h4>
         <StatusBadge status={r.stage} />
       </div>
-      {r.gradeLevel && (
-        <span
-          style={{
-            display: "inline-block",
-            fontSize: 11,
-            fontWeight: 700,
-            color: "#00274c",
-            background: "#fff8dc",
-            border: "1px solid #ffcb05",
-            padding: "2px 10px",
-            borderRadius: 20,
-            marginBottom: 6,
-          }}
-        >
-          🎓 {r.gradeLevel}
-        </span>
-      )}
       <p
         style={{
           ...bodyStyle,
@@ -184,23 +188,14 @@ function ResearchItem({ r, onRegister }) {
       >
         {r.idea}
       </p>
-      {r.deliverable && (
-        <p
-          style={{
-            fontSize: 12,
-            color: "#166534",
-            fontWeight: 600,
-            margin: "0 0 4px",
-          }}
-        >
-          📦 You'll produce: {r.deliverable}
-        </p>
-      )}
       {r.prerequisites && (
         <p style={{ fontSize: 12, color: "#888", margin: "0 0 4px" }}>
           ✅ Prerequisites: {r.prerequisites}
         </p>
       )}
+      <KeywordsLine
+        items={[r.gradeLevel, r.deliverable, ...expertiseTags]}
+      />
       <SeatsRow kind='research' item={r} onRegister={onRegister} />
       {open && (
         <>
@@ -416,6 +411,17 @@ export default function TeacherProfile() {
     );
   }
 
+  // The "Expertise" tag row draws on whichever of these subject fields the
+  // mentor has, deduped - real teacher docs don't have a dedicated
+  // multi-tag field, so this reuses what's already there.
+  const expertiseTags = [
+    ...new Set(
+      [teacher.major, teacher.researchArea, teacher.expertise].filter(
+        Boolean,
+      ),
+    ),
+  ];
+
   return (
     <div style={{ minHeight: "100vh", background: "#f9fafb" }}>
       <Navbar />
@@ -442,8 +448,6 @@ export default function TeacherProfile() {
         </button>
 
         {/* Hero section */}
-
-        {/* Hero section */}
         <div
           style={{
             background: "white",
@@ -453,12 +457,12 @@ export default function TeacherProfile() {
             boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
             display: "flex",
             gap: 32,
-            alignItems: "center",
+            alignItems: "flex-start",
             flexWrap: "wrap",
           }}
         >
           {/* Left — Avatar */}
-          <div style={{ flex: "0 0 30%" }}>
+          <div style={{ flex: "0 0 200px", width: 200 }}>
             {teacher.photoURL ? (
               <img
                 src={teacher.photoURL}
@@ -486,91 +490,103 @@ export default function TeacherProfile() {
           </div>
           {/* Right — Info */}
           <div style={{ flex: 1, minWidth: 260 }}>
-            <h1 style={{ margin: "0 0 16px", fontSize: 32 }}>
+            <h1 style={{ margin: "0 0 4px", fontSize: 30 }}>
               {teacher.name?.startsWith("Prof.")
                 ? teacher.name?.split(" ").slice(0, 2).join(" ")
                 : teacher.name?.startsWith("Dr.")
                   ? `Dr. ${teacher.name?.split(" ").pop()}`
                   : `Dr. ${teacher.name?.split(" ").pop()}`}
-            </h1>
-
-            {/* Badges */}
-            <div
-              style={{
-                display: "flex",
-                gap: 8,
-                flexWrap: "wrap",
-                marginBottom: 16,
-              }}
-            >
-              {teacher.gender && (
-                <span
-                  style={{
-                    fontSize: 12,
-                    background: "#f0f4ff",
-                    color: "#00274c",
-                    padding: "4px 12px",
-                    borderRadius: 20,
-                    fontWeight: 600,
-                  }}
-                >
-                  {teacher.gender === "Male" ? "👨" : "👩"} {teacher.gender}
-                </span>
-              )}
-              {teacher.degree && (
-                <span
-                  style={{
-                    fontSize: 12,
-                    background: "#f0fdf4",
-                    color: "#16a34a",
-                    padding: "4px 12px",
-                    borderRadius: 20,
-                    fontWeight: 600,
-                  }}
-                >
-                  🎓 {teacher.degree}
-                </span>
-              )}
               {teacher.major && (
                 <span
                   style={{
-                    fontSize: 12,
-                    background: "#fdf4ff",
-                    color: "#9333ea",
-                    padding: "4px 12px",
-                    borderRadius: 20,
-                    fontWeight: 600,
+                    fontWeight: 400,
+                    fontSize: 16,
+                    color: "#888",
                   }}
                 >
-                  🔬 {teacher.major}
+                  {" "}
+                  - Research Mentor
                 </span>
               )}
-              {teacher.yearsOfExperience && (
-                <span
-                  style={{
-                    fontSize: 12,
-                    background: "#fdf4ff",
-                    color: "#9333ea",
-                    padding: "4px 12px",
-                    borderRadius: 20,
-                    fontWeight: 600,
-                  }}
-                >
-                  📆 {teacher.yearsOfExperience} years exp.
-                </span>
-              )}
-            </div>
+            </h1>
 
-            {teacher.expertise && (
+            {(teacher.degree || teacher.university) && (
+              <p style={{ margin: "0 0 16px", fontSize: 15, color: "#888" }}>
+                {[teacher.degree, teacher.university]
+                  .filter(Boolean)
+                  .join(" at ")}
+              </p>
+            )}
+
+            {/* Expertise tags */}
+            {expertiseTags.length > 0 && (
+              <div style={{ marginBottom: 16 }}>
+                <p
+                  style={{
+                    margin: "0 0 6px",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: "#00274c",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                  }}
+                >
+                  Expertise
+                </p>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {expertiseTags.map((tag) => (
+                    <span
+                      key={tag}
+                      style={{
+                        fontSize: 12,
+                        background: "#fff8dc",
+                        color: "#00274c",
+                        border: "1px solid #ffcb05",
+                        padding: "4px 12px",
+                        borderRadius: 20,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Compact metadata line */}
+            {(teacher.gender ||
+              teacher.yearsOfExperience ||
+              teacher.languages ||
+              teacher.website) && (
               <p
                 style={{
-                  margin: "0 0 24px",
-                  fontSize: 15,
-                  color: "#555",
-                  fontWeight: 600,
+                  margin: "0 0 20px",
+                  fontSize: 13,
+                  color: "#aaa",
+                  display: "flex",
+                  gap: 14,
+                  flexWrap: "wrap",
                 }}
               >
-                💡 {teacher.expertise}
+                {teacher.gender && <span>{teacher.gender}</span>}
+                {teacher.yearsOfExperience && (
+                  <span>{teacher.yearsOfExperience} years exp.</span>
+                )}
+                {teacher.languages && <span>🗣 {teacher.languages}</span>}
+                {teacher.website &&
+                  (safeUrl(teacher.website) ? (
+                    <a
+                      href={safeUrl(teacher.website)}
+                      target='_blank'
+                      rel='noreferrer'
+                      style={{ color: "#00274c" }}
+                    >
+                      {teacher.website}
+                    </a>
+                  ) : (
+                    <span>{teacher.website}</span>
+                  ))}
               </p>
             )}
 
@@ -593,124 +609,32 @@ export default function TeacherProfile() {
           </div>
         </div>
 
-        {/* Info cards grid */}
-        {/* <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))",
-            gap: 16,
-            marginBottom: 24,
-          }}
-        > */}
-        {/* Info cards grid */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 16,
-            marginBottom: 24,
-          }}
-        >
-          {/* Academic Info */}
+        {/* About */}
+        {teacher.bio && (
           <div
             style={{
               background: "white",
               borderRadius: 16,
               padding: 24,
+              marginBottom: 24,
               boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
             }}
           >
-            <h3 style={{ margin: "0 0 16px", fontSize: 16, color: "#333" }}>
-              🎓 Academic Background
+            <h3 style={{ margin: "0 0 12px", fontSize: 16, color: "#333" }}>
+              👤 Bio
             </h3>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {teacher.university && (
-                <div>
-                  <p style={{ fontSize: 12, color: "#aaa", margin: "0 0 2px" }}>
-                    University / Institution
-                  </p>
-                  <p
-                    style={{
-                      fontSize: 14,
-                      color: "#333",
-                      margin: 0,
-                      fontWeight: 600,
-                    }}
-                  >
-                    {teacher.university}
-                  </p>
-                </div>
-              )}
-              {teacher.researchArea && (
-                <div>
-                  <p style={{ fontSize: 12, color: "#aaa", margin: "0 0 2px" }}>
-                    Research Area
-                  </p>
-                  <p style={{ fontSize: 14, color: "#333", margin: 0 }}>
-                    {teacher.researchArea}
-                  </p>
-                </div>
-              )}
-              {teacher.languages && (
-                <div>
-                  <p style={{ fontSize: 12, color: "#aaa", margin: "0 0 2px" }}>
-                    Languages Spoken
-                  </p>
-                  <p style={{ fontSize: 14, color: "#333", margin: 0 }}>
-                    {teacher.languages}
-                  </p>
-                </div>
-              )}
-              {teacher.website && (
-                <div>
-                  <p style={{ fontSize: 12, color: "#aaa", margin: "0 0 2px" }}>
-                    Website / LinkedIn
-                  </p>
-                  {safeUrl(teacher.website) ? (
-                    <a
-                      href={safeUrl(teacher.website)}
-                      target='_blank'
-                      rel='noreferrer'
-                      style={{ fontSize: 14, color: "#00274c" }}
-                    >
-                      {teacher.website}
-                    </a>
-                  ) : (
-                    <p style={{ fontSize: 14, color: "#333", margin: 0 }}>
-                      {teacher.website}
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* About */}
-          {teacher.bio && (
-            <div
+            <p
               style={{
-                background: "white",
-                borderRadius: 16,
-                padding: 24,
-                boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
+                fontSize: 14,
+                color: "#555",
+                lineHeight: 1.7,
+                margin: 0,
               }}
             >
-              <h3 style={{ margin: "0 0 12px", fontSize: 16, color: "#333" }}>
-                👤 About Me
-              </h3>
-              <p
-                style={{
-                  fontSize: 14,
-                  color: "#555",
-                  lineHeight: 1.7,
-                  margin: 0,
-                }}
-              >
-                {teacher.bio}
-              </p>
-            </div>
-          )}
-        </div>
+              {teacher.bio}
+            </p>
+          </div>
+        )}
 
         {/* Research */}
         {research.length > 0 && (
@@ -718,7 +642,12 @@ export default function TeacherProfile() {
             <h3 style={sectionTitle}>🔬 Research</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {research.map((r) => (
-                <ResearchItem key={r.id} r={r} onRegister={openRegister} />
+                <ResearchItem
+                  key={r.id}
+                  r={r}
+                  onRegister={openRegister}
+                  expertiseTags={expertiseTags}
+                />
               ))}
             </div>
           </div>
@@ -745,23 +674,6 @@ export default function TeacherProfile() {
                     </h4>
                     {project.stage && <StatusBadge status={project.stage} />}
                   </div>
-                  {project.gradeLevel && (
-                    <span
-                      style={{
-                        display: "inline-block",
-                        fontSize: 11,
-                        fontWeight: 700,
-                        color: "#00274c",
-                        background: "#fff8dc",
-                        border: "1px solid #ffcb05",
-                        padding: "2px 10px",
-                        borderRadius: 20,
-                        marginBottom: 6,
-                      }}
-                    >
-                      🎓 {project.gradeLevel}
-                    </span>
-                  )}
                   {project.description && (
                     <ExpandableText
                       text={project.description}
@@ -773,23 +685,18 @@ export default function TeacherProfile() {
                       }}
                     />
                   )}
-                  {project.deliverable && (
-                    <p
-                      style={{
-                        fontSize: 12,
-                        color: "#166534",
-                        fontWeight: 600,
-                        margin: "6px 0 0",
-                      }}
-                    >
-                      📦 You'll produce: {project.deliverable}
-                    </p>
-                  )}
                   {project.prerequisites && (
                     <p style={{ fontSize: 12, color: "#888", margin: "6px 0 0" }}>
                       ✅ Prerequisites: {project.prerequisites}
                     </p>
                   )}
+                  <KeywordsLine
+                    items={[
+                      project.gradeLevel,
+                      project.deliverable,
+                      ...expertiseTags,
+                    ]}
+                  />
                   <SeatsRow
                     kind='project'
                     item={project}
