@@ -14,6 +14,11 @@ const SORT_OPTIONS = [
   { value: "name", label: "Name (A-Z)" },
 ];
 
+const OPENING_OPTIONS = [
+  { value: "research", label: "Research" },
+  { value: "project", label: "Project" },
+];
+
 const checkboxRow = {
   display: "flex",
   alignItems: "center",
@@ -47,10 +52,12 @@ export default function Tutors({ standalone = false }) {
   const navigate = useNavigate();
   const sectionRef = useRef(null);
 
+  const [research, setResearch] = useState([]);
+  const [projects, setProjects] = useState([]);
+
   const [search, setSearch] = useState("");
-  const [selectedDegrees, setSelectedDegrees] = useState([]);
-  const [selectedMajors, setSelectedMajors] = useState([]);
   const [selectedResearchAreas, setSelectedResearchAreas] = useState([]);
+  const [selectedOpenings, setSelectedOpenings] = useState([]);
   const [sortBy, setSortBy] = useState("featured");
   const [visibleCount, setVisibleCount] = useState(20);
 
@@ -87,20 +94,44 @@ export default function Tutors({ standalone = false }) {
     return () => unsub();
   }, []);
 
-  const degreeOptions = useMemo(
-    () => [...new Set(teachers.map((t) => t.degree).filter(Boolean))].sort(),
-    [teachers],
-  );
+  // Fetched to know which mentors currently have an open (unfilled) research
+  // or project seat, for the Opening filter.
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, "research"), (snapshot) => {
+      setResearch(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+    });
+    return () => unsub();
+  }, []);
 
-  const majorOptions = useMemo(
-    () => [...new Set(teachers.map((t) => t.major).filter(Boolean))].sort(),
-    [teachers],
-  );
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, "projects"), (snapshot) => {
+      setProjects(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+    });
+    return () => unsub();
+  }, []);
 
   const researchAreaOptions = useMemo(
     () => [...new Set(teachers.map((t) => t.researchArea).filter(Boolean))].sort(),
     [teachers],
   );
+
+  const openResearchTeacherIds = useMemo(() => {
+    const set = new Set();
+    research.forEach((r) => {
+      const left = (r.seats || 0) - (r.enrolledCount || 0);
+      if (r.status === "published" && left > 0) set.add(r.teacherId);
+    });
+    return set;
+  }, [research]);
+
+  const openProjectTeacherIds = useMemo(() => {
+    const set = new Set();
+    projects.forEach((p) => {
+      const left = (p.seats || 0) - (p.enrolledCount || 0);
+      if (left > 0) set.add(p.teacherId);
+    });
+    return set;
+  }, [projects]);
 
   function toggleValue(list, setList, value) {
     setList(
@@ -110,9 +141,8 @@ export default function Tutors({ standalone = false }) {
 
   function clearFilters() {
     setSearch("");
-    setSelectedDegrees([]);
-    setSelectedMajors([]);
     setSelectedResearchAreas([]);
+    setSelectedOpenings([]);
     setSortBy("featured");
   }
 
@@ -123,17 +153,21 @@ export default function Tutors({ standalone = false }) {
         const haystack = `${t.name || ""} ${t.expertise || ""} ${t.bio || ""} ${t.major || ""} ${t.researchArea || ""}`.toLowerCase();
         if (!haystack.includes(q)) return false;
       }
-      if (selectedDegrees.length > 0 && !selectedDegrees.includes(t.degree)) {
-        return false;
-      }
-      if (selectedMajors.length > 0 && !selectedMajors.includes(t.major)) {
-        return false;
-      }
       if (
         selectedResearchAreas.length > 0 &&
         !selectedResearchAreas.includes(t.researchArea)
       ) {
         return false;
+      }
+      if (selectedOpenings.length > 0) {
+        const hasOpenResearch = openResearchTeacherIds.has(t.id);
+        const hasOpenProject = openProjectTeacherIds.has(t.id);
+        const matches = selectedOpenings.some(
+          (o) =>
+            (o === "research" && hasOpenResearch) ||
+            (o === "project" && hasOpenProject),
+        );
+        if (!matches) return false;
       }
       return true;
     });
@@ -149,9 +183,10 @@ export default function Tutors({ standalone = false }) {
   }, [
     teachers,
     search,
-    selectedDegrees,
-    selectedMajors,
     selectedResearchAreas,
+    selectedOpenings,
+    openResearchTeacherIds,
+    openProjectTeacherIds,
     sortBy,
   ]);
 
@@ -159,7 +194,7 @@ export default function Tutors({ standalone = false }) {
   // so "Show more" doesn't leave a stale page depth after a new search/filter.
   useEffect(() => {
     setVisibleCount(20);
-  }, [search, selectedDegrees, selectedMajors, selectedResearchAreas, sortBy]);
+  }, [search, selectedResearchAreas, selectedOpenings, sortBy]);
 
   const visibleTeachers = filteredTeachers.slice(0, visibleCount);
 
@@ -409,50 +444,6 @@ export default function Tutors({ standalone = false }) {
               </button>
             </div>
 
-            {degreeOptions.length > 0 && (
-              <>
-                <p style={filterLabel}>Degree</p>
-                {degreeOptions.map((d) => (
-                  <label key={d} style={checkboxRow}>
-                    <input
-                      type='checkbox'
-                      checked={selectedDegrees.includes(d)}
-                      onChange={() =>
-                        toggleValue(selectedDegrees, setSelectedDegrees, d)
-                      }
-                    />
-                    {d}
-                  </label>
-                ))}
-              </>
-            )}
-
-            {majorOptions.length > 0 && (
-              <>
-                <p style={filterLabel}>Major</p>
-                <div
-                  style={{
-                    maxHeight: 180,
-                    overflowY: "auto",
-                    paddingRight: 4,
-                  }}
-                >
-                  {majorOptions.map((m) => (
-                    <label key={m} style={checkboxRow}>
-                      <input
-                        type='checkbox'
-                        checked={selectedMajors.includes(m)}
-                        onChange={() =>
-                          toggleValue(selectedMajors, setSelectedMajors, m)
-                        }
-                      />
-                      {m}
-                    </label>
-                  ))}
-                </div>
-              </>
-            )}
-
             {researchAreaOptions.length > 0 && (
               <>
                 <p style={filterLabel}>Research Area</p>
@@ -482,6 +473,20 @@ export default function Tutors({ standalone = false }) {
                 </div>
               </>
             )}
+
+            <p style={filterLabel}>Opening</p>
+            {OPENING_OPTIONS.map((o) => (
+              <label key={o.value} style={checkboxRow}>
+                <input
+                  type='checkbox'
+                  checked={selectedOpenings.includes(o.value)}
+                  onChange={() =>
+                    toggleValue(selectedOpenings, setSelectedOpenings, o.value)
+                  }
+                />
+                {o.label}
+              </label>
+            ))}
           </aside>
 
           {/* Main content */}
