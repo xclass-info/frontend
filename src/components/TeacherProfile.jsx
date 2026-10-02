@@ -604,7 +604,7 @@ export default function TeacherProfile() {
                 cursor: "pointer",
               }}
             >
-              📅 Book a Session
+              📅 Book a Consultation
             </button>
           </div>
         </div>
@@ -741,62 +741,6 @@ export default function TeacherProfile() {
           </div>
         )}
 
-        {/* Available Slots */}
-        <div
-          style={{
-            background: "white",
-            borderRadius: 16,
-            padding: 24,
-            boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
-          }}
-        >
-          <h3 style={{ margin: "0 0 16px", fontSize: 16, color: "#333" }}>
-            🗓 Available Slots
-          </h3>
-          {slots.length === 0 ? (
-            <p style={{ color: "#aaa", fontSize: 14 }}>
-              No available slots at the moment.
-            </p>
-          ) : (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-                gap: 10,
-              }}
-            >
-              {slots.map((slot) => (
-                <div
-                  key={slot.id}
-                  onClick={() => {
-                    setSelectedSlot(slot);
-                    setShowBooking(true);
-                  }}
-                  style={{
-                    padding: "12px 16px",
-                    borderRadius: 10,
-                    border: `2px solid ${selectedSlot?.id === slot.id ? "#00274c" : "#eee"}`,
-                    background:
-                      selectedSlot?.id === slot.id ? "#eff6ff" : "white",
-                    cursor: "pointer",
-                    fontSize: 14,
-                  }}
-                >
-                  <p style={{ margin: "0 0 4px", fontWeight: 600 }}>
-                    📅 {slot.date}
-                  </p>
-                  <p style={{ margin: "0 0 4px", color: "#555" }}>
-                    ⏰ {slot.time}
-                  </p>
-                  <p style={{ margin: 0, color: "#888", fontSize: 12 }}>
-                    ⏱ {slot.duration} min{" "}
-                    {slot.price > 0 ? `· $${slot.price}` : "· Free"}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
 
       {/* ── Booking Modal ── */}
