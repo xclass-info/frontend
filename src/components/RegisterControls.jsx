@@ -1,11 +1,11 @@
 // src/components/RegisterControls.jsx
-// Shared "Register now" button + signup modal for research and projects.
+// Shared "Apply now" button + signup modal for research and projects.
 // Used on the mentor profile page and on the research detail page.
 import { useState } from "react";
 import { seatsStatus } from "../utils/format";
 import { seatsLeft, totalSeats, registerForItem } from "../utils/registration";
 
-// Seat count plus a Register now button while seats remain. Research posts
+// Seat count plus an Apply now button while seats remain. Research posts
 // only ever have a single seat, so the count is redundant there - just the
 // button shows.
 export function SeatsRow({ kind, item, onRegister, extra }) {
@@ -43,7 +43,7 @@ export function SeatsRow({ kind, item, onRegister, extra }) {
             cursor: "pointer",
           }}
         >
-          Register now
+          Apply now
         </button>
       )}
     </div>
