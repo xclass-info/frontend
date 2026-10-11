@@ -8,27 +8,28 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 6%;
-  background: #00274c;
-  border-bottom: 3px solid #ffcb05;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border, #d5dde2);
 }
 
 .logo {
   flex-shrink: 0;
   margin-right: 12px;
-  font-family: "Fredoka One", cursive;
+  font-family: "Source Serif 4", Georgia, serif;
   font-size: 1.5rem;
   font-weight: 400;
   text-decoration: none;
-  color: #ffffff;
+  color: #1a1a1a;
   letter-spacing: 0.02em;
 }
 
 .logoClass {
-  color: #ffcb05;
+  color: var(--primary-hover, #2f6175);
+  font-weight: 700;
 }
 
 .logoInfo {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--muted, #555f66);
   font-size: 1rem;
 }
 
@@ -40,14 +41,14 @@
 
 .links a {
   text-decoration: none;
-  color: rgba(255, 255, 255, 0.8);
+  color: #333;
   font-size: 1.05rem;
-  font-weight: 700;
+  font-weight: 600;
   transition: color 0.2s;
 }
 
 .links a:hover {
-  color: #ffcb05;
+  color: var(--primary-hover, #2f6175);
 }
 
 .dropdown {
@@ -59,14 +60,14 @@
   align-items: center;
   gap: 4px;
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.8);
+  color: #333;
   font-size: 1.05rem;
-  font-weight: 700;
+  font-weight: 600;
   transition: color 0.2s;
 }
 
 .dropdown:hover .dropdownTrigger {
-  color: #ffcb05;
+  color: var(--primary-hover, #2f6175);
 }
 
 .dropdownCaret {
@@ -102,14 +103,14 @@
 }
 
 .dropdownMenuInner {
-  background: #00274c;
-  border: 1px solid rgba(255, 203, 5, 0.3);
+  background: #ffffff;
+  border: 1px solid var(--border, #d5dde2);
   border-radius: 12px;
   padding: 8px;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
 }
 
 .dropdownMenu a {
@@ -117,19 +118,19 @@
   padding: 10px 14px;
   border-radius: 8px;
   text-decoration: none;
-  color: rgba(255, 255, 255, 0.85);
+  color: #333;
   font-size: 0.95rem;
-  font-weight: 700;
+  font-weight: 600;
   white-space: nowrap;
 }
 
 .dropdownMenu a:hover {
-  background: rgba(255, 203, 5, 0.14);
-  color: #ffcb05;
+  background: var(--primary-soft, #e3eff3);
+  color: var(--primary-hover, #2f6175);
 }
 
 .mobileGroupLabel {
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--muted, #555f66);
   font-size: 0.75rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -144,43 +145,38 @@
 }
 
 .teacherBtn {
-  background: transparent;
-  color: #ffcb05;
+  background: var(--primary-soft, #e3eff3);
+  color: var(--primary-hover, #2f6175);
   padding: 8px 20px;
   border-radius: 50px;
   font-size: 0.875rem;
-  font-weight: 800;
+  font-weight: 700;
   text-decoration: none;
-  border: 2px solid rgba(255, 203, 5, 0.6);
+  border: 1px solid transparent;
   transition: all 0.15s;
-  font-family: "Nunito", sans-serif;
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
 }
 
 .teacherBtn:hover {
-  background: rgba(255, 203, 5, 0.15);
-  border-color: #ffcb05;
+  background: #d9ebf1;
+  border-color: var(--primary, #427e94);
 }
 
 .cta {
-  background: #ffcb05;
-  color: #00274c;
+  background: var(--primary, #427e94);
+  color: #ffffff;
   padding: 8px 20px;
   border-radius: 50px;
   font-size: 0.875rem;
-  font-weight: 800;
+  font-weight: 700;
   text-decoration: none;
-  transition: all 0.15s;
-  font-family: "Nunito", sans-serif;
+  transition: background 0.15s;
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
   border: none;
 }
 
 .cta:hover {
-  background: #e6b800;
-  transform: translateY(-2px);
-}
-
-.cta:active {
-  transform: translateY(1px);
+  background: var(--primary-hover, #2f6175);
 }
 
 .hamburger {
@@ -189,7 +185,7 @@
   border: none;
   font-size: 2rem;
   cursor: pointer;
-  color: #ffcb05;
+  color: var(--primary-hover, #2f6175);
 }
 
 .mobileMenu {
@@ -198,23 +194,24 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: #00274c;
-  border-bottom: 3px solid #ffcb05;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border, #d5dde2);
   list-style: none;
   flex-direction: column;
   padding: 16px 6%;
   gap: 20px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
 }
 
 .mobileMenu a {
   text-decoration: none;
-  color: rgba(255, 255, 255, 0.8);
+  color: #333;
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .mobileMenu a:hover {
-  color: #ffcb05;
+  color: var(--primary-hover, #2f6175);
 }
 
 @media (max-width: 1260px) {

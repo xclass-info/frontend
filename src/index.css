@@ -7,23 +7,28 @@
 }
 
 :root {
-  --primary: #00274c;
-  --accent: #ffcb05;
-  --bg: #f5f5f0;
-  --surface: #fff3e8;
+  /* Ported from the libri-stack design system: a muted teal/gold palette
+     with a serif display face, flat white tiles and thin borders instead
+     of the previous bright rainbow + heavy drop-shadow look. */
+  --primary: #427e94;
+  --primary-hover: #2f6175;
+  --primary-soft: #e3eff3;
+  --accent: #9a772b;
+  --bg: #f8fafb;
+  --surface: #eef6f9;
   --card: #ffffff;
-  --border: #ede0cc;
-  --coral: #ff6b4a;
-  --yellow: #ffd23f;
-  --blue: #4a8fe2;
-  --mint: #2dcb85;
-  --purple: #9b6bff;
-  --pink: #ff6ba8;
-  --orange: #ff9f1c;
-  --text: #1a1a2e;
-  --muted: #8b7e6e;
-  --radius: 20px;
-  --radius-lg: 28px;
+  --border: #d5dde2;
+  --coral: #427e94;
+  --yellow: #9a772b;
+  --blue: #427e94;
+  --mint: #1f6f4a;
+  --purple: #6d3f6b;
+  --pink: #a01f13;
+  --orange: #9a772b;
+  --text: #1a1a1a;
+  --muted: #555f66;
+  --radius: 12px;
+  --radius-lg: 16px;
 }
 
 html {
@@ -32,7 +37,7 @@ html {
 }
 
 body {
-  font-family: "Nunito", sans-serif;
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
   background: var(--bg);
   color: var(--text);
   overflow-x: hidden;
@@ -48,7 +53,7 @@ body::before {
   pointer-events: none;
   background-image: radial-gradient(
     circle,
-    rgba(255, 107, 74, 0.07) 1.5px,
+    rgba(66, 126, 148, 0.06) 1.5px,
     transparent 1.5px
   );
   background-size: 30px 30px;
@@ -87,22 +92,22 @@ body::before {
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--coral);
+  color: var(--primary-hover);
   margin-bottom: 14px;
-  background: rgba(255, 107, 74, 0.1);
+  background: var(--primary-soft);
   padding: 5px 14px;
   border-radius: 50px;
-  border: 2px solid rgba(255, 107, 74, 0.2);
+  border: 1px solid var(--border);
 }
 
 h2 {
-  font-family: "Fredoka One", cursive;
+  font-family: "Source Serif 4", Georgia, serif;
   font-size: clamp(1.8rem, 3.2vw, 2.8rem);
-  font-weight: 400;
+  font-weight: 700;
   line-height: 1.15;
   margin-bottom: 14px;
-  letter-spacing: 0.01em;
-  color: var(--text);
+  letter-spacing: 0;
+  color: var(--accent);
 }
 
 .section-sub {
@@ -115,54 +120,49 @@ h2 {
 
 .btn-primary {
   display: inline-block;
-  background: var(--coral);
+  background: var(--primary);
   color: #fff;
-  padding: 14px 30px;
-  border-radius: 50px;
-  font-weight: 800;
+  padding: 12px 28px;
+  border-radius: var(--radius);
+  font-weight: 700;
   text-decoration: none;
-  font-size: 0.95rem;
-  transition: all 0.15s;
+  font-size: 1rem;
+  transition: background 0.15s;
   cursor: pointer;
   border: none;
-  font-family: "Nunito", sans-serif;
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
 }
 
 .btn-primary:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 0 #c94530;
+  background: var(--primary-hover);
 }
 
 .btn-primary:active {
-  transform: translateY(2px);
-  box-shadow: 0 2px 0 #c94530;
+  background: var(--primary-hover);
 }
 
 .btn-primary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
 }
 
 .btn-ghost {
   display: inline-block;
-  border: 2.5px solid var(--border);
-  color: var(--text);
-  padding: 14px 30px;
-  border-radius: 50px;
-  font-weight: 800;
+  border: 1px solid var(--border);
+  color: var(--primary-hover);
+  padding: 12px 28px;
+  border-radius: var(--radius);
+  font-weight: 700;
   text-decoration: none;
-  font-size: 0.95rem;
-  transition: all 0.15s;
-  background: white;
-  font-family: "Nunito", sans-serif;
+  font-size: 1rem;
+  transition: background 0.15s, border-color 0.15s;
+  background: var(--primary-soft);
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
 }
 
 .btn-ghost:hover {
-  border-color: var(--coral);
-  color: var(--coral);
-  transform: translateY(-2px);
+  border-color: var(--primary);
+  background: #d9ebf1;
 }
 
 .reveal {

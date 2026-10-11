@@ -17,7 +17,7 @@ export default function InitialsAvatar({
         justifyContent: "center",
         background: avatarGradient(seed ?? name),
         color: "#fff",
-        fontFamily: "'Fredoka One', cursive",
+        fontFamily: "'Source Serif 4', Georgia, serif",
         fontWeight: 400,
         fontSize: fontSize ?? "1.4rem",
         flexShrink: 0,

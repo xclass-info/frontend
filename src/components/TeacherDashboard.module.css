@@ -24,7 +24,7 @@
 }
 
 .headerLeft .logo {
-  font-family: "Fredoka One", cursive;
+  font-family: "Source Serif 4", Georgia, serif;
   font-size: 1.8rem;
   color: #00274c;
   margin-bottom: 4px;
@@ -101,7 +101,7 @@
 }
 
 .statNum {
-  font-family: "Fredoka One", cursive;
+  font-family: "Source Serif 4", Georgia, serif;
   font-size: 2rem;
   color: #00274c;
 }
@@ -118,7 +118,7 @@
 }
 
 .sectionTitle {
-  font-family: "Fredoka One", cursive;
+  font-family: "Source Serif 4", Georgia, serif;
   font-size: 1.4rem;
   color: #00274c;
   margin-bottom: 24px;
@@ -164,7 +164,7 @@
 }
 
 .cardTitle {
-  font-family: "Fredoka One", cursive;
+  font-family: "Source Serif 4", Georgia, serif;
   font-size: 1.1rem;
   color: #00274c;
 }

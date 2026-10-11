@@ -1,9 +1,8 @@
-import styles from "./Footer.module.css";
 import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
-    <footer style={{ background: "#00274c", borderTop: "3px solid #ffcb05" }}>
+    <footer style={{ background: "#ffffff", borderTop: "1px solid #d5dde2" }}>
       <div
         style={{
           maxWidth: 1100,
@@ -23,15 +22,15 @@ export default function Footer() {
               fontSize: "1.4rem",
               fontWeight: 700,
               textDecoration: "none",
-              color: "white",
-              fontFamily: "Fredoka One, cursive",
+              color: "#1a1a1a",
+              fontFamily: "'Source Serif 4', Georgia, serif",
             }}
           >
-            happy<span style={{ color: "#ffcb05" }}>Research</span>
+            happy<span style={{ color: "#2f6175" }}>Research</span>
           </Link>
           <p
             style={{
-              color: "rgba(255,255,255,0.6)",
+              color: "#555f66",
               fontSize: 14,
               lineHeight: 1.7,
               marginTop: 12,
@@ -48,7 +47,7 @@ export default function Footer() {
                 display: "flex",
                 alignItems: "center",
                 gap: 8,
-                color: "rgba(255,255,255,0.6)",
+                color: "#555f66",
                 fontSize: 13,
                 textDecoration: "none",
                 marginBottom: 8,
@@ -62,7 +61,7 @@ export default function Footer() {
                 display: "flex",
                 alignItems: "center",
                 gap: 8,
-                color: "rgba(255,255,255,0.6)",
+                color: "#555f66",
                 fontSize: 13,
                 textDecoration: "none",
               }}
@@ -77,7 +76,7 @@ export default function Footer() {
           <div>
             <h4
               style={{
-                color: "#ffcb05",
+                color: "#555f66",
                 fontSize: 14,
                 fontWeight: 700,
                 marginBottom: 16,
@@ -91,7 +90,7 @@ export default function Footer() {
               <Link
                 to='/research'
                 style={{
-                  color: "rgba(255,255,255,0.6)",
+                  color: "#555f66",
                   fontSize: 14,
                   textDecoration: "none",
                 }}
@@ -101,7 +100,7 @@ export default function Footer() {
               <Link
                 to='/internship'
                 style={{
-                  color: "rgba(255,255,255,0.6)",
+                  color: "#555f66",
                   fontSize: 14,
                   textDecoration: "none",
                 }}
@@ -111,7 +110,7 @@ export default function Footer() {
               <Link
                 to='/tutors'
                 style={{
-                  color: "rgba(255,255,255,0.6)",
+                  color: "#555f66",
                   fontSize: 14,
                   textDecoration: "none",
                 }}
@@ -121,7 +120,7 @@ export default function Footer() {
               <Link
                 to='/gallery'
                 style={{
-                  color: "rgba(255,255,255,0.6)",
+                  color: "#555f66",
                   fontSize: 14,
                   textDecoration: "none",
                 }}
@@ -131,7 +130,7 @@ export default function Footer() {
               <Link
                 to='/teacher/login'
                 style={{
-                  color: "rgba(255,255,255,0.6)",
+                  color: "#555f66",
                   fontSize: 14,
                   textDecoration: "none",
                 }}
@@ -144,7 +143,7 @@ export default function Footer() {
           <div>
             <h4
               style={{
-                color: "#ffcb05",
+                color: "#555f66",
                 fontSize: 14,
                 fontWeight: 700,
                 marginBottom: 16,
@@ -158,7 +157,7 @@ export default function Footer() {
               <Link
                 to='/about'
                 style={{
-                  color: "rgba(255,255,255,0.6)",
+                  color: "#555f66",
                   fontSize: 14,
                   textDecoration: "none",
                 }}
@@ -168,7 +167,7 @@ export default function Footer() {
               <Link
                 to='/contact'
                 style={{
-                  color: "rgba(255,255,255,0.6)",
+                  color: "#555f66",
                   fontSize: 14,
                   textDecoration: "none",
                 }}
@@ -184,7 +183,7 @@ export default function Footer() {
                   }, 300)
                 }
                 style={{
-                  color: "rgba(255,255,255,0.6)",
+                  color: "#555f66",
                   fontSize: 14,
                   textDecoration: "none",
                 }}
@@ -194,7 +193,7 @@ export default function Footer() {
               <a
                 href='#'
                 style={{
-                  color: "rgba(255,255,255,0.6)",
+                  color: "#555f66",
                   fontSize: 14,
                   textDecoration: "none",
                 }}
@@ -204,7 +203,7 @@ export default function Footer() {
               <a
                 href='#'
                 style={{
-                  color: "rgba(255,255,255,0.6)",
+                  color: "#555f66",
                   fontSize: 14,
                   textDecoration: "none",
                 }}
@@ -219,7 +218,7 @@ export default function Footer() {
       {/* Bottom bar */}
       <div
         style={{
-          borderTop: "1px solid rgba(255,203,5,0.2)",
+          borderTop: "1px solid #d5dde2",
           padding: "16px 24px",
           display: "flex",
           justifyContent: "space-between",
@@ -230,14 +229,14 @@ export default function Footer() {
           gap: 8,
         }}
       >
-        <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, margin: 0 }}>
+        <p style={{ color: "#8a98a0", fontSize: 13, margin: 0 }}>
           © 2026 HappyResearch — All rights reserved
         </p>
         <div style={{ display: "flex", gap: 20 }}>
           <a
             href='#'
             style={{
-              color: "rgba(255,255,255,0.35)",
+              color: "#8a98a0",
               fontSize: 13,
               textDecoration: "none",
             }}
@@ -247,7 +246,7 @@ export default function Footer() {
           <a
             href='#'
             style={{
-              color: "rgba(255,255,255,0.35)",
+              color: "#8a98a0",
               fontSize: 13,
               textDecoration: "none",
             }}
