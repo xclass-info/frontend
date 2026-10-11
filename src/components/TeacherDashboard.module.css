@@ -26,7 +26,7 @@
 .headerLeft .logo {
   font-family: "Source Serif 4", Georgia, serif;
   font-size: 1.8rem;
-  color: #00274c;
+  color: #2f6175;
   margin-bottom: 4px;
 }
 
@@ -43,8 +43,8 @@
 }
 
 .createBtn {
-  background: #ffcb05;
-  color: #00274c;
+  background: #9a772b;
+  color: #ffffff;
   padding: 10px 22px;
   border-radius: 50px;
   font-size: 1.1rem;
@@ -57,9 +57,8 @@
 }
 
 .createBtn:hover {
-  background: #e6b800;
+  background: #7a5e22;
   transform: translateY(-2px);
-  box-shadow: 0 6px 0 #c9a800;
 }
 
 .logoutBtn {
@@ -76,8 +75,8 @@
 }
 
 .logoutBtn:hover {
-  border-color: #00274c;
-  color: #00274c;
+  border-color: #2f6175;
+  color: #2f6175;
 }
 
 .stats {
@@ -91,7 +90,7 @@
 .statCard {
   background: #ffffff;
   border: 2px solid #e2e8f0;
-  border-top: 4px solid #ffcb05;
+  border-top: 4px solid #9a772b;
   border-radius: 12px;
   padding: 24px;
   display: flex;
@@ -103,7 +102,7 @@
 .statNum {
   font-family: "Source Serif 4", Georgia, serif;
   font-size: 2rem;
-  color: #00274c;
+  color: #2f6175;
 }
 
 .statLabel {
@@ -120,7 +119,7 @@
 .sectionTitle {
   font-family: "Source Serif 4", Georgia, serif;
   font-size: 1.4rem;
-  color: #00274c;
+  color: #2f6175;
   margin-bottom: 24px;
 }
 
@@ -149,7 +148,7 @@
   background: #ffffff;
   border: 2px solid #e2e8f0;
   border-radius: 12px;
-  border-top: 4px solid #00274c;
+  border-top: 4px solid #2f6175;
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -166,7 +165,7 @@
 .cardTitle {
   font-family: "Source Serif 4", Georgia, serif;
   font-size: 1.1rem;
-  color: #00274c;
+  color: #2f6175;
 }
 
 .badge {
@@ -180,7 +179,7 @@
 }
 
 .active {
-  color: #166534;
+  color: #14532d;
   border-color: rgba(22, 101, 52, 0.3);
   background: rgba(22, 101, 52, 0.08);
 }
@@ -229,8 +228,8 @@
 
 .joinBtn {
   flex: 1;
-  background: #00274c;
-  color: #ffcb05;
+  background: #2f6175;
+  color: #ffffff;
   padding: 8px 14px;
   border-radius: 50px;
   font-size: 0.95rem;
@@ -242,8 +241,7 @@
 }
 
 .joinBtn:hover {
-  background: #ffcb05;
-  color: #00274c;
+  background: #1f4a57;
   transform: translateY(-2px);
 }
 
@@ -262,9 +260,9 @@
 }
 
 .copyBtn:hover {
-  border-color: #ffcb05;
-  color: #00274c;
-  background: rgba(255, 203, 5, 0.1);
+  border-color: #9a772b;
+  color: #2f6175;
+  background: rgba(154, 119, 43, 0.1);
 }
 
 @media (max-width: 900px) {

@@ -31,8 +31,8 @@ const programs = [
       "Robotics AI",
       "Data Science",
     ],
-    color: "#00274c",
-    accent: "#ffcb05",
+    color: "#2f6175",
+    accent: "#9a772b",
   },
   {
     id: "public-health",
@@ -47,7 +47,7 @@ const programs = [
       "Mental Health",
       "Global Health",
     ],
-    color: "#166534",
+    color: "#14532d",
     accent: "#bbf7d0",
   },
   {
@@ -96,12 +96,12 @@ export default function ResearchPrograms() {
             style={{
               display: "inline-block",
               background: "#fff8dc",
-              color: "#00274c",
+              color: "#2f6175",
               fontSize: 12,
               fontWeight: 700,
               padding: "4px 16px",
               borderRadius: 20,
-              border: "1px solid #ffcb05",
+              border: "1px solid #9a772b",
               marginBottom: 12,
               textTransform: "uppercase",
               letterSpacing: "0.05em",
@@ -113,7 +113,7 @@ export default function ResearchPrograms() {
             style={{
               fontSize: "2rem",
               fontWeight: 700,
-              color: "#00274c",
+              color: "#2f6175",
               marginBottom: 12,
             }}
           >
@@ -161,8 +161,8 @@ export default function ResearchPrograms() {
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "translateY(-6px)";
-                e.currentTarget.style.boxShadow = `0 12px 32px rgba(0,39,76,0.12)`;
-                e.currentTarget.style.borderColor = "#ffcb05";
+                e.currentTarget.style.boxShadow = `0 12px 32px rgba(47, 97, 117,0.12)`;
+                e.currentTarget.style.borderColor = "#9a772b";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "translateY(0)";
@@ -192,7 +192,7 @@ export default function ResearchPrograms() {
                 style={{
                   fontSize: 16,
                   fontWeight: 700,
-                  color: "#00274c",
+                  color: "#2f6175",
                   marginBottom: 8,
                 }}
               >
@@ -226,7 +226,7 @@ export default function ResearchPrograms() {
                     style={{
                       fontSize: 11,
                       background: "#f5f5f0",
-                      color: "#00274c",
+                      color: "#2f6175",
                       padding: "2px 8px",
                       borderRadius: 20,
                       fontWeight: 600,
@@ -243,12 +243,12 @@ export default function ResearchPrograms() {
                   display: "flex",
                   alignItems: "center",
                   gap: 4,
-                  color: "#00274c",
+                  color: "#2f6175",
                   fontWeight: 700,
                   fontSize: 13,
                 }}
               >
-                Explore <span style={{ color: "#ffcb05" }}>→</span>
+                Explore <span style={{ color: "#9a772b" }}>→</span>
               </div>
             </div>
           ))}

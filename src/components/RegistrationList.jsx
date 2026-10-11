@@ -34,7 +34,7 @@ export default function RegistrationList({ itemId }) {
         style={{
           background: "none",
           border: "none",
-          color: "#00274c",
+          color: "#2f6175",
           cursor: "pointer",
           fontSize: 13,
           fontWeight: 700,

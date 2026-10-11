@@ -53,7 +53,7 @@ export default function ShowcaseListing() {
       <Link
         to={`/teacher/${s.teacherId}`}
         onClick={(e) => e.stopPropagation()}
-        style={{ color: "#00274c", textDecoration: "underline" }}
+        style={{ color: "#2f6175", textDecoration: "underline" }}
       >
         {name}
       </Link>
@@ -117,8 +117,8 @@ export default function ShowcaseListing() {
               style={{
                 padding: "8px 16px",
                 borderRadius: 20,
-                border: "1px solid " + (filter === "all" ? "#00274c" : "#ddd"),
-                background: filter === "all" ? "#00274c" : "white",
+                border: "1px solid " + (filter === "all" ? "#2f6175" : "#ddd"),
+                background: filter === "all" ? "#2f6175" : "white",
                 color: filter === "all" ? "white" : "#555",
                 fontSize: 13,
                 fontWeight: 600,
@@ -134,8 +134,8 @@ export default function ShowcaseListing() {
                 style={{
                   padding: "8px 16px",
                   borderRadius: 20,
-                  border: "1px solid " + (filter === d ? "#00274c" : "#ddd"),
-                  background: filter === d ? "#00274c" : "white",
+                  border: "1px solid " + (filter === d ? "#2f6175" : "#ddd"),
+                  background: filter === d ? "#2f6175" : "white",
                   color: filter === d ? "white" : "#555",
                   fontSize: 13,
                   fontWeight: 600,
@@ -179,7 +179,7 @@ export default function ShowcaseListing() {
                     display: "inline-block",
                     fontSize: 11,
                     fontWeight: 700,
-                    color: "#166534",
+                    color: "#14532d",
                     background: "rgba(22,101,52,0.08)",
                     padding: "3px 10px",
                     borderRadius: 20,
@@ -236,7 +236,7 @@ export default function ShowcaseListing() {
                       rel='noreferrer'
                       style={{
                         fontSize: 12,
-                        color: "#00274c",
+                        color: "#2f6175",
                         fontWeight: 600,
                         textDecoration: "none",
                       }}

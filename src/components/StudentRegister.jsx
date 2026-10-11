@@ -101,7 +101,7 @@ export default function StudentRegister() {
           {done ? (
             <div style={{ textAlign: "center", padding: 20 }}>
               <p style={{ fontSize: 48, marginBottom: 12 }}>📧</p>
-              <h3 style={{ color: "#00274c", marginBottom: 8 }}>
+              <h3 style={{ color: "#2f6175", marginBottom: 8 }}>
                 {emailFailed ? "Account created" : "Check your email!"}
               </h3>
               <p

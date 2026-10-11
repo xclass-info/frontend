@@ -21,7 +21,7 @@ function countWords(str) {
 
 function WordCount({ count, limit }) {
   return (
-    <span style={{ fontSize: 12, color: count >= limit ? "#e74c3c" : "#aaa" }}>
+    <span style={{ fontSize: 12, color: count >= limit ? "#a01f13" : "#aaa" }}>
       {count} / {limit} words
     </span>
   );
@@ -120,7 +120,7 @@ export default function ProjectForm({ project, onClose }) {
           style={{
             background: "none",
             border: "none",
-            color: "#00274c",
+            color: "#2f6175",
             cursor: "pointer",
             fontSize: 14,
             marginBottom: 12,
@@ -302,7 +302,7 @@ export default function ProjectForm({ project, onClose }) {
             className={styles.btn}
             type='submit'
             disabled={loading}
-            style={{ background: saved ? "#27ae60" : undefined }}
+            style={{ background: saved ? "#1f6f4a" : undefined }}
           >
             {loading
               ? isEditing

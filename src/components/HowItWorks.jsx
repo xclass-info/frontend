@@ -11,19 +11,19 @@ const STEPS = [
     icon: "🧑‍🔬",
     title: "Get matched with a mentor",
     desc: "Connect with a PhD mentor from a top university who guides your project.",
-    color: "#4a8fe2",
+    color: "#427e94",
   },
   {
     icon: "🎥",
     title: "Do the research",
     desc: "Work 1-on-1 with your mentor via live video sessions, chat, and shared docs.",
-    color: "#9b6bff",
+    color: "#6d3f6b",
   },
   {
     icon: "📄",
     title: "Present & publish",
     desc: "Turn your project into a paper, presentation, or portfolio piece.",
-    color: "#ff6ba8",
+    color: "#a0527a",
   },
 ];
 

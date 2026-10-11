@@ -67,7 +67,7 @@ export default function ResearchSection() {
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "translateY(-4px)";
                 e.currentTarget.style.boxShadow = "0 12px 28px rgba(0,0,0,0.1)";
-                e.currentTarget.style.borderColor = "#ffcb05";
+                e.currentTarget.style.borderColor = "#9a772b";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "translateY(0)";
@@ -102,7 +102,7 @@ export default function ResearchSection() {
               <p
                 style={{
                   fontSize: 12,
-                  color: "#27ae60",
+                  color: "#1f6f4a",
                   fontWeight: 600,
                   margin: 0,
                 }}
@@ -120,7 +120,7 @@ export default function ResearchSection() {
               display: "inline-block",
               padding: "12px 32px",
               borderRadius: 32,
-              background: "#00274c",
+              background: "#2f6175",
               color: "white",
               textDecoration: "none",
               fontWeight: 600,
@@ -129,7 +129,7 @@ export default function ResearchSection() {
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,39,76,0.25)";
+              e.currentTarget.style.boxShadow = "0 8px 20px rgba(47, 97, 117,0.25)";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = "translateY(0)";

@@ -32,7 +32,7 @@ const checkboxRow = {
 const filterLabel = {
   fontSize: 13,
   fontWeight: 700,
-  color: "#00274c",
+  color: "#2f6175",
   textTransform: "uppercase",
   letterSpacing: "0.04em",
   margin: "20px 0 10px",
@@ -246,7 +246,7 @@ export default function Tutors({ standalone = false }) {
               style={{
                 fontSize: 11,
                 background: "#f0f4ff",
-                color: "#00274c",
+                color: "#2f6175",
                 padding: "2px 10px",
                 borderRadius: 20,
                 fontWeight: 600,
@@ -260,7 +260,7 @@ export default function Tutors({ standalone = false }) {
               style={{
                 fontSize: 11,
                 background: "#f0fdf4",
-                color: "#16a34a",
+                color: "#1f6f4a",
                 padding: "2px 10px",
                 borderRadius: 20,
                 fontWeight: 600,
@@ -374,9 +374,9 @@ export default function Tutors({ standalone = false }) {
                     style={{
                       padding: "12px 32px",
                       borderRadius: 10,
-                      border: "2px solid #00274c",
+                      border: "2px solid #2f6175",
                       background: "white",
-                      color: "#00274c",
+                      color: "#2f6175",
                       fontSize: 14,
                       fontWeight: 700,
                       cursor: "pointer",
@@ -433,7 +433,7 @@ export default function Tutors({ standalone = false }) {
                 style={{
                   background: "none",
                   border: "none",
-                  color: "#00274c",
+                  color: "#2f6175",
                   fontSize: 12,
                   fontWeight: 600,
                   cursor: "pointer",
@@ -560,7 +560,7 @@ export default function Tutors({ standalone = false }) {
                     padding: "8px 20px",
                     borderRadius: 8,
                     border: "none",
-                    background: "#00274c",
+                    background: "#2f6175",
                     color: "white",
                     cursor: "pointer",
                   }}
@@ -580,9 +580,9 @@ export default function Tutors({ standalone = false }) {
                       style={{
                         padding: "12px 32px",
                         borderRadius: 10,
-                        border: "2px solid #00274c",
+                        border: "2px solid #2f6175",
                         background: "white",
-                        color: "#00274c",
+                        color: "#2f6175",
                         fontSize: 14,
                         fontWeight: 700,
                         cursor: "pointer",

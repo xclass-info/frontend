@@ -9,21 +9,21 @@ const OPTIONS = [
   {
     to: "/tutors",
     icon: "🧑‍🏫",
-    color: "#ff6ba8",
+    color: "#a0527a",
     label: "1-1 Learning",
     desc: "Book a 1-on-1 session with a mentor for general help - homework, a specific question, anything.",
   },
   {
     to: "/projects",
     icon: "💡",
-    color: "#ff9f1c",
+    color: "#8a6a25",
     label: "Projects",
     desc: "Hands-on projects you build alongside a mentor, ending in something real you made.",
   },
   {
     to: "/research",
     icon: "🔬",
-    color: "#9b6bff",
+    color: "#6d3f6b",
     label: "Research",
     desc: "Real research topics led by PhD mentors, from idea to a finished paper or presentation.",
   },
@@ -41,12 +41,12 @@ export default function ExploreResources() {
             style={{
               display: "inline-block",
               background: "#fff8dc",
-              color: "#00274c",
+              color: "#2f6175",
               fontSize: 12,
               fontWeight: 700,
               padding: "4px 16px",
               borderRadius: 20,
-              border: "1px solid #ffcb05",
+              border: "1px solid #9a772b",
               marginBottom: 12,
               textTransform: "uppercase",
               letterSpacing: "0.05em",
@@ -130,7 +130,7 @@ export default function ExploreResources() {
               >
                 {o.desc}
               </p>
-              <span style={{ color: "#00274c", fontWeight: 700, fontSize: 14 }}>
+              <span style={{ color: "#2f6175", fontWeight: 700, fontSize: 14 }}>
                 Browse {o.label} →
               </span>
             </Link>

@@ -78,7 +78,7 @@ function RegistrationCard({ row }) {
             👩‍🏫 Mentored by:{" "}
             <Link
               to={`/teacher/${reg.teacherId}`}
-              style={{ color: "#00274c", textDecoration: "underline" }}
+              style={{ color: "#2f6175", textDecoration: "underline" }}
             >
               {formatMentorName(mentorName)}
             </Link>
@@ -156,7 +156,7 @@ export function StudentDashboardView({
       <div className={styles.page}>
         <div className={styles.header}>
           <div className={styles.headerLeft}>
-            <h1 className={styles.logo}>💻 happy<span style={{ color: "#ffcb05" }}>Research</span></h1>
+            <h1 className={styles.logo}>💻 happy<span style={{ color: "#9a772b" }}>Research</span></h1>
             <p className={styles.welcome}>
               Welcome back, <strong>{student.name}</strong> 👋
             </p>
@@ -194,10 +194,10 @@ export function StudentDashboardView({
                   cursor: "pointer",
                   fontSize: 19,
                   fontWeight: 600,
-                  color: activeTab === tab.id ? "#00274c" : "#888",
+                  color: activeTab === tab.id ? "#2f6175" : "#888",
                   borderBottom:
                     activeTab === tab.id
-                      ? "2px solid #00274c"
+                      ? "2px solid #2f6175"
                       : "2px solid transparent",
                   marginBottom: -2,
                   transition: "all 0.15s",
@@ -241,7 +241,7 @@ export function StudentDashboardView({
                     padding: "10px 20px",
                     borderRadius: 8,
                     border: "none",
-                    background: "#00274c",
+                    background: "#2f6175",
                     color: "white",
                     fontSize: 14,
                     fontWeight: 600,
@@ -273,7 +273,7 @@ export function StudentDashboardView({
                 <p style={labelStyle}>Email</p>
                 <p style={valueStyle}>
                   {email}{" "}
-                  <span style={{ color: "#16a34a", fontSize: 13 }}>
+                  <span style={{ color: "#1f6f4a", fontSize: 13 }}>
                     ✓ verified
                   </span>
                 </p>
@@ -327,7 +327,7 @@ export function StudentDashboardView({
               {editing && (
                 <>
                   {error && (
-                    <p style={{ color: "#e74c3c", fontSize: 13 }}>{error}</p>
+                    <p style={{ color: "#a01f13", fontSize: 13 }}>{error}</p>
                   )}
                   <div style={{ display: "flex", gap: 12 }}>
                     <button
@@ -337,7 +337,7 @@ export function StudentDashboardView({
                         padding: "12px 32px",
                         borderRadius: 8,
                         border: "none",
-                        background: "#00274c",
+                        background: "#2f6175",
                         color: "white",
                         fontSize: 15,
                         fontWeight: 600,

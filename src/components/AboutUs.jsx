@@ -9,7 +9,7 @@ export default function AboutUs() {
       {/* Hero */}
       <div
         style={{
-          background: "linear-gradient(135deg, #667eea, #764ba2)",
+          background: "linear-gradient(135deg, #2f6175, #427e94)",
           padding: "120px 24px 80px",
           textAlign: "center",
           color: "white",
@@ -50,7 +50,7 @@ export default function AboutUs() {
             style={{
               width: 48,
               height: 3,
-              background: "linear-gradient(135deg, #667eea, #764ba2)",
+              background: "linear-gradient(135deg, #2f6175, #427e94)",
               borderRadius: 2,
               marginBottom: 24,
             }}
@@ -105,8 +105,8 @@ export default function AboutUs() {
               lineHeight: 1.9,
               marginBottom: 16,
               fontStyle: "italic",
-              color: "#00274c",
-              borderLeft: "3px solid #00274c",
+              color: "#2f6175",
+              borderLeft: "3px solid #2f6175",
               paddingLeft: 16,
             }}
           >
@@ -302,7 +302,7 @@ export default function AboutUs() {
                   width: 32,
                   height: 32,
                   borderRadius: "50%",
-                  background: "linear-gradient(135deg, #667eea, #764ba2)",
+                  background: "linear-gradient(135deg, #2f6175, #427e94)",
                   color: "white",
                   fontWeight: 700,
                   display: "flex",
@@ -343,7 +343,7 @@ export default function AboutUs() {
         {/* Stats */}
         <div
           style={{
-            background: "linear-gradient(135deg, #667eea, #764ba2)",
+            background: "linear-gradient(135deg, #2f6175, #427e94)",
             borderRadius: 16,
             padding: 40,
             marginBottom: 24,
@@ -407,7 +407,7 @@ export default function AboutUs() {
             style={{
               padding: "12px 32px",
               borderRadius: 32,
-              background: "#00274c",
+              background: "#2f6175",
               color: "white",
               textDecoration: "none",
               fontWeight: 600,
@@ -421,7 +421,7 @@ export default function AboutUs() {
             style={{
               padding: "12px 32px",
               borderRadius: 32,
-              background: "#00274c",
+              background: "#2f6175",
               color: "white",
               textDecoration: "none",
               fontWeight: 600,
@@ -435,7 +435,7 @@ export default function AboutUs() {
             style={{
               padding: "12px 32px",
               borderRadius: 32,
-              background: "#00274c",
+              background: "#2f6175",
               color: "white",
               textDecoration: "none",
               fontWeight: 600,

@@ -24,7 +24,7 @@ export default function GetStartedSection() {
           <Link
             to='/explore'
             className={styles.bigButton}
-            style={{ "--btn-accent": "#4a8fe2" }}
+            style={{ "--btn-accent": "#427e94" }}
           >
             🔎 Explore Learning Resources
           </Link>
@@ -32,7 +32,7 @@ export default function GetStartedSection() {
           <Link
             to='/tell-us-what-you-need'
             className={styles.bigButton}
-            style={{ "--btn-accent": "#ff9f1c" }}
+            style={{ "--btn-accent": "#8a6a25" }}
           >
             💬 On-demand Learning
           </Link>

@@ -99,7 +99,7 @@ export default function ProjectDetail() {
         <Navbar />
         <div style={{ ...wrapStyle, textAlign: "center" }}>
           <p>Project not found.</p>
-          <Link to='/projects' style={{ color: "#00274c" }}>
+          <Link to='/projects' style={{ color: "#2f6175" }}>
             ← Back to all projects
           </Link>
         </div>
@@ -121,7 +121,7 @@ export default function ProjectDetail() {
         <Link
           to='/projects'
           style={{
-            color: "#00274c",
+            color: "#2f6175",
             fontSize: 14,
             textDecoration: "none",
             display: "inline-block",
@@ -156,9 +156,9 @@ export default function ProjectDetail() {
                 display: "inline-block",
                 fontSize: 12,
                 fontWeight: 700,
-                color: "#00274c",
+                color: "#2f6175",
                 background: "#fff8dc",
-                border: "1px solid #ffcb05",
+                border: "1px solid #9a772b",
                 padding: "3px 12px",
                 borderRadius: 20,
                 marginBottom: 12,
@@ -173,7 +173,7 @@ export default function ProjectDetail() {
             {mentor ? (
               <Link
                 to={`/teacher/${mentor.id}`}
-                style={{ color: "#00274c", textDecoration: "underline" }}
+                style={{ color: "#2f6175", textDecoration: "underline" }}
               >
                 {mentorLabel}
               </Link>
@@ -186,7 +186,7 @@ export default function ProjectDetail() {
             <p
               style={{
                 fontSize: 14,
-                color: "#166534",
+                color: "#14532d",
                 fontWeight: 600,
                 margin: "0 0 16px",
               }}
@@ -230,7 +230,7 @@ export default function ProjectDetail() {
               style={{
                 ...sectionBody,
                 background: "#f0fdf4",
-                borderLeft: "3px solid #27ae60",
+                borderLeft: "3px solid #1f6f4a",
               }}
             >
               {project.learning}

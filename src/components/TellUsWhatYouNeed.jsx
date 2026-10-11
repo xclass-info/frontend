@@ -106,7 +106,7 @@ export default function TellUsWhatYouNeed() {
     width: "100%",
     padding: 12,
     borderRadius: 8,
-    border: `1px solid ${hasError ? "#e74c3c" : "#ddd"}`,
+    border: `1px solid ${hasError ? "#a01f13" : "#ddd"}`,
     marginBottom: 4,
     boxSizing: "border-box",
     fontSize: 15,
@@ -124,12 +124,12 @@ export default function TellUsWhatYouNeed() {
             style={{
               display: "inline-block",
               background: "#fff8dc",
-              color: "#00274c",
+              color: "#2f6175",
               fontSize: 12,
               fontWeight: 700,
               padding: "4px 16px",
               borderRadius: 20,
-              border: "1px solid #ffcb05",
+              border: "1px solid #9a772b",
               marginBottom: 12,
               textTransform: "uppercase",
               letterSpacing: "0.05em",
@@ -168,7 +168,7 @@ export default function TellUsWhatYouNeed() {
                   padding: "12px 28px",
                   borderRadius: 8,
                   border: "none",
-                  background: "#00274c",
+                  background: "#2f6175",
                   color: "white",
                   fontSize: 15,
                   fontWeight: 600,
@@ -199,7 +199,7 @@ export default function TellUsWhatYouNeed() {
                 style={inputStyle(errors.name)}
               />
               {errors.name && (
-                <p style={{ color: "#e74c3c", fontSize: 12, margin: "0 0 12px" }}>
+                <p style={{ color: "#a01f13", fontSize: 12, margin: "0 0 12px" }}>
                   {errors.name}
                 </p>
               )}
@@ -224,7 +224,7 @@ export default function TellUsWhatYouNeed() {
                 style={inputStyle(errors.email)}
               />
               {errors.email && (
-                <p style={{ color: "#e74c3c", fontSize: 12, margin: "0 0 12px" }}>
+                <p style={{ color: "#a01f13", fontSize: 12, margin: "0 0 12px" }}>
                   {errors.email}
                 </p>
               )}
@@ -249,7 +249,7 @@ export default function TellUsWhatYouNeed() {
                 style={{ ...inputStyle(errors.details), resize: "vertical" }}
               />
               {errors.details && (
-                <p style={{ color: "#e74c3c", fontSize: 12, margin: "0 0 12px" }}>
+                <p style={{ color: "#a01f13", fontSize: 12, margin: "0 0 12px" }}>
                   {errors.details}
                 </p>
               )}
@@ -296,7 +296,7 @@ export default function TellUsWhatYouNeed() {
                       padding: "8px 14px",
                       fontSize: 13,
                       cursor: "pointer",
-                      color: "#e74c3c",
+                      color: "#a01f13",
                     }}
                   >
                     Remove
@@ -311,13 +311,13 @@ export default function TellUsWhatYouNeed() {
                 />
               )}
               {errors.image && (
-                <p style={{ color: "#e74c3c", fontSize: 12, margin: "0 0 12px" }}>
+                <p style={{ color: "#a01f13", fontSize: 12, margin: "0 0 12px" }}>
                   {errors.image}
                 </p>
               )}
 
               {submitError && (
-                <p style={{ color: "#e74c3c", fontSize: 13, margin: "12px 0" }}>
+                <p style={{ color: "#a01f13", fontSize: 13, margin: "12px 0" }}>
                   {submitError}
                 </p>
               )}
@@ -331,7 +331,7 @@ export default function TellUsWhatYouNeed() {
                   marginTop: 12,
                   borderRadius: 8,
                   border: "none",
-                  background: "#00274c",
+                  background: "#2f6175",
                   color: "white",
                   fontSize: 16,
                   fontWeight: 700,

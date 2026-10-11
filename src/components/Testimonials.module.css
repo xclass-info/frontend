@@ -73,22 +73,22 @@
 
 .card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 39, 76, 0.1);
-  border-color: #ffcb05;
+  box-shadow: 0 8px 24px rgba(47, 97, 117, 0.1);
+  border-color: #9a772b;
 }
 
 .featured {
-  border-color: #ffcb05;
+  border-color: #9a772b;
   border-width: 2.5px;
-  background: linear-gradient(160deg, #fff 60%, rgba(255, 203, 5, 0.04));
+  background: linear-gradient(160deg, #fff 60%, rgba(154, 119, 43, 0.04));
 }
 
 .stars {
-  color: #ffcb05;
+  color: #9a772b;
   letter-spacing: 2px;
   font-size: 1rem;
   margin-bottom: 14px;
-  filter: drop-shadow(0 1px 2px rgba(255, 203, 5, 0.4));
+  filter: drop-shadow(0 1px 2px rgba(154, 119, 43, 0.4));
 }
 
 .card blockquote {
@@ -111,7 +111,7 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  border: 2.5px solid #ffcb05;
+  border: 2.5px solid #9a772b;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -120,14 +120,14 @@
   font-size: 0.9rem;
   color: #fff;
   flex-shrink: 0;
-  background: #00274c;
+  background: #2f6175;
 }
 
 .name {
   font-weight: 800;
   font-size: 0.9rem;
   display: block;
-  color: #00274c;
+  color: #2f6175;
 }
 
 .info {

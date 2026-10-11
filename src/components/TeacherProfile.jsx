@@ -42,7 +42,7 @@ const BADGES = {
   },
   active: {
     label: "Active",
-    color: "#166534",
+    color: "#14532d",
     bg: "rgba(22,101,52,0.08)",
     border: "rgba(22,101,52,0.3)",
   },
@@ -104,7 +104,7 @@ function ExpandableText({ text, style }) {
           style={{
             background: "none",
             border: "none",
-            color: "#00274c",
+            color: "#2f6175",
             cursor: "pointer",
             fontSize: 12,
             fontWeight: 600,
@@ -205,10 +205,10 @@ function ResearchItem({ r, onRegister, expertiseTags }) {
               padding: "10px 12px",
               borderRadius: 8,
               background: "#f0fdf4",
-              borderLeft: "3px solid #27ae60",
+              borderLeft: "3px solid #1f6f4a",
             }}
           >
-            <p style={{ ...labelStyle, color: "#16a34a" }}>Impact</p>
+            <p style={{ ...labelStyle, color: "#1f6f4a" }}>Impact</p>
             <p style={bodyStyle}>{r.impact}</p>
           </div>
           {r.details && (
@@ -232,7 +232,7 @@ function ResearchItem({ r, onRegister, expertiseTags }) {
         style={{
           background: "none",
           border: "none",
-          color: "#00274c",
+          color: "#2f6175",
           cursor: "pointer",
           fontSize: 12,
           fontWeight: 600,
@@ -399,7 +399,7 @@ export default function TeacherProfile() {
               padding: "10px 24px",
               borderRadius: 8,
               border: "none",
-              background: "#00274c",
+              background: "#2f6175",
               color: "white",
               cursor: "pointer",
             }}
@@ -435,7 +435,7 @@ export default function TeacherProfile() {
           style={{
             background: "none",
             border: "none",
-            color: "#00274c",
+            color: "#2f6175",
             cursor: "pointer",
             fontSize: 14,
             marginBottom: 24,
@@ -526,7 +526,7 @@ export default function TeacherProfile() {
                     margin: "0 0 6px",
                     fontSize: 11,
                     fontWeight: 700,
-                    color: "#00274c",
+                    color: "#2f6175",
                     textTransform: "uppercase",
                     letterSpacing: "0.05em",
                   }}
@@ -540,8 +540,8 @@ export default function TeacherProfile() {
                       style={{
                         fontSize: 12,
                         background: "#fff8dc",
-                        color: "#00274c",
-                        border: "1px solid #ffcb05",
+                        color: "#2f6175",
+                        border: "1px solid #9a772b",
                         padding: "4px 12px",
                         borderRadius: 20,
                         fontWeight: 600,
@@ -580,7 +580,7 @@ export default function TeacherProfile() {
                       href={safeUrl(teacher.website)}
                       target='_blank'
                       rel='noreferrer'
-                      style={{ color: "#00274c" }}
+                      style={{ color: "#2f6175" }}
                     >
                       {teacher.website}
                     </a>
@@ -597,7 +597,7 @@ export default function TeacherProfile() {
                 padding: "14px 40px",
                 borderRadius: 12,
                 border: "none",
-                background: "#00274c",
+                background: "#2f6175",
                 color: "white",
                 fontSize: 16,
                 fontWeight: 700,
@@ -709,7 +709,7 @@ export default function TeacherProfile() {
                         padding: "10px 12px",
                         borderRadius: 8,
                         background: "#f0fdf4",
-                        borderLeft: "3px solid #27ae60",
+                        borderLeft: "3px solid #1f6f4a",
                       }}
                     >
                       <p
@@ -717,7 +717,7 @@ export default function TeacherProfile() {
                           margin: "0 0 4px",
                           fontSize: 11,
                           fontWeight: 700,
-                          color: "#16a34a",
+                          color: "#1f6f4a",
                           textTransform: "uppercase",
                           letterSpacing: "0.05em",
                         }}
@@ -784,7 +784,7 @@ export default function TeacherProfile() {
                     padding: "10px 24px",
                     borderRadius: 8,
                     border: "none",
-                    background: "#00274c",
+                    background: "#2f6175",
                     color: "white",
                     cursor: "pointer",
                   }}
@@ -837,7 +837,7 @@ export default function TeacherProfile() {
                         style={{
                           padding: "10px 16px",
                           borderRadius: 8,
-                          border: `2px solid ${selectedSlot?.id === slot.id ? "#00274c" : "#eee"}`,
+                          border: `2px solid ${selectedSlot?.id === slot.id ? "#2f6175" : "#eee"}`,
                           background:
                             selectedSlot?.id === slot.id ? "#eff6ff" : "white",
                           cursor: "pointer",
@@ -906,7 +906,7 @@ export default function TeacherProfile() {
                     padding: "12px",
                     borderRadius: 8,
                     border: "none",
-                    background: "#00274c",
+                    background: "#2f6175",
                     color: "white",
                     fontSize: 16,
                     cursor: "pointer",

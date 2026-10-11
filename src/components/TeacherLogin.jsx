@@ -137,9 +137,9 @@ export default function TeacherLogin() {
                 width: "100%",
                 padding: "10px",
                 borderRadius: 8,
-                border: "1px solid #00274c",
+                border: "1px solid #2f6175",
                 background: "transparent",
-                color: "#00274c",
+                color: "#2f6175",
                 cursor: "pointer",
                 fontSize: 13,
                 fontWeight: 600,
@@ -153,7 +153,7 @@ export default function TeacherLogin() {
           {resendSent && (
             <p
               style={{
-                color: "#27ae60",
+                color: "#1f6f4a",
                 fontSize: 14,
                 marginBottom: 12,
                 textAlign: "center",
@@ -166,7 +166,7 @@ export default function TeacherLogin() {
           {resetSent && (
             <p
               style={{
-                color: "#27ae60",
+                color: "#1f6f4a",
                 fontSize: 14,
                 marginBottom: 12,
                 textAlign: "center",
@@ -211,7 +211,7 @@ export default function TeacherLogin() {
                 style={{
                   background: "none",
                   border: "none",
-                  color: "#00274c",
+                  color: "#2f6175",
                   cursor: "pointer",
                   fontSize: 13,
                 }}

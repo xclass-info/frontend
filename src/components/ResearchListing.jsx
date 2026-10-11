@@ -31,7 +31,7 @@ const clampStyle = (lines) => ({
 });
 
 const STAGE_BADGE = {
-  active: { label: "Active", color: "#166534", bg: "rgba(22,101,52,0.08)" },
+  active: { label: "Active", color: "#14532d", bg: "rgba(22,101,52,0.08)" },
   completed: { label: "Completed", color: "#1e40af", bg: "rgba(37,99,235,0.08)" },
 };
 const STAGE_OPTIONS = ["active", "completed"];
@@ -54,7 +54,7 @@ const checkboxRow = {
 const filterLabel = {
   fontSize: 13,
   fontWeight: 700,
-  color: "#00274c",
+  color: "#2f6175",
   textTransform: "uppercase",
   letterSpacing: "0.04em",
   margin: "20px 0 10px",
@@ -116,7 +116,7 @@ export default function ResearchListing() {
       <Link
         to={`/teacher/${r.teacherId}`}
         onClick={(e) => e.stopPropagation()}
-        style={{ color: "#00274c", textDecoration: "underline" }}
+        style={{ color: "#2f6175", textDecoration: "underline" }}
       >
         {name}
       </Link>
@@ -243,7 +243,7 @@ export default function ResearchListing() {
               style={{
                 background: "none",
                 border: "none",
-                color: "#00274c",
+                color: "#2f6175",
                 fontSize: 12,
                 fontWeight: 600,
                 cursor: "pointer",
@@ -374,7 +374,7 @@ export default function ResearchListing() {
                   padding: "8px 20px",
                   borderRadius: 8,
                   border: "none",
-                  background: "#00274c",
+                  background: "#2f6175",
                   color: "white",
                   cursor: "pointer",
                 }}
@@ -448,9 +448,9 @@ export default function ResearchListing() {
                           display: "inline-block",
                           fontSize: 11,
                           fontWeight: 700,
-                          color: "#00274c",
+                          color: "#2f6175",
                           background: "#fff8dc",
-                          border: "1px solid #ffcb05",
+                          border: "1px solid #9a772b",
                           padding: "2px 10px",
                           borderRadius: 20,
                           marginBottom: 12,
@@ -474,7 +474,7 @@ export default function ResearchListing() {
                       <p
                         style={{
                           fontSize: 12,
-                          color: "#166534",
+                          color: "#14532d",
                           fontWeight: 600,
                           margin: "0 0 8px",
                         }}
@@ -506,7 +506,7 @@ export default function ResearchListing() {
                         👩‍🏫 Mentored by: {mentorLabel(r)}
                       </span>
                       <span
-                        style={{ fontSize: 12, color: "#00274c", fontWeight: 600 }}
+                        style={{ fontSize: 12, color: "#2f6175", fontWeight: 600 }}
                       >
                         Read more →
                       </span>

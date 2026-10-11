@@ -260,7 +260,7 @@ export default function TeacherDashboard() {
       <div className={styles.page}>
         <div className={styles.header}>
           <div className={styles.headerLeft}>
-            <h1 className={styles.logo}>🔬 happy<span style={{ color: "#ffcb05" }}>Research</span></h1>
+            <h1 className={styles.logo}>🔬 happy<span style={{ color: "#9a772b" }}>Research</span></h1>
           </div>
         </div>
         <div className={styles.grid}>
@@ -299,7 +299,7 @@ export default function TeacherDashboard() {
         {/* Header */}
         <div className={styles.header}>
           <div className={styles.headerLeft}>
-            <h1 className={styles.logo}>💻 happy<span style={{ color: "#ffcb05" }}>Research</span></h1>
+            <h1 className={styles.logo}>💻 happy<span style={{ color: "#9a772b" }}>Research</span></h1>
             <p className={styles.welcome}>
               Welcome back, <strong>{teacher?.name}</strong> 👋
             </p>
@@ -343,10 +343,10 @@ export default function TeacherDashboard() {
                 cursor: "pointer",
                 fontSize: 19,
                 fontWeight: 600,
-                color: activeTab === tab.id ? "#00274c" : "#888",
+                color: activeTab === tab.id ? "#2f6175" : "#888",
                 borderBottom:
                   activeTab === tab.id
-                    ? "2px solid #00274c"
+                    ? "2px solid #2f6175"
                     : "2px solid transparent",
                 marginBottom: -2,
                 transition: "all 0.15s",
@@ -419,9 +419,9 @@ export default function TeacherDashboard() {
                               display: "inline-block",
                               fontSize: 11,
                               fontWeight: 700,
-                              color: "#00274c",
+                              color: "#2f6175",
                               background: "#fff8dc",
-                              border: "1px solid #ffcb05",
+                              border: "1px solid #9a772b",
                               padding: "2px 10px",
                               borderRadius: 20,
                               marginBottom: 6,
@@ -434,7 +434,7 @@ export default function TeacherDashboard() {
                           <p
                             style={{
                               fontSize: 12,
-                              color: "#166534",
+                              color: "#14532d",
                               fontWeight: 600,
                               margin: "0 0 6px",
                             }}
@@ -464,7 +464,7 @@ export default function TeacherDashboard() {
                           <button
                             className={styles.copyBtn}
                             onClick={() => deleteResearch(r.id)}
-                            style={{ color: "#e74c3c" }}
+                            style={{ color: "#a01f13" }}
                           >
                             🗑️ Delete
                           </button>
@@ -541,9 +541,9 @@ export default function TeacherDashboard() {
                               display: "inline-block",
                               fontSize: 11,
                               fontWeight: 700,
-                              color: "#00274c",
+                              color: "#2f6175",
                               background: "#fff8dc",
-                              border: "1px solid #ffcb05",
+                              border: "1px solid #9a772b",
                               padding: "2px 10px",
                               borderRadius: 20,
                               marginBottom: 6,
@@ -556,7 +556,7 @@ export default function TeacherDashboard() {
                           <p
                             style={{
                               fontSize: 12,
-                              color: "#166534",
+                              color: "#14532d",
                               fontWeight: 600,
                               margin: "0 0 6px",
                             }}
@@ -593,7 +593,7 @@ export default function TeacherDashboard() {
                           <button
                             className={styles.copyBtn}
                             onClick={() => deleteProject(p.id)}
-                            style={{ color: "#e74c3c" }}
+                            style={{ color: "#a01f13" }}
                           >
                             🗑️ Delete
                           </button>
@@ -690,7 +690,7 @@ export default function TeacherDashboard() {
                             rel='noreferrer'
                             style={{
                               fontSize: 13,
-                              color: "#00274c",
+                              color: "#2f6175",
                               textDecoration: "underline",
                             }}
                           >
@@ -710,7 +710,7 @@ export default function TeacherDashboard() {
                           <button
                             className={styles.copyBtn}
                             onClick={() => deleteShowcaseEntry(s.id)}
-                            style={{ color: "#e74c3c" }}
+                            style={{ color: "#a01f13" }}
                           >
                             🗑️ Delete
                           </button>
@@ -761,7 +761,7 @@ export default function TeacherDashboard() {
                     padding: "10px 20px",
                     borderRadius: 8,
                     border: "none",
-                    background: "#00274c",
+                    background: "#2f6175",
                     color: "white",
                     fontSize: 14,
                     fontWeight: 600,
@@ -806,7 +806,7 @@ export default function TeacherDashboard() {
                         display: "block",
                         marginTop: 4,
                         fontSize: 15,
-                        color: "#00274c",
+                        color: "#2f6175",
                       }}
                     >
                       {profile.website}
@@ -838,7 +838,7 @@ export default function TeacherDashboard() {
               {/* Gender */}
               <div style={fieldStyle}>
                 <label style={labelStyle}>
-                  Gender <span style={{ color: "#e74c3c" }}>*</span>
+                  Gender <span style={{ color: "#a01f13" }}>*</span>
                 </label>
                 <select
                   name='gender'
@@ -854,7 +854,7 @@ export default function TeacherDashboard() {
               {/* Degree */}
               <div style={fieldStyle}>
                 <label style={labelStyle}>
-                  Degree <span style={{ color: "#e74c3c" }}>*</span>
+                  Degree <span style={{ color: "#a01f13" }}>*</span>
                 </label>
                 <select
                   name='degree'
@@ -942,7 +942,7 @@ export default function TeacherDashboard() {
               <div style={fieldStyle}>
                 <label style={labelStyle}>
                   University / Institution{" "}
-                  <span style={{ color: "#e74c3c" }}>*</span>
+                  <span style={{ color: "#a01f13" }}>*</span>
                 </label>
                 <input
                   name='university'
@@ -956,7 +956,7 @@ export default function TeacherDashboard() {
               {/* Expertise */}
               <div style={fieldStyle}>
                 <label style={labelStyle}>
-                  Area of Expertise <span style={{ color: "#e74c3c" }}>*</span>
+                  Area of Expertise <span style={{ color: "#a01f13" }}>*</span>
                 </label>
                 <input
                   name='expertise'
@@ -996,7 +996,7 @@ export default function TeacherDashboard() {
               {/* Languages */}
               <div style={fieldStyle}>
                 <label style={labelStyle}>
-                  Languages Spoken <span style={{ color: "#e74c3c" }}>*</span>
+                  Languages Spoken <span style={{ color: "#a01f13" }}>*</span>
                 </label>
                 <input
                   name='languages'
@@ -1032,7 +1032,7 @@ export default function TeacherDashboard() {
                   <span
                     style={{
                       fontSize: 12,
-                      color: wordCount > 280 ? "#e74c3c" : "#aaa",
+                      color: wordCount > 280 ? "#a01f13" : "#aaa",
                     }}
                   >
                     {wordCount} / 500 words
@@ -1047,7 +1047,7 @@ export default function TeacherDashboard() {
                   style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }}
                 />
                 {wordCount >= 300 && (
-                  <p style={{ color: "#e74c3c", fontSize: 12, marginTop: 4 }}>
+                  <p style={{ color: "#a01f13", fontSize: 12, marginTop: 4 }}>
                     Maximum 300 words reached.
                   </p>
                 )}
@@ -1062,7 +1062,7 @@ export default function TeacherDashboard() {
                     padding: "12px 32px",
                     borderRadius: 8,
                     border: "none",
-                    background: profileSaved ? "#27ae60" : "#00274c",
+                    background: profileSaved ? "#1f6f4a" : "#2f6175",
                     color: "white",
                     fontSize: 15,
                     fontWeight: 600,

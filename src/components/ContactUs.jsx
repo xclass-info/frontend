@@ -96,7 +96,7 @@ export default function ContactUs() {
               </p>
               <a
                 href='mailto:happyprogramming.us@gmail.com'
-                style={{ fontSize: 15, color: "#00274c", fontWeight: 600 }}
+                style={{ fontSize: 15, color: "#2f6175", fontWeight: 600 }}
               >
                 happyprogramming.us@gmail.com
               </a>
@@ -124,7 +124,7 @@ export default function ContactUs() {
               </p>
               <a
                 href='tel:+15716929109'
-                style={{ fontSize: 15, color: "#00274c", fontWeight: 600 }}
+                style={{ fontSize: 15, color: "#2f6175", fontWeight: 600 }}
               >
                 (703)-300-0061
               </a>
@@ -145,7 +145,7 @@ export default function ContactUs() {
               </p>
               <a
                 href='https://happyresearch.org'
-                style={{ fontSize: 15, color: "#00274c", fontWeight: 600 }}
+                style={{ fontSize: 15, color: "#2f6175", fontWeight: 600 }}
               >
                 happyresearch.org
               </a>
@@ -270,7 +270,7 @@ export default function ContactUs() {
                   padding: "10px 24px",
                   borderRadius: 8,
                   border: "none",
-                  background: "#00274c",
+                  background: "#2f6175",
                   color: "white",
                   cursor: "pointer",
                   fontWeight: 600,
@@ -284,7 +284,7 @@ export default function ContactUs() {
               {error && (
                 <p
                   style={{
-                    color: "#e74c3c",
+                    color: "#a01f13",
                     fontSize: 13,
                     marginBottom: 16,
                     background: "#fee2e2",
@@ -423,7 +423,7 @@ export default function ContactUs() {
                   padding: 14,
                   borderRadius: 10,
                   border: "none",
-                  background: "#00274c",
+                  background: "#2f6175",
                   color: "white",
                   fontSize: 16,
                   fontWeight: 600,

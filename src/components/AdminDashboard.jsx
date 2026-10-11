@@ -296,7 +296,7 @@ export default function AdminDashboard() {
                 padding: 12,
                 borderRadius: 8,
                 border: "none",
-                background: "#00274c",
+                background: "#2f6175",
                 color: "white",
                 fontSize: 15,
                 cursor: "pointer",
@@ -329,7 +329,7 @@ export default function AdminDashboard() {
             Logged in as {user.email}
           </p>
         </div>
-        <button onClick={handleLogout} style={btnStyle("#e74c3c")}>
+        <button onClick={handleLogout} style={btnStyle("#a01f13")}>
           Logout
         </button>
       </div>
@@ -351,7 +351,7 @@ export default function AdminDashboard() {
               padding: "8px 20px",
               borderRadius: 20,
               border: "none",
-              background: tab === t.id ? "#00274c" : "#e0e0e0",
+              background: tab === t.id ? "#2f6175" : "#e0e0e0",
               color: tab === t.id ? "white" : "#555",
               cursor: "pointer",
               fontWeight: 600,
@@ -374,7 +374,7 @@ export default function AdminDashboard() {
                   padding: "8px 20px",
                   borderRadius: 20,
                   border: "none",
-                  background: adTab === t ? "#00274c" : "#e0e0e0",
+                  background: adTab === t ? "#2f6175" : "#e0e0e0",
                   color: adTab === t ? "white" : "#555",
                   cursor: "pointer",
                   fontWeight: 600,
@@ -446,13 +446,13 @@ export default function AdminDashboard() {
                       <>
                         <button
                           onClick={() => handleApprove(ad.id)}
-                          style={{ ...btnStyle("#27ae60"), flex: 1 }}
+                          style={{ ...btnStyle("#1f6f4a"), flex: 1 }}
                         >
                           ✅ Approve
                         </button>
                         <button
                           onClick={() => handleReject(ad.id)}
-                          style={{ ...btnStyle("#e74c3c"), flex: 1 }}
+                          style={{ ...btnStyle("#a01f13"), flex: 1 }}
                         >
                           ❌ Reject
                         </button>
@@ -461,7 +461,7 @@ export default function AdminDashboard() {
                     {adTab === "approved" && (
                       <button
                         onClick={() => handleReject(ad.id)}
-                        style={{ ...btnStyle("#e74c3c"), width: "100%" }}
+                        style={{ ...btnStyle("#a01f13"), width: "100%" }}
                       >
                         ❌ Remove
                       </button>
@@ -469,7 +469,7 @@ export default function AdminDashboard() {
                     {adTab === "rejected" && (
                       <button
                         onClick={() => handleApprove(ad.id)}
-                        style={{ ...btnStyle("#27ae60"), width: "100%" }}
+                        style={{ ...btnStyle("#1f6f4a"), width: "100%" }}
                       >
                         ✅ Approve
                       </button>
@@ -501,7 +501,7 @@ export default function AdminDashboard() {
                 setAddType("research");
                 setAddForm({ title: "", idea: "", impact: "", details: "" });
               }}
-              style={btnStyle("#00274c")}
+              style={btnStyle("#2f6175")}
             >
               + Add Research
             </button>
@@ -532,7 +532,7 @@ export default function AdminDashboard() {
                       style={{
                         fontSize: 11,
                         background: "#fee2e2",
-                        color: "#e74c3c",
+                        color: "#a01f13",
                         padding: "2px 8px",
                         borderRadius: 20,
                         marginBottom: 8,
@@ -565,21 +565,21 @@ export default function AdminDashboard() {
                         setEditItem({ ...r });
                         setEditType("research");
                       }}
-                      style={btnStyle("#00274c")}
+                      style={btnStyle("#2f6175")}
                     >
                       ✏️ Edit
                     </button>
                     <button
                       onClick={() => handleDisable("research", r.id, r.status)}
                       style={btnStyle(
-                        r.status === "disabled" ? "#27ae60" : "#f59e0b",
+                        r.status === "disabled" ? "#1f6f4a" : "#f59e0b",
                       )}
                     >
                       {r.status === "disabled" ? "✅ Enable" : "⏸ Disable"}
                     </button>
                     <button
                       onClick={() => handleDelete("research", r.id)}
-                      style={btnStyle("#e74c3c")}
+                      style={btnStyle("#a01f13")}
                     >
                       🗑 Delete
                     </button>
@@ -621,7 +621,7 @@ export default function AdminDashboard() {
                   deadline: "",
                 });
               }}
-              style={btnStyle("#00274c")}
+              style={btnStyle("#2f6175")}
             >
               + Add Internship
             </button>
@@ -652,7 +652,7 @@ export default function AdminDashboard() {
                       style={{
                         fontSize: 11,
                         background: "#fee2e2",
-                        color: "#e74c3c",
+                        color: "#a01f13",
                         padding: "2px 8px",
                         borderRadius: 20,
                         marginBottom: 8,
@@ -668,7 +668,7 @@ export default function AdminDashboard() {
                   <p
                     style={{
                       fontSize: 12,
-                      color: "#00274c",
+                      color: "#2f6175",
                       fontWeight: 600,
                       marginBottom: 6,
                     }}
@@ -697,7 +697,7 @@ export default function AdminDashboard() {
                         setEditItem({ ...intern });
                         setEditType("internships");
                       }}
-                      style={btnStyle("#00274c")}
+                      style={btnStyle("#2f6175")}
                     >
                       ✏️ Edit
                     </button>
@@ -706,14 +706,14 @@ export default function AdminDashboard() {
                         handleDisable("internships", intern.id, intern.status)
                       }
                       style={btnStyle(
-                        intern.status === "disabled" ? "#27ae60" : "#f59e0b",
+                        intern.status === "disabled" ? "#1f6f4a" : "#f59e0b",
                       )}
                     >
                       {intern.status === "disabled" ? "✅ Enable" : "⏸ Disable"}
                     </button>
                     <button
                       onClick={() => handleDelete("internships", intern.id)}
-                      style={btnStyle("#e74c3c")}
+                      style={btnStyle("#a01f13")}
                     >
                       🗑 Delete
                     </button>
@@ -757,7 +757,7 @@ export default function AdminDashboard() {
                 setImageFile(null);
                 setImagePreview(null);
               }}
-              style={btnStyle("#00274c")}
+              style={btnStyle("#2f6175")}
             >
               + Add Mentor
             </button>
@@ -788,7 +788,7 @@ export default function AdminDashboard() {
                       style={{
                         fontSize: 11,
                         background: "#fee2e2",
-                        color: "#e74c3c",
+                        color: "#a01f13",
                         padding: "2px 8px",
                         borderRadius: 20,
                         marginBottom: 8,
@@ -835,7 +835,7 @@ export default function AdminDashboard() {
                           height: 96,
                           borderRadius: "50%",
                           background:
-                            "linear-gradient(135deg, #667eea, #764ba2)",
+                            "linear-gradient(135deg, #2f6175, #427e94)",
                           color: "white",
                           fontSize: 36,
                           fontWeight: 700,
@@ -871,7 +871,7 @@ export default function AdminDashboard() {
                           height: 48,
                           borderRadius: "50%",
                           background:
-                            "linear-gradient(135deg, #667eea, #764ba2)",
+                            "linear-gradient(135deg, #2f6175, #427e94)",
                           color: "white",
                           fontSize: 18,
                           fontWeight: 700,
@@ -890,7 +890,7 @@ export default function AdminDashboard() {
                     )} */}
                     <div>
                       <h3 style={{ margin: 0, fontSize: 15 }}>{mentor.name}</h3>
-                      <p style={{ margin: 0, fontSize: 12, color: "#00274c" }}>
+                      <p style={{ margin: 0, fontSize: 12, color: "#2f6175" }}>
                         {mentor.expertise}
                       </p>
                     </div>
@@ -909,7 +909,7 @@ export default function AdminDashboard() {
                         setImageFile(null);
                         setImagePreview(null);
                       }}
-                      style={btnStyle("#00274c")}
+                      style={btnStyle("#2f6175")}
                     >
                       ✏️ Edit
                     </button>
@@ -919,13 +919,13 @@ export default function AdminDashboard() {
                           disabled: !mentor.disabled,
                         });
                       }}
-                      style={btnStyle(mentor.disabled ? "#27ae60" : "#f59e0b")}
+                      style={btnStyle(mentor.disabled ? "#1f6f4a" : "#f59e0b")}
                     >
                       {mentor.disabled ? "✅ Enable" : "⏸ Disable"}
                     </button>
                     <button
                       onClick={() => handleDelete("teachers", mentor.id)}
-                      style={btnStyle("#e74c3c")}
+                      style={btnStyle("#a01f13")}
                     >
                       🗑 Delete
                     </button>
@@ -1018,7 +1018,7 @@ export default function AdminDashboard() {
                 rel='noreferrer'
                 style={{
                   fontSize: 14,
-                  color: "#00274c",
+                  color: "#2f6175",
                   display: "block",
                   marginBottom: 16,
                 }}
@@ -1060,7 +1060,7 @@ export default function AdminDashboard() {
                     handleApprove(selectedAd.id);
                     setSelectedAd(null);
                   }}
-                  style={{ ...btnStyle("#27ae60"), flex: 1, padding: 12 }}
+                  style={{ ...btnStyle("#1f6f4a"), flex: 1, padding: 12 }}
                 >
                   ✅ Approve
                 </button>
@@ -1069,7 +1069,7 @@ export default function AdminDashboard() {
                     handleReject(selectedAd.id);
                     setSelectedAd(null);
                   }}
-                  style={{ ...btnStyle("#e74c3c"), flex: 1, padding: 12 }}
+                  style={{ ...btnStyle("#a01f13"), flex: 1, padding: 12 }}
                 >
                   ❌ Reject
                 </button>
@@ -1159,7 +1159,7 @@ export default function AdminDashboard() {
                       width: 90,
                       height: 90,
                       borderRadius: "50%",
-                      background: "linear-gradient(135deg, #667eea, #764ba2)",
+                      background: "linear-gradient(135deg, #2f6175, #427e94)",
                       color: "white",
                       fontSize: 32,
                       fontWeight: 700,
@@ -1180,7 +1180,7 @@ export default function AdminDashboard() {
                   style={{
                     cursor: "pointer",
                     fontSize: 13,
-                    color: "#00274c",
+                    color: "#2f6175",
                     fontWeight: 600,
                   }}
                 >
@@ -1409,7 +1409,7 @@ export default function AdminDashboard() {
                         ],
                       })
                     }
-                    style={{ ...btnStyle("#00274c"), fontSize: 12 }}
+                    style={{ ...btnStyle("#2f6175"), fontSize: 12 }}
                   >
                     + Add Project
                   </button>
@@ -1455,7 +1455,7 @@ export default function AdminDashboard() {
                         style={{
                           background: "none",
                           border: "none",
-                          color: "#e74c3c",
+                          color: "#a01f13",
                           cursor: "pointer",
                           fontSize: 13,
                         }}
@@ -1515,7 +1515,7 @@ export default function AdminDashboard() {
               <button
                 onClick={handleSaveEdit}
                 disabled={imageUploading}
-                style={{ ...btnStyle("#27ae60"), flex: 1, padding: 12 }}
+                style={{ ...btnStyle("#1f6f4a"), flex: 1, padding: 12 }}
               >
                 {imageUploading ? "Saving..." : "Save Changes ✓"}
               </button>
@@ -1615,7 +1615,7 @@ export default function AdminDashboard() {
                       width: 90,
                       height: 90,
                       borderRadius: "50%",
-                      background: "linear-gradient(135deg, #667eea, #764ba2)",
+                      background: "linear-gradient(135deg, #2f6175, #427e94)",
                       color: "white",
                       fontSize: 32,
                       fontWeight: 700,
@@ -1632,7 +1632,7 @@ export default function AdminDashboard() {
                   style={{
                     cursor: "pointer",
                     fontSize: 13,
-                    color: "#00274c",
+                    color: "#2f6175",
                     fontWeight: 600,
                   }}
                 >
@@ -1848,7 +1848,7 @@ export default function AdminDashboard() {
                         ],
                       })
                     }
-                    style={{ ...btnStyle("#00274c"), fontSize: 12 }}
+                    style={{ ...btnStyle("#2f6175"), fontSize: 12 }}
                   >
                     + Add Project
                   </button>
@@ -1894,7 +1894,7 @@ export default function AdminDashboard() {
                         style={{
                           background: "none",
                           border: "none",
-                          color: "#e74c3c",
+                          color: "#a01f13",
                           cursor: "pointer",
                           fontSize: 13,
                         }}
@@ -1954,7 +1954,7 @@ export default function AdminDashboard() {
               <button
                 onClick={handleAdd}
                 disabled={addLoading}
-                style={{ ...btnStyle("#27ae60"), flex: 1, padding: 12 }}
+                style={{ ...btnStyle("#1f6f4a"), flex: 1, padding: 12 }}
               >
                 {addLoading ? "Adding..." : "Add ✓"}
               </button>

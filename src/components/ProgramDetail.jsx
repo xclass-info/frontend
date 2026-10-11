@@ -41,7 +41,7 @@ const programData = {
     title: "AI & Computer Science",
     description:
       "Artificial Intelligence and Computer Science represent the frontier of modern research. Our mentors work on cutting-edge projects in machine learning, computer vision, natural language processing and autonomous systems.",
-    color: "#00274c",
+    color: "#2f6175",
     highlights: [
       {
         icon: "🧠",
@@ -70,7 +70,7 @@ const programData = {
     title: "Public Health",
     description:
       "Public health research addresses some of the most pressing challenges facing humanity — from pandemic preparedness to mental health crises. Our mentors work on evidence-based solutions that save lives.",
-    color: "#166534",
+    color: "#14532d",
     highlights: [
       {
         icon: "🦠",
@@ -294,7 +294,7 @@ export default function ProgramDetail() {
               padding: "10px 24px",
               borderRadius: 8,
               border: "none",
-              background: "#00274c",
+              background: "#2f6175",
               color: "white",
               cursor: "pointer",
             }}
@@ -360,7 +360,7 @@ export default function ProgramDetail() {
             style={{
               fontSize: "1.5rem",
               fontWeight: 700,
-              color: "#00274c",
+              color: "#2f6175",
               marginBottom: 24,
             }}
           >
@@ -387,9 +387,9 @@ export default function ProgramDetail() {
                   transition: "all 0.2s",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = "#ffcb05";
+                  e.currentTarget.style.borderColor = "#9a772b";
                   e.currentTarget.style.boxShadow =
-                    "0 8px 24px rgba(0,39,76,0.12)";
+                    "0 8px 24px rgba(47, 97, 117,0.12)";
                   e.currentTarget.querySelector(".hover-panel").style.opacity =
                     "1";
                   e.currentTarget.querySelector(
@@ -417,7 +417,7 @@ export default function ProgramDetail() {
                   style={{
                     fontSize: 15,
                     fontWeight: 700,
-                    color: "#00274c",
+                    color: "#2f6175",
                     marginBottom: 6,
                   }}
                 >
@@ -442,7 +442,7 @@ export default function ProgramDetail() {
                     top: "calc(100% + 8px)",
                     left: 0,
                     right: 0,
-                    background: "#00274c",
+                    background: "#2f6175",
                     borderRadius: 12,
                     padding: 16,
                     zIndex: 10,
@@ -450,14 +450,14 @@ export default function ProgramDetail() {
                     transform: "translateY(8px)",
                     transition: "all 0.25s ease",
                     pointerEvents: "none",
-                    boxShadow: "0 8px 24px rgba(0,39,76,0.2)",
-                    borderTop: "3px solid #ffcb05",
+                    boxShadow: "0 8px 24px rgba(47, 97, 117,0.2)",
+                    borderTop: "3px solid #9a772b",
                   }}
                 >
                   <p
                     style={{
                       fontSize: 11,
-                      color: "#ffcb05",
+                      color: "#9a772b",
                       fontWeight: 700,
                       marginBottom: 10,
                       textTransform: "uppercase",
@@ -544,7 +544,7 @@ export default function ProgramDetail() {
             style={{
               fontSize: "1.5rem",
               fontWeight: 700,
-              color: "#00274c",
+              color: "#2f6175",
               marginBottom: 24,
             }}
           >
@@ -572,7 +572,7 @@ export default function ProgramDetail() {
                   padding: "8px 20px",
                   borderRadius: 8,
                   border: "none",
-                  background: "#00274c",
+                  background: "#2f6175",
                   color: "white",
                   cursor: "pointer",
                 }}
@@ -602,7 +602,7 @@ export default function ProgramDetail() {
                     transition: "all 0.2s",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = "#ffcb05";
+                    e.currentTarget.style.borderColor = "#9a772b";
                     e.currentTarget.style.transform = "translateY(-4px)";
                   }}
                   onMouseLeave={(e) => {
@@ -628,8 +628,8 @@ export default function ProgramDetail() {
                         width: 80,
                         height: 80,
                         borderRadius: "50%",
-                        background: "#00274c",
-                        color: "#ffcb05",
+                        background: "#2f6175",
+                        color: "#ffffff",
                         fontSize: 28,
                         fontWeight: 700,
                         display: "flex",
@@ -649,7 +649,7 @@ export default function ProgramDetail() {
                     style={{
                       fontSize: 15,
                       fontWeight: 700,
-                      color: "#00274c",
+                      color: "#2f6175",
                       marginBottom: 4,
                     }}
                   >
@@ -673,7 +673,7 @@ export default function ProgramDetail() {
                       style={{
                         fontSize: 11,
                         background: "#fff8dc",
-                        color: "#00274c",
+                        color: "#2f6175",
                         padding: "2px 10px",
                         borderRadius: 20,
                         fontWeight: 600,
@@ -694,7 +694,7 @@ export default function ProgramDetail() {
             style={{
               fontSize: "1.5rem",
               fontWeight: 700,
-              color: "#00274c",
+              color: "#2f6175",
               marginBottom: 24,
             }}
           >
@@ -719,7 +719,7 @@ export default function ProgramDetail() {
                   padding: "8px 20px",
                   borderRadius: 8,
                   border: "none",
-                  background: "#00274c",
+                  background: "#2f6175",
                   color: "white",
                   cursor: "pointer",
                 }}
@@ -749,7 +749,7 @@ export default function ProgramDetail() {
                     transition: "all 0.2s",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = "#ffcb05";
+                    e.currentTarget.style.borderColor = "#9a772b";
                     e.currentTarget.style.transform = "translateY(-4px)";
                   }}
                   onMouseLeave={(e) => {
@@ -761,7 +761,7 @@ export default function ProgramDetail() {
                     style={{
                       fontSize: 15,
                       fontWeight: 700,
-                      color: "#00274c",
+                      color: "#2f6175",
                       marginBottom: 8,
                     }}
                   >
@@ -793,7 +793,7 @@ export default function ProgramDetail() {
             style={{
               fontSize: "1.5rem",
               fontWeight: 700,
-              color: "#00274c",
+              color: "#2f6175",
               marginBottom: 24,
             }}
           >
@@ -818,7 +818,7 @@ export default function ProgramDetail() {
                   padding: "8px 20px",
                   borderRadius: 8,
                   border: "none",
-                  background: "#00274c",
+                  background: "#2f6175",
                   color: "white",
                   cursor: "pointer",
                 }}
@@ -848,7 +848,7 @@ export default function ProgramDetail() {
                     transition: "all 0.2s",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = "#ffcb05";
+                    e.currentTarget.style.borderColor = "#9a772b";
                     e.currentTarget.style.transform = "translateY(-4px)";
                   }}
                   onMouseLeave={(e) => {
@@ -860,7 +860,7 @@ export default function ProgramDetail() {
                     style={{
                       fontSize: 15,
                       fontWeight: 700,
-                      color: "#00274c",
+                      color: "#2f6175",
                       marginBottom: 8,
                     }}
                   >
@@ -889,11 +889,11 @@ export default function ProgramDetail() {
         {/* CTA */}
         <div
           style={{
-            background: "#00274c",
+            background: "#2f6175",
             borderRadius: 16,
             padding: 40,
             textAlign: "center",
-            borderTop: "4px solid #ffcb05",
+            borderTop: "4px solid #9a772b",
           }}
         >
           <h2
@@ -930,8 +930,8 @@ export default function ProgramDetail() {
                 padding: "12px 28px",
                 borderRadius: 24,
                 border: "none",
-                background: "#ffcb05",
-                color: "#00274c",
+                background: "#9a772b",
+                color: "#ffffff",
                 fontWeight: 700,
                 fontSize: 14,
                 cursor: "pointer",

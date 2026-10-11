@@ -7,7 +7,7 @@ const TESTIMONIALS = [
     name: "Sophia L.",
     info: "11th Grade · Astrophysics Research Intern",
     initials: "SL",
-    gradient: "linear-gradient(135deg, #FF6BA8, #9B6BFF)",
+    gradient: "linear-gradient(135deg, #2f6175, #427e94)",
     featured: false,
   },
   {
@@ -16,7 +16,7 @@ const TESTIMONIALS = [
     name: "Marcus T.",
     info: "12th Grade · AI & Computer Vision Intern",
     initials: "MT",
-    gradient: "linear-gradient(135deg, #FF6B4A, #FF9F1C)",
+    gradient: "linear-gradient(135deg, #8a6a25, #9a772b)",
     featured: true,
   },
   {
@@ -25,7 +25,7 @@ const TESTIMONIALS = [
     name: "Jennifer W.",
     info: "Parent · Environmental Science Program",
     initials: "JW",
-    gradient: "linear-gradient(135deg, #4A8FE2, #2DCB85)",
+    gradient: "linear-gradient(135deg, #9a4a2f, #a85a44)",
     featured: false,
   },
 
@@ -35,7 +35,7 @@ const TESTIMONIALS = [
     name: "Aiden C.",
     info: "10th Grade · Genomics & Bioinformatics Intern",
     initials: "AC",
-    gradient: "linear-gradient(135deg, #11998e, #38ef7d)",
+    gradient: "linear-gradient(135deg, #4a4f8c, #6d3f6b)",
     featured: false,
   },
   {
@@ -44,7 +44,7 @@ const TESTIMONIALS = [
     name: "Priya M.",
     info: "10th Grade · Robotics Research Intern",
     initials: "PM",
-    gradient: "linear-gradient(135deg, #f953c6, #b91d73)",
+    gradient: "linear-gradient(135deg, #1f6f4a, #2f6175)",
     featured: false,
   },
   {
@@ -53,7 +53,7 @@ const TESTIMONIALS = [
     name: "Ethan B.",
     info: "10th Grade · Cognitive Psychology Intern",
     initials: "EB",
-    gradient: "linear-gradient(135deg, #4facfe, #00f2fe)",
+    gradient: "linear-gradient(135deg, #4b5a63, #555f66)",
     featured: false,
   },
 ];
