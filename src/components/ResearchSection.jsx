@@ -1,5 +1,6 @@
 // src/components/ResearchSection.jsx
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { db } from "../firebase";
 import {
   collection,
@@ -11,6 +12,7 @@ import {
 } from "firebase/firestore";
 
 export default function ResearchSection() {
+  const navigate = useNavigate();
   const [research, setResearch] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -62,7 +64,7 @@ export default function ResearchSection() {
                 transition: "transform 0.25s, box-shadow 0.25s, border-color 0.25s",
               }}
               onClick={() => {
-                window.location.hash = `#/research/${r.id}`;
+                navigate(`/research/${r.id}`);
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "translateY(-4px)";
@@ -115,7 +117,7 @@ export default function ResearchSection() {
 
         <div className='reveal' style={{ textAlign: "center", marginTop: 32 }}>
           <a
-            href='/#/research'
+            href='/research'
             style={{
               display: "inline-block",
               padding: "12px 32px",

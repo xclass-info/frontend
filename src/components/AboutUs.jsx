@@ -403,7 +403,7 @@ export default function AboutUs() {
           }}
         >
           <a
-            href='/#/internship'
+            href='/internship'
             style={{
               padding: "12px 32px",
               borderRadius: 32,
@@ -417,7 +417,7 @@ export default function AboutUs() {
             🧪 Browse Internships
           </a>
           <a
-            href='/#/research'
+            href='/research'
             style={{
               padding: "12px 32px",
               borderRadius: 32,
@@ -431,7 +431,7 @@ export default function AboutUs() {
             🔬 Browse Research
           </a>
           <a
-            href='/#/tutors'
+            href='/tutors'
             style={{
               padding: "12px 32px",
               borderRadius: 32,
@@ -445,7 +445,7 @@ export default function AboutUs() {
             Browse Mentors
           </a>
           <a
-            href='/#/contact'
+            href='/contact'
             style={{
               padding: "12px 32px",
               borderRadius: 32,

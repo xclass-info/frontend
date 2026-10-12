@@ -163,7 +163,7 @@ export default function MentorVerificationForm({ teacher }) {
           from_name: "HappyResearch",
           from_email: "happyprogramming.us@gmail.com",
           subject: "Verify your work email for HappyResearch",
-          message: `Hi ${teacher.name || ""},\n\nClick the link below to verify this is your work email and continue your mentor application:\n\nhttps://happyresearch.org/#/verify-mentor-email?uid=${uid}&token=${token}\n\nIf you didn't request this, you can ignore this email.`,
+          message: `Hi ${teacher.name || ""},\n\nClick the link below to verify this is your work email and continue your mentor application:\n\nhttps://happyresearch.org/verify-mentor-email?uid=${uid}&token=${token}\n\nIf you didn't request this, you can ignore this email.`,
           to_email: workEmail.trim(),
         },
         import.meta.env.VITE_EMAILJS_PUBLIC_KEY,

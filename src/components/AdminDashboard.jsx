@@ -298,7 +298,7 @@ export default function AdminDashboard() {
         >
           {/* X button */}
           <a
-            href='/#/'
+            href='/'
             style={{
               position: "absolute",
               top: 16,

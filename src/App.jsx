@@ -9,7 +9,7 @@ import Footer from "./components/Footer";
 import TeacherRegister from "./components/TeacherRegister";
 import TeacherLogin from "./components/TeacherLogin";
 import TeacherDashboard from "./components/TeacherDashboard";
-import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
 import AdminDashboard from "./components/AdminDashboard";
 import TeacherProfile from "./components/TeacherProfile";
@@ -90,7 +90,7 @@ function HomePage() {
 
 export default function App() {
   return (
-    <HashRouter>
+    <BrowserRouter>
       <ScrollToTop />
       <Routes>
         <Route path='/' element={<HomePage />} />
@@ -121,6 +121,6 @@ export default function App() {
         <Route path='/gallery' element={<Gallery />} />
         <Route path='/programs/:programId' element={<ProgramDetail />} />
       </Routes>
-    </HashRouter>
+    </BrowserRouter>
   );
 }
