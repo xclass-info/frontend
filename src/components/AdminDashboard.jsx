@@ -16,7 +16,7 @@ import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { Link } from "react-router-dom";
 import { mentorTypeLabel } from "../utils/mentorVerification";
 
-const ADMIN_EMAIL = "xclassinfo@gmail.com";
+const ADMIN_EMAIL = "zhenhepan@gmail.com";
 
 export default function AdminDashboard() {
   const [user, setUser] = useState(null);
