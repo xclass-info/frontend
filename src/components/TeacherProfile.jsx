@@ -21,17 +21,61 @@ import InitialsAvatar from "./InitialsAvatar";
 const cardStyle = {
   background: "white",
   borderRadius: 16,
-  padding: 24,
-  boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
+  padding: 28,
+  boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+  border: "1px solid #eef1f3",
   marginBottom: 24,
 };
-const sectionTitle = { margin: "0 0 16px", fontSize: 16, color: "#333" };
 const itemStyle = {
-  padding: 16,
-  borderRadius: 10,
+  padding: 20,
+  borderRadius: 12,
   background: "#f9fafb",
   border: "1px solid #eee",
+  transition: "transform 0.15s, box-shadow 0.15s, border-color 0.15s",
 };
+
+function liftOn(e) {
+  e.currentTarget.style.transform = "translateY(-2px)";
+  e.currentTarget.style.boxShadow = "0 8px 20px rgba(47,97,117,0.1)";
+  e.currentTarget.style.borderColor = "#d8e4e8";
+}
+function liftOff(e) {
+  e.currentTarget.style.transform = "translateY(0)";
+  e.currentTarget.style.boxShadow = "none";
+  e.currentTarget.style.borderColor = "#eee";
+}
+
+// Small eyebrow + serif heading, reused above each portfolio section -
+// echoes the site's section-label + Source Serif 4 convention elsewhere.
+function SectionHeading({ eyebrow, title }) {
+  return (
+    <div style={{ marginBottom: 20 }}>
+      <p
+        style={{
+          margin: "0 0 4px",
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: "0.08em",
+          textTransform: "uppercase",
+          color: "#9a772b",
+        }}
+      >
+        {eyebrow}
+      </p>
+      <h3
+        style={{
+          margin: 0,
+          fontFamily: "'Source Serif 4', Georgia, serif",
+          fontSize: 22,
+          fontWeight: 700,
+          color: "#1a1a1a",
+        }}
+      >
+        {title}
+      </h3>
+    </div>
+  );
+}
 
 const BADGES = {
   registration: {
@@ -159,7 +203,7 @@ function ResearchItem({ r, onRegister, expertiseTags }) {
     whiteSpace: "pre-wrap",
   };
   return (
-    <div style={itemStyle}>
+    <div style={itemStyle} onMouseEnter={liftOn} onMouseLeave={liftOff}>
       <div
         style={{
           display: "flex",
@@ -422,12 +466,32 @@ export default function TeacherProfile() {
     ),
   ];
 
+  const displayName = teacher.name?.startsWith("Prof.")
+    ? teacher.name?.split(" ").slice(0, 2).join(" ")
+    : `Dr. ${teacher.name?.split(" ").pop()}`;
+
+  const projectsTotal = projects.length + (teacher.projects?.length || 0);
+  const stats = [
+    research.length > 0 && {
+      value: research.length,
+      label: research.length === 1 ? "Research Topic" : "Research Topics",
+    },
+    projectsTotal > 0 && {
+      value: projectsTotal,
+      label: projectsTotal === 1 ? "Project" : "Projects",
+    },
+    teacher.yearsOfExperience && {
+      value: teacher.yearsOfExperience,
+      label: "Years Exp.",
+    },
+  ].filter(Boolean);
+
   return (
     <div style={{ minHeight: "100vh", background: "#f9fafb" }}>
       <Navbar />
 
       <div
-        style={{ maxWidth: 800, margin: "0 auto", padding: "100px 24px 48px" }}
+        style={{ maxWidth: 1180, margin: "0 auto", padding: "100px 24px 60px" }}
       >
         {/* Back button */}
         <button
@@ -438,7 +502,7 @@ export default function TeacherProfile() {
             color: "#2f6175",
             cursor: "pointer",
             fontSize: 14,
-            marginBottom: 24,
+            marginBottom: 20,
             display: "flex",
             alignItems: "center",
             gap: 6,
@@ -447,102 +511,104 @@ export default function TeacherProfile() {
           ← Back
         </button>
 
-        {/* Hero section */}
         <div
           style={{
-            background: "white",
-            borderRadius: 20,
-            padding: 32,
-            marginBottom: 24,
-            boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
             display: "flex",
             gap: 32,
-            alignItems: "flex-start",
             flexWrap: "wrap",
           }}
         >
-          {/* Left — Avatar */}
-          <div style={{ flex: "0 0 200px", width: 200 }}>
-            {teacher.photoURL ? (
-              <img
-                src={teacher.photoURL}
-                alt={teacher.name}
-                style={{
-                  width: "100%",
-                  aspectRatio: "1/1",
-                  borderRadius: 16,
-                  objectFit: "cover",
-                  background: "#fff8dc",
-                }}
-              />
-            ) : (
-              <InitialsAvatar
-                name={teacher.name}
-                seed={teacher.id}
-                fontSize='3rem'
-                style={{
-                  width: "100%",
-                  aspectRatio: "1/1",
-                  borderRadius: 16,
-                }}
-              />
-            )}
-          </div>
-          {/* Right — Info */}
-          <div style={{ flex: 1, minWidth: 260 }}>
-            <h1 style={{ margin: "0 0 4px", fontSize: 30 }}>
-              {teacher.name?.startsWith("Prof.")
-                ? teacher.name?.split(" ").slice(0, 2).join(" ")
-                : teacher.name?.startsWith("Dr.")
-                  ? `Dr. ${teacher.name?.split(" ").pop()}`
-                  : `Dr. ${teacher.name?.split(" ").pop()}`}
-              {teacher.major && (
-                <span
+          {/* Sidebar — avatar, facts, stats, CTA */}
+          <aside
+            style={{
+              flex: "0 0 320px",
+              width: 320,
+            }}
+          >
+            <div
+              style={{
+                ...cardStyle,
+                textAlign: "center",
+                marginBottom: 0,
+                position: "sticky",
+                top: 92,
+              }}
+            >
+              {teacher.photoURL ? (
+                <img
+                  src={teacher.photoURL}
+                  alt={teacher.name}
                   style={{
-                    fontWeight: 400,
-                    fontSize: 16,
-                    color: "#888",
+                    width: 150,
+                    height: 150,
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    background: "#fff8dc",
+                    border: "4px solid #fff",
+                    boxShadow: "0 0 0 3px #e3eff3",
+                    margin: "0 auto 16px",
                   }}
-                >
-                  {" "}
-                  - Research Mentor
-                </span>
+                />
+              ) : (
+                <InitialsAvatar
+                  name={teacher.name}
+                  seed={teacher.id}
+                  fontSize='2.6rem'
+                  style={{
+                    width: 150,
+                    height: 150,
+                    borderRadius: "50%",
+                    border: "4px solid #fff",
+                    boxShadow: "0 0 0 3px #e3eff3",
+                    margin: "0 auto 16px",
+                  }}
+                />
               )}
-            </h1>
 
-            {(teacher.degree || teacher.university) && (
-              <p style={{ margin: "0 0 16px", fontSize: 15, color: "#888" }}>
-                {[teacher.degree, teacher.university]
-                  .filter(Boolean)
-                  .join(" at ")}
+              <h1
+                style={{
+                  margin: "0 0 2px",
+                  fontFamily: "'Source Serif 4', Georgia, serif",
+                  fontSize: 24,
+                  fontWeight: 700,
+                  color: "#1a1a1a",
+                }}
+              >
+                {displayName}
+              </h1>
+              <p style={{ margin: "0 0 10px", fontSize: 13, color: "#9a772b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                Research Mentor
               </p>
-            )}
 
-            {/* Expertise tags */}
-            {expertiseTags.length > 0 && (
-              <div style={{ marginBottom: 16 }}>
-                <p
+              {(teacher.degree || teacher.university) && (
+                <p style={{ margin: "0 0 18px", fontSize: 13.5, color: "#888" }}>
+                  {[teacher.degree, teacher.university]
+                    .filter(Boolean)
+                    .join(" at ")}
+                </p>
+              )}
+
+              {/* Expertise tags */}
+              {expertiseTags.length > 0 && (
+                <div
                   style={{
-                    margin: "0 0 6px",
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: "#2f6175",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
+                    display: "flex",
+                    gap: 6,
+                    flexWrap: "wrap",
+                    justifyContent: "center",
+                    paddingTop: 16,
+                    borderTop: "1px solid #eef1f3",
                   }}
                 >
-                  Expertise
-                </p>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   {expertiseTags.map((tag) => (
                     <span
                       key={tag}
                       style={{
-                        fontSize: 12,
+                        fontSize: 11.5,
                         background: "#fff8dc",
                         color: "#2f6175",
                         border: "1px solid #9a772b",
-                        padding: "4px 12px",
+                        padding: "4px 11px",
                         borderRadius: 20,
                         fontWeight: 600,
                       }}
@@ -551,95 +617,122 @@ export default function TeacherProfile() {
                     </span>
                   ))}
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Compact metadata line */}
-            {(teacher.gender ||
-              teacher.yearsOfExperience ||
-              teacher.languages ||
-              teacher.website) && (
-              <p
+              {/* Stats row */}
+              {stats.length > 0 && (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: 0,
+                    marginTop: 18,
+                    paddingTop: 18,
+                    borderTop: "1px solid #eef1f3",
+                  }}
+                >
+                  {stats.map((s, i) => (
+                    <div
+                      key={s.label}
+                      style={{
+                        flex: 1,
+                        padding: "0 8px",
+                        borderLeft: i > 0 ? "1px solid #eef1f3" : "none",
+                      }}
+                    >
+                      <p
+                        style={{
+                          margin: "0 0 2px",
+                          fontSize: 20,
+                          fontWeight: 700,
+                          color: "#2f6175",
+                          fontFamily: "'Source Serif 4', Georgia, serif",
+                        }}
+                      >
+                        {s.value}
+                      </p>
+                      <p style={{ margin: 0, fontSize: 11, color: "#999", lineHeight: 1.3 }}>
+                        {s.label}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <button
+                onClick={() => setShowBooking(true)}
                 style={{
-                  margin: "0 0 20px",
-                  fontSize: 13,
-                  color: "#aaa",
-                  display: "flex",
-                  gap: 14,
-                  flexWrap: "wrap",
+                  width: "100%",
+                  marginTop: 20,
+                  padding: "14px 20px",
+                  borderRadius: 12,
+                  border: "none",
+                  background: "#2f6175",
+                  color: "white",
+                  fontSize: 15.5,
+                  fontWeight: 700,
+                  cursor: "pointer",
                 }}
               >
-                {teacher.gender && <span>{teacher.gender}</span>}
-                {teacher.yearsOfExperience && (
-                  <span>{teacher.yearsOfExperience} years exp.</span>
-                )}
-                {teacher.languages && <span>🗣 {teacher.languages}</span>}
-                {teacher.website &&
-                  (safeUrl(teacher.website) ? (
-                    <a
-                      href={safeUrl(teacher.website)}
-                      target='_blank'
-                      rel='noreferrer'
-                      style={{ color: "#2f6175" }}
-                    >
-                      {teacher.website}
-                    </a>
-                  ) : (
-                    <span>{teacher.website}</span>
-                  ))}
-              </p>
+                📅 Book a Consultation
+              </button>
+
+              {(teacher.gender || teacher.languages || teacher.website) && (
+                <div
+                  style={{
+                    marginTop: 16,
+                    paddingTop: 16,
+                    borderTop: "1px solid #eef1f3",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 6,
+                    fontSize: 12.5,
+                    color: "#999",
+                  }}
+                >
+                  {teacher.gender && <span>{teacher.gender}</span>}
+                  {teacher.languages && <span>🗣 {teacher.languages}</span>}
+                  {teacher.website &&
+                    (safeUrl(teacher.website) ? (
+                      <a
+                        href={safeUrl(teacher.website)}
+                        target='_blank'
+                        rel='noreferrer'
+                        style={{ color: "#2f6175" }}
+                      >
+                        {teacher.website}
+                      </a>
+                    ) : (
+                      <span>{teacher.website}</span>
+                    ))}
+                </div>
+              )}
+            </div>
+          </aside>
+
+          {/* Main column — bio, research, projects */}
+          <main style={{ flex: "1 1 600px", minWidth: 0 }}>
+            {/* About */}
+            {teacher.bio && (
+              <div style={cardStyle}>
+                <SectionHeading eyebrow='About' title='👤 Bio' />
+                <p
+                  style={{
+                    fontSize: 14.5,
+                    color: "#555",
+                    lineHeight: 1.75,
+                    margin: 0,
+                  }}
+                >
+                  {teacher.bio}
+                </p>
+              </div>
             )}
-
-            {/* Book button at bottom */}
-            <button
-              onClick={() => setShowBooking(true)}
-              style={{
-                padding: "14px 40px",
-                borderRadius: 12,
-                border: "none",
-                background: "#2f6175",
-                color: "white",
-                fontSize: 16,
-                fontWeight: 700,
-                cursor: "pointer",
-              }}
-            >
-              📅 Book a Consultation
-            </button>
-          </div>
-        </div>
-
-        {/* About */}
-        {teacher.bio && (
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              padding: 24,
-              marginBottom: 24,
-              boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
-            }}
-          >
-            <h3 style={{ margin: "0 0 12px", fontSize: 16, color: "#333" }}>
-              👤 Bio
-            </h3>
-            <p
-              style={{
-                fontSize: 14,
-                color: "#555",
-                lineHeight: 1.7,
-                margin: 0,
-              }}
-            >
-              {teacher.bio}
-            </p>
-          </div>
-        )}
 
         {/* Research */}
         {research.length > 0 && (
           <div style={cardStyle}>
-            <h3 style={sectionTitle}>🔬 Research</h3>
+            <SectionHeading eyebrow='Portfolio' title='🔬 Research' />
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {research.map((r) => (
                 <ResearchItem
@@ -656,10 +749,15 @@ export default function TeacherProfile() {
         {/* Projects (new collection first, then the older per-profile list) */}
         {[...projects, ...(teacher.projects || [])].length > 0 && (
           <div style={cardStyle}>
-            <h3 style={sectionTitle}>💡 Projects</h3>
+            <SectionHeading eyebrow='Portfolio' title='💡 Projects' />
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {[...projects, ...(teacher.projects || [])].map((project) => (
-                <div key={project.id} style={itemStyle}>
+                <div
+                  key={project.id}
+                  style={itemStyle}
+                  onMouseEnter={liftOn}
+                  onMouseLeave={liftOff}
+                >
                   <div
                     style={{
                       display: "flex",
@@ -740,7 +838,8 @@ export default function TeacherProfile() {
             </div>
           </div>
         )}
-
+          </main>
+        </div>
       </div>
 
       {/* ── Booking Modal ── */}
@@ -760,18 +859,21 @@ export default function TeacherProfile() {
           <div
             style={{
               background: "white",
-              borderRadius: 16,
+              borderRadius: 18,
               padding: 32,
               width: "100%",
               maxWidth: 440,
               maxHeight: "90vh",
               overflowY: "auto",
+              boxShadow: "0 20px 50px rgba(0,0,0,0.2)",
             }}
           >
             {booked ? (
               <div style={{ textAlign: "center", padding: 20 }}>
                 <p style={{ fontSize: 48 }}>✅</p>
-                <h3>Booking Request Sent!</h3>
+                <h3 style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}>
+                  Booking Request Sent!
+                </h3>
                 <p style={{ color: "#888", marginBottom: 20 }}>
                   {teacher.name} will confirm your session soon.
                 </p>
@@ -802,7 +904,14 @@ export default function TeacherProfile() {
                     marginBottom: 20,
                   }}
                 >
-                  <h3 style={{ margin: 0 }}>Book with {teacher.name}</h3>
+                  <h3
+                    style={{
+                      margin: 0,
+                      fontFamily: "'Source Serif 4', Georgia, serif",
+                    }}
+                  >
+                    Book with {teacher.name}
+                  </h3>
                   <button
                     onClick={() => setShowBooking(false)}
                     style={{
