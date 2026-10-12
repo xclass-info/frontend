@@ -224,20 +224,6 @@ export default function MentorVerificationForm({ teacher }) {
             {mentorTypeLabel(teacher.mentorType)}
           </span>
         </div>
-        {teacher.approvalMessage && (
-          <p
-            style={{
-              marginTop: 16,
-              fontSize: 13,
-              color: "#1f6f4a",
-              background: "rgba(31,111,74,0.06)",
-              padding: "10px 12px",
-              borderRadius: 8,
-            }}
-          >
-            {teacher.approvalMessage}
-          </p>
-        )}
       </div>
     );
   }

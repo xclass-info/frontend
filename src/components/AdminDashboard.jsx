@@ -39,7 +39,9 @@ export default function AdminDashboard() {
   const pendingApplications = mentors.filter(
     (m) => m.verificationStatus === "pending_review",
   );
-  const [reviewMessages, setReviewMessages] = useState({});
+  const [rejectTarget, setRejectTarget] = useState(null); // mentor being rejected, or null
+  const [rejectReason, setRejectReason] = useState("");
+  const [rejectError, setRejectError] = useState("");
 
   const [selectedAd, setSelectedAd] = useState(null);
   const [editItem, setEditItem] = useState(null);
@@ -171,27 +173,36 @@ export default function AdminDashboard() {
     await updateDoc(doc(db, "adposts", adId), { status: "rejected" });
   }
 
-  async function approveApplication(mentorId, message) {
+  async function approveApplication(mentorId) {
     await updateDoc(doc(db, "teachers", mentorId), {
       verificationStatus: "approved",
       rejectionReason: null,
-      approvalMessage: (message || "").trim() || null,
     });
   }
 
-  async function rejectApplication(mentorId, message) {
-    const trimmed = (message || "").trim();
-    if (!trimmed) {
-      alert(
-        "Please add a message explaining what needs to change before rejecting.",
+  async function rejectApplication(mentorId, reason) {
+    await updateDoc(doc(db, "teachers", mentorId), {
+      verificationStatus: "rejected",
+      rejectionReason: reason.trim(),
+    });
+  }
+
+  function openRejectModal(mentorId) {
+    setRejectTarget(mentorId);
+    setRejectReason("");
+    setRejectError("");
+  }
+
+  async function submitRejectModal() {
+    const trimmed = rejectReason.trim();
+    if (trimmed.length < 10 || !/[a-zA-Z]{3,}/.test(trimmed)) {
+      setRejectError(
+        "Please write at least one full sentence explaining why this is being rejected.",
       );
       return;
     }
-    await updateDoc(doc(db, "teachers", mentorId), {
-      verificationStatus: "rejected",
-      rejectionReason: trimmed,
-      approvalMessage: null,
-    });
+    await rejectApplication(rejectTarget, trimmed);
+    setRejectTarget(null);
   }
 
   async function handleDisable(collection_, id, currentStatus) {
@@ -933,43 +944,16 @@ export default function AdminDashboard() {
                     )}
                   </div>
 
-                  <textarea
-                    placeholder='Message to mentor (optional to approve, required to reject)'
-                    value={reviewMessages[mentor.id] || ""}
-                    onChange={(e) =>
-                      setReviewMessages((prev) => ({
-                        ...prev,
-                        [mentor.id]: e.target.value,
-                      }))
-                    }
-                    rows={2}
-                    style={{
-                      width: "100%",
-                      padding: 8,
-                      borderRadius: 6,
-                      border: "1px solid #ddd",
-                      fontSize: 13,
-                      marginBottom: 10,
-                      fontFamily: "inherit",
-                      resize: "vertical",
-                      boxSizing: "border-box",
-                    }}
-                  />
-
                   <div style={{ display: "flex", gap: 8 }}>
                     <button
                       style={btnStyle("#14532d")}
-                      onClick={() =>
-                        approveApplication(mentor.id, reviewMessages[mentor.id])
-                      }
+                      onClick={() => approveApplication(mentor.id)}
                     >
                       Approve
                     </button>
                     <button
                       style={btnStyle("#a01f13")}
-                      onClick={() =>
-                        rejectApplication(mentor.id, reviewMessages[mentor.id])
-                      }
+                      onClick={() => openRejectModal(mentor.id)}
                     >
                       Reject
                     </button>
@@ -978,6 +962,104 @@ export default function AdminDashboard() {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* ── Reject Application Modal ── */}
+      {rejectTarget && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 200,
+            padding: 16,
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              borderRadius: 16,
+              padding: 32,
+              width: "100%",
+              maxWidth: 480,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 12,
+              }}
+            >
+              <h3 style={{ margin: 0 }}>Reject Application</h3>
+              <button
+                onClick={() => setRejectTarget(null)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: 20,
+                  cursor: "pointer",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <p style={{ color: "#888", fontSize: 13, marginBottom: 12 }}>
+              Explain what needs to change before this can be approved. This
+              is shown to the mentor.
+            </p>
+            <textarea
+              autoFocus
+              value={rejectReason}
+              onChange={(e) => {
+                setRejectReason(e.target.value);
+                setRejectError("");
+              }}
+              rows={4}
+              placeholder='e.g. "The uploaded transcript is not legible, please re-upload a clearer scan."'
+              style={{
+                width: "100%",
+                padding: 10,
+                borderRadius: 8,
+                border: "1px solid #ddd",
+                fontSize: 14,
+                fontFamily: "inherit",
+                resize: "vertical",
+                boxSizing: "border-box",
+                marginBottom: 8,
+              }}
+            />
+            {rejectError && (
+              <p style={{ color: "#a01f13", fontSize: 13, marginBottom: 12 }}>
+                {rejectError}
+              </p>
+            )}
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+              <button
+                onClick={() => setRejectTarget(null)}
+                style={{
+                  padding: "10px 20px",
+                  borderRadius: 8,
+                  border: "1px solid #ddd",
+                  background: "white",
+                  color: "#555",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button onClick={submitRejectModal} style={btnStyle("#a01f13")}>
+                Reject Application
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
