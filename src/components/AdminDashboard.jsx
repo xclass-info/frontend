@@ -257,7 +257,6 @@ export default function AdminDashboard() {
         teacherId: "admin",
         teacherName: "HappyResearch Team",
         createdAt: new Date(),
-        ...(addType === "research" && { status: "published" }),
         ...(addType === "internships" && { status: "open", applicants: 0 }),
         ...(addType === "teachers" && {
           photoURL,
@@ -585,15 +584,6 @@ export default function AdminDashboard() {
             <p style={{ color: "#888", margin: 0 }}>
               {visibleResearch.length} of {research.length} research entries
             </p>
-            <button
-              onClick={() => {
-                setAddType("research");
-                setAddForm({ title: "", idea: "", impact: "", details: "" });
-              }}
-              style={btnStyle("#2f6175")}
-            >
-              + Add Research
-            </button>
           </div>
           <div
             style={{
@@ -1729,25 +1719,6 @@ export default function AdminDashboard() {
                   >
                     PROJECT IDEAS
                   </label>
-                  <button
-                    type='button'
-                    onClick={() =>
-                      setEditItem({
-                        ...editItem,
-                        projects: [
-                          ...(editItem.projects || []),
-                          {
-                            id: Date.now().toString(),
-                            title: "",
-                            description: "",
-                          },
-                        ],
-                      })
-                    }
-                    style={{ ...btnStyle("#2f6175"), fontSize: 12 }}
-                  >
-                    + Add Project
-                  </button>
                 </div>
                 {(editItem.projects || []).length === 0 && (
                   <p style={{ fontSize: 13, color: "#aaa" }}>
@@ -1904,12 +1875,7 @@ export default function AdminDashboard() {
               }}
             >
               <h3 style={{ margin: 0 }}>
-                ➕ Add{" "}
-                {addType === "research"
-                  ? "Research"
-                  : addType === "internships"
-                    ? "Internship"
-                    : "Mentor"}
+                ➕ Add {addType === "internships" ? "Internship" : "Mentor"}
               </h3>
               <button
                 onClick={() => {
@@ -2151,139 +2117,6 @@ export default function AdminDashboard() {
                   )}
                 </div>
               ))}
-
-            {/* Projects for adding mentor */}
-            {addType === "teachers" && (
-              <div style={{ marginBottom: 16 }}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: 8,
-                  }}
-                >
-                  <label
-                    style={{ fontSize: 12, color: "#888", fontWeight: 600 }}
-                  >
-                    PROJECT IDEAS
-                  </label>
-                  <button
-                    type='button'
-                    onClick={() =>
-                      setAddForm({
-                        ...addForm,
-                        projects: [
-                          ...(addForm.projects || []),
-                          {
-                            id: Date.now().toString(),
-                            title: "",
-                            description: "",
-                          },
-                        ],
-                      })
-                    }
-                    style={{ ...btnStyle("#2f6175"), fontSize: 12 }}
-                  >
-                    + Add Project
-                  </button>
-                </div>
-                {(addForm.projects || []).length === 0 && (
-                  <p style={{ fontSize: 13, color: "#aaa" }}>
-                    No projects yet. Click + Add Project.
-                  </p>
-                )}
-                {(addForm.projects || []).map((project, index) => (
-                  <div
-                    key={project.id}
-                    style={{
-                      background: "#f9fafb",
-                      borderRadius: 8,
-                      padding: 12,
-                      marginBottom: 8,
-                      border: "1px solid #eee",
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        marginBottom: 6,
-                      }}
-                    >
-                      <label
-                        style={{ fontSize: 12, color: "#888", fontWeight: 600 }}
-                      >
-                        Project {index + 1}
-                      </label>
-                      <button
-                        type='button'
-                        onClick={() =>
-                          setAddForm({
-                            ...addForm,
-                            projects: addForm.projects.filter(
-                              (_, i) => i !== index,
-                            ),
-                          })
-                        }
-                        style={{
-                          background: "none",
-                          border: "none",
-                          color: "#a01f13",
-                          cursor: "pointer",
-                          fontSize: 13,
-                        }}
-                      >
-                        ✕ Remove
-                      </button>
-                    </div>
-                    <input
-                      placeholder='Project title'
-                      value={project.title}
-                      onChange={(e) => {
-                        const updated = [...addForm.projects];
-                        updated[index] = {
-                          ...updated[index],
-                          title: e.target.value,
-                        };
-                        setAddForm({ ...addForm, projects: updated });
-                      }}
-                      style={{
-                        width: "100%",
-                        padding: 8,
-                        borderRadius: 6,
-                        border: "1px solid #ddd",
-                        fontSize: 13,
-                        boxSizing: "border-box",
-                        marginBottom: 6,
-                      }}
-                    />
-                    <textarea
-                      placeholder='Project description'
-                      value={project.description}
-                      onChange={(e) => {
-                        const updated = [...addForm.projects];
-                        updated[index] = {
-                          ...updated[index],
-                          description: e.target.value,
-                        };
-                        setAddForm({ ...addForm, projects: updated });
-                      }}
-                      rows={5}
-                      style={{
-                        width: "100%",
-                        padding: 8,
-                        borderRadius: 6,
-                        border: "1px solid #ddd",
-                        fontSize: 13,
-                        boxSizing: "border-box",
-                        resize: "vertical",
-                      }}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
 
             <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
               <button
