@@ -247,28 +247,16 @@ export default function AdminDashboard() {
     if (!addType) return;
     setAddLoading(true);
     try {
-      let photoURL = null;
-      if (imageFile && addType === "teachers") {
-        const tempId = Date.now().toString();
-        photoURL = await uploadMentorImage(imageFile, tempId);
-      }
       await addDoc(collection(db, addType), {
         ...addForm,
         teacherId: "admin",
         teacherName: "HappyResearch Team",
         createdAt: new Date(),
-        ...(addType === "internships" && { status: "open", applicants: 0 }),
-        ...(addType === "teachers" && {
-          photoURL,
-          disabled: false,
-          verificationStatus: "approved",
-          projects: addForm.projects || [],
-        }),
+        status: "open",
+        applicants: 0,
       });
       setAddType(null);
       setAddForm({});
-      setImageFile(null);
-      setImagePreview(null);
     } catch (err) {
       console.error(err);
       alert("Failed to add. Please try again.");
@@ -1157,30 +1145,6 @@ export default function AdminDashboard() {
             <p style={{ color: "#888", margin: 0 }}>
               {visibleMentors.length} of {mentors.length} mentors
             </p>
-            <button
-              onClick={() => {
-                setAddType("teachers");
-                setAddForm({
-                  name: "",
-                  email: "",
-                  bio: "",
-                  degree: "",
-                  university: "",
-                  major: "",
-                  expertise: "",
-                  researchArea: "",
-                  yearsOfExperience: "",
-                  languages: "",
-                  gender: "Female",
-                  projects: [],
-                });
-                setImageFile(null);
-                setImagePreview(null);
-              }}
-              style={btnStyle("#2f6175")}
-            >
-              + Add Mentor
-            </button>
           </div>
           <div
             style={{
@@ -1875,7 +1839,7 @@ export default function AdminDashboard() {
               }}
             >
               <h3 style={{ margin: 0 }}>
-                ➕ Add {addType === "internships" ? "Internship" : "Mentor"}
+                ➕ Add Internship
               </h3>
               <button
                 onClick={() => {
@@ -1895,59 +1859,6 @@ export default function AdminDashboard() {
               </button>
             </div>
 
-            {/* Image upload for adding mentor */}
-            {addType === "teachers" && (
-              <div style={{ textAlign: "center", marginBottom: 20 }}>
-                {imagePreview ? (
-                  <img
-                    src={imagePreview}
-                    alt='Mentor'
-                    style={{
-                      width: 90,
-                      height: 90,
-                      borderRadius: "50%",
-                      objectFit: "cover",
-                      marginBottom: 10,
-                    }}
-                  />
-                ) : (
-                  <div
-                    style={{
-                      width: 90,
-                      height: 90,
-                      borderRadius: "50%",
-                      background: "linear-gradient(135deg, #2f6175, #427e94)",
-                      color: "white",
-                      fontSize: 32,
-                      fontWeight: 700,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      margin: "0 auto 10px",
-                    }}
-                  >
-                    ?
-                  </div>
-                )}
-                <label
-                  style={{
-                    cursor: "pointer",
-                    fontSize: 13,
-                    color: "#2f6175",
-                    fontWeight: 600,
-                  }}
-                >
-                  📷 {imagePreview ? "Change Photo" : "Upload Photo"}
-                  <input
-                    type='file'
-                    accept='image/*'
-                    onChange={handleImageChange}
-                    style={{ display: "none" }}
-                  />
-                </label>
-              </div>
-            )}
-
             {Object.entries(addForm)
               .filter(([key]) => key !== "projects")
               .map(([key, value]) => (
@@ -1964,25 +1875,7 @@ export default function AdminDashboard() {
                   >
                     {key.replace(/([A-Z])/g, " $1")}
                   </label>
-                  {key === "gender" ? (
-                    <select
-                      value={value}
-                      onChange={(e) =>
-                        setAddForm({ ...addForm, [key]: e.target.value })
-                      }
-                      style={{
-                        width: "100%",
-                        padding: 8,
-                        borderRadius: 6,
-                        border: "1px solid #ddd",
-                        fontSize: 13,
-                        boxSizing: "border-box",
-                      }}
-                    >
-                      <option value='Female'>Female</option>
-                      <option value='Male'>Male</option>
-                    </select>
-                  ) : key === "mode" ? (
+                  {key === "mode" ? (
                     <select
                       value={value}
                       onChange={(e) =>
@@ -2020,45 +1913,6 @@ export default function AdminDashboard() {
                       <option value='Paid'>Paid</option>
                       <option value='Academic Credit'>Academic Credit</option>
                     </select>
-                  ) : key === "degree" ? (
-                    <select
-                      value={value}
-                      onChange={(e) =>
-                        setAddForm({ ...addForm, [key]: e.target.value })
-                      }
-                      style={{
-                        width: "100%",
-                        padding: 8,
-                        borderRadius: 6,
-                        border: "1px solid #ddd",
-                        fontSize: 13,
-                        boxSizing: "border-box",
-                      }}
-                    >
-                      <option value=''>Select degree</option>
-                      <option value='High School Diploma'>
-                        High School Diploma
-                      </option>
-                      <option value='Bachelor of Science (BS)'>
-                        Bachelor of Science (BS)
-                      </option>
-                      <option value='Bachelor of Arts (BA)'>
-                        Bachelor of Arts (BA)
-                      </option>
-                      <option value='Master of Science (MS)'>
-                        Master of Science (MS)
-                      </option>
-                      <option value='Master of Arts (MA)'>
-                        Master of Arts (MA)
-                      </option>
-                      <option value='Doctor of Philosophy (PhD)'>
-                        Doctor of Philosophy (PhD)
-                      </option>
-                      <option value='Doctor of Medicine (MD)'>
-                        Doctor of Medicine (MD)
-                      </option>
-                      <option value='Other'>Other</option>
-                    </select>
                   ) : key === "deadline" ? (
                     <input
                       type='date'
@@ -2076,11 +1930,7 @@ export default function AdminDashboard() {
                       }}
                     />
                   ) : typeof value === "string" &&
-                    (key === "bio" ||
-                      key === "idea" ||
-                      key === "impact" ||
-                      key === "details" ||
-                      key === "description" ||
+                    (key === "description" ||
                       key === "requirements" ||
                       key === "outcomes") ? (
                     <textarea
@@ -2088,7 +1938,7 @@ export default function AdminDashboard() {
                       onChange={(e) =>
                         setAddForm({ ...addForm, [key]: e.target.value })
                       }
-                      rows={key === "bio" ? 10 : 3}
+                      rows={3}
                       style={{
                         width: "100%",
                         padding: 8,
