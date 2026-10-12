@@ -10,7 +10,7 @@ import {
   updateDoc,
   deleteDoc,
 } from "firebase/firestore";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./TeacherDashboard.module.css";
 
 import Availability from "./Availability";
@@ -19,12 +19,27 @@ import { SkeletonDashboardCard } from "./Skeleton";
 import ResearchForm from "./ResearchForm";
 import ProjectForm from "./ProjectForm";
 import ShowcaseForm from "./ShowcaseForm";
+import ContentCard from "./ContentCard";
 import MentorVerificationForm from "./MentorVerificationForm";
 import { statusInfo } from "../utils/mentorVerification";
 
 import Footer from "./Footer";
 import { safeUrl } from "../utils/format";
-import RegistrationList from "./RegistrationList";
+
+const COLLECTION_BY_KIND = {
+  research: "research",
+  project: "projects",
+  showcase: "showcase",
+};
+
+const NAV_ITEMS = [
+  { id: "overview", label: "🏠 Overview" },
+  { id: "content", label: "📚 Content", group: "My Content" },
+  { id: "availability", label: "🗓 Availability", group: "Scheduling" },
+  { id: "bookings", label: "📬 Bookings", group: "Scheduling" },
+  { id: "profile", label: "👤 Profile", group: "Account" },
+  { id: "verification", label: "✅ Verification", group: "Account" },
+];
 
 function profileFromTeacherData(data) {
   return {
@@ -45,16 +60,12 @@ export default function TeacherDashboard() {
   const location = useLocation();
   const [teacher, setTeacher] = useState(null);
   const [research, setResearch] = useState([]);
-  const [showResearchForm, setShowResearchForm] = useState(false);
-  const [editingResearch, setEditingResearch] = useState(null);
   const [projects, setProjects] = useState([]);
-  const [showProjectForm, setShowProjectForm] = useState(false);
-  const [editingProject, setEditingProject] = useState(null);
   const [showcase, setShowcase] = useState([]);
-  const [showShowcaseForm, setShowShowcaseForm] = useState(false);
-  const [editingShowcase, setEditingShowcase] = useState(null);
+  const [activeForm, setActiveForm] = useState(null); // { kind, item } | null
+  const [contentFilter, setContentFilter] = useState("all");
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState(location.state?.tab || "research");
+  const [activeTab, setActiveTab] = useState(location.state?.tab || "overview");
 
   // Profile form state
   const [profile, setProfile] = useState({
@@ -153,55 +164,31 @@ export default function TeacherDashboard() {
     navigate("/teacher/login");
   }
 
-  async function deleteResearch(id) {
-    if (!confirm("Delete this research post? This can't be undone.")) return;
+  async function deleteItem(kind, id) {
+    if (!confirm("Delete this? This can't be undone.")) return;
     try {
-      await deleteDoc(doc(db, "research", id));
+      await deleteDoc(doc(db, COLLECTION_BY_KIND[kind], id));
     } catch (err) {
       console.error(err);
       alert("Failed to delete. Please try again.");
     }
   }
 
-  async function toggleResearchStage(r) {
-    const nextStage = r.stage === "completed" ? "active" : "completed";
+  async function toggleStage(kind, item) {
+    const nextStage = item.stage === "completed" ? "active" : "completed";
     try {
-      await updateDoc(doc(db, "research", r.id), { stage: nextStage });
+      await updateDoc(doc(db, COLLECTION_BY_KIND[kind], item.id), {
+        stage: nextStage,
+      });
     } catch (err) {
       console.error(err);
       alert("Failed to update status. Please try again.");
     }
   }
 
-  async function deleteProject(id) {
-    if (!confirm("Delete this project post? This can't be undone.")) return;
-    try {
-      await deleteDoc(doc(db, "projects", id));
-    } catch (err) {
-      console.error(err);
-      alert("Failed to delete. Please try again.");
-    }
-  }
-
-  async function toggleProjectStage(p) {
-    const nextStage = p.stage === "completed" ? "active" : "completed";
-    try {
-      await updateDoc(doc(db, "projects", p.id), { stage: nextStage });
-    } catch (err) {
-      console.error(err);
-      alert("Failed to update status. Please try again.");
-    }
-  }
-
-  async function deleteShowcaseEntry(id) {
-    if (!confirm("Remove this from Student Work? This can't be undone."))
-      return;
-    try {
-      await deleteDoc(doc(db, "showcase", id));
-    } catch (err) {
-      console.error(err);
-      alert("Failed to delete. Please try again.");
-    }
+  function startAdd(kind) {
+    setContentFilter(kind);
+    setActiveForm({ kind, item: null });
   }
 
   function handleProfileChange(e) {
@@ -214,36 +201,12 @@ export default function TeacherDashboard() {
     setProfile((prev) => ({ ...prev, [name]: value }));
   }
 
-  // async function saveProfile() {
-  //   setProfileSaving(true);
-  //   try {
-  //     const user = auth.currentUser;
-  //     await updateDoc(doc(db, "teachers", user.uid), {
-  //       ...profile,
-  //       updatedAt: new Date(),
-  //     });
-  //     setProfileSaved(true);
-  //     setTimeout(() => setProfileSaved(false), 2000);
-  //   } catch (err) {
-  //     console.error(err);
-  //     alert("Failed to save profile. Please try again.");
-  //   } finally {
-  //     setProfileSaving(false);
-  //   }
-  // }
-
   async function saveProfile() {
-    //if (!profile.gender) return alert("Please select your gender."); // ← add this
-    // Validate required fields
     if (!profile.degree) return alert("Please select your degree.");
     if (!profile.university.trim())
       return alert("Please enter your university.");
     if (!profile.expertise.trim())
       return alert("Please enter your area of expertise.");
-    // if (!profile.researchArea.trim())
-    //   return alert("Please enter your research area.");
-    // if (!profile.yearsOfExperience)
-    //   return alert("Please enter your years of experience.");
     if (!profile.languages.trim())
       return alert("Please enter languages spoken.");
 
@@ -306,6 +269,25 @@ export default function TeacherDashboard() {
     marginBottom: 16,
   };
 
+  const allContent = [
+    ...research.map((r) => ({ ...r, kind: "research" })),
+    ...projects.map((p) => ({ ...p, kind: "project" })),
+    ...showcase.map((s) => ({ ...s, kind: "showcase" })),
+  ].sort((a, b) => (b.createdAt?.toMillis?.() ?? 0) - (a.createdAt?.toMillis?.() ?? 0));
+
+  const visibleContent =
+    contentFilter === "all"
+      ? allContent
+      : allContent.filter((i) => i.kind === contentFilter);
+
+  const vStatus = statusInfo(teacher?.verificationStatus);
+
+  function navCls(id) {
+    return `${styles.navItem} ${activeTab === id ? styles.navItemActive : ""}`.trim();
+  }
+
+  let navGroup = null;
+
   return (
     <>
       <div className={styles.page}>
@@ -318,12 +300,6 @@ export default function TeacherDashboard() {
             </p>
           </div>
           <div className={styles.headerRight}>
-            <button
-              className={styles.createBtn}
-              onClick={() => setActiveTab("profile")}
-            >
-              Profile
-            </button>
             <button className={styles.logoutBtn} onClick={handleLogout}>
               Logout
             </button>
@@ -339,8 +315,8 @@ export default function TeacherDashboard() {
               justifyContent: "space-between",
               width: "100%",
               gap: 12,
-              background: statusInfo(teacher?.verificationStatus).bg,
-              border: `1px solid ${statusInfo(teacher?.verificationStatus).color}33`,
+              background: vStatus.bg,
+              border: `1px solid ${vStatus.color}33`,
               borderRadius: 10,
               padding: "12px 18px",
               marginBottom: 20,
@@ -352,7 +328,7 @@ export default function TeacherDashboard() {
               style={{
                 fontSize: 14,
                 fontWeight: 600,
-                color: statusInfo(teacher?.verificationStatus).color,
+                color: vStatus.color,
               }}
             >
               {teacher?.verificationStatus === "pending_review"
@@ -365,7 +341,7 @@ export default function TeacherDashboard() {
               style={{
                 fontSize: 13,
                 fontWeight: 700,
-                color: statusInfo(teacher?.verificationStatus).color,
+                color: vStatus.color,
                 whiteSpace: "nowrap",
               }}
             >
@@ -373,795 +349,651 @@ export default function TeacherDashboard() {
             </span>
           </button>
         )}
-        {/* Tabs */}
-        <div
-          style={{
-            display: "flex",
-            gap: 8,
-            marginBottom: 24,
-            borderBottom: "2px solid #f0f0f0",
-            paddingBottom: 0,
-          }}
-        >
-          {[
-            { id: "research", label: "🔬 Research" },
-            { id: "projects", label: "💡 Projects" },
-            { id: "showcase", label: "🏆 Student Work" },
-            { id: "availability", label: "🗓 Availability" },
-            { id: "bookings", label: "📬 Bookings" },
-            { id: "verification", label: "✅ Verification" },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              style={{
-                padding: "10px 20px",
-                border: "none",
-                background: "none",
-                cursor: "pointer",
-                fontSize: 19,
-                fontWeight: 600,
-                color: activeTab === tab.id ? "#2f6175" : "#888",
-                borderBottom:
-                  activeTab === tab.id
-                    ? "2px solid #2f6175"
-                    : "2px solid transparent",
-                marginBottom: -2,
-                transition: "all 0.15s",
-              }}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-        {activeTab === "research" && (
-          <div className={styles.section}>
-            {showResearchForm ? (
-              <ResearchForm
-                research={editingResearch}
-                onClose={() => {
-                  setShowResearchForm(false);
-                  setEditingResearch(null);
-                }}
-              />
-            ) : (
-              <>
+
+        <div className={styles.layout}>
+          {/* Sidebar nav */}
+          <nav className={styles.sidebar}>
+            {NAV_ITEMS.map((item) => {
+              const showGroupLabel = item.group && item.group !== navGroup;
+              if (showGroupLabel) navGroup = item.group;
+              return (
+                <div key={item.id}>
+                  {showGroupLabel && (
+                    <p className={styles.navGroupLabel}>{item.group}</p>
+                  )}
+                  <button
+                    className={navCls(item.id)}
+                    onClick={() => setActiveTab(item.id)}
+                  >
+                    {item.label}
+                  </button>
+                </div>
+              );
+            })}
+          </nav>
+
+          {/* Main content */}
+          <main className={styles.main}>
+            {/* ── Overview Tab ── */}
+            {activeTab === "overview" && (
+              <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>
+                  Welcome back, {teacher?.name}
+                </h2>
+                <div className={styles.stats}>
+                  <div className={styles.statCard}>
+                    <p className={styles.statNum}>{research.length}</p>
+                    <p className={styles.statLabel}>Research Posts</p>
+                  </div>
+                  <div className={styles.statCard}>
+                    <p className={styles.statNum}>{projects.length}</p>
+                    <p className={styles.statLabel}>Projects</p>
+                  </div>
+                  <div className={styles.statCard}>
+                    <p className={styles.statNum}>{showcase.length}</p>
+                    <p className={styles.statLabel}>Student Work</p>
+                  </div>
+                </div>
+
                 <div
                   style={{
+                    background: vStatus.bg,
+                    border: `1px solid ${vStatus.color}33`,
+                    borderRadius: 12,
+                    padding: "18px 22px",
+                    marginBottom: 24,
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    marginBottom: 16,
+                    flexWrap: "wrap",
+                    gap: 12,
                   }}
                 >
-                  <h2 className={styles.sectionTitle}>Your Research</h2>
+                  <p style={{ margin: 0, fontWeight: 700, color: vStatus.color }}>
+                    {teacher?.verificationStatus === "approved"
+                      ? "✅ You're verified and live"
+                      : teacher?.verificationStatus === "pending_review"
+                        ? "⏳ Application under review"
+                        : teacher?.verificationStatus === "rejected"
+                          ? "⚠️ Changes needed on your application"
+                          : "🔒 Verification not started"}
+                  </p>
+                  {teacher?.verificationStatus !== "approved" && (
+                    <button
+                      onClick={() => setActiveTab("verification")}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: vStatus.color,
+                        fontWeight: 700,
+                        fontSize: 13,
+                        cursor: "pointer",
+                      }}
+                    >
+                      Go to Verification →
+                    </button>
+                  )}
+                </div>
+
+                <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                   <button
-                    onClick={() => {
-                      setEditingResearch(null);
-                      setShowResearchForm(true);
-                    }}
                     className={styles.createBtn}
+                    onClick={() => {
+                      setActiveTab("content");
+                      startAdd("research");
+                    }}
                   >
                     + Add Research
                   </button>
-                </div>
-                {research.length === 0 ? (
-                  <div className={styles.empty}>
-                    <p>🔬 No research posted yet!</p>
-                    <button
-                      onClick={() => {
-                        setEditingResearch(null);
-                        setShowResearchForm(true);
-                      }}
-                      className={styles.createBtn}
-                    >
-                      + Post your first research
-                    </button>
-                  </div>
-                ) : (
-                  <div className={styles.grid}>
-                    {research.map((r) => (
-                      <div key={r.id} className={styles.card}>
-                        <div className={styles.cardTop}>
-                          <h3 className={styles.cardTitle}>{r.title}</h3>
-                          <span
-                            className={`${styles.badge} ${r.stage === "completed" ? styles.draft : styles.active}`}
-                          >
-                            {r.stage === "completed" ? "Completed" : "Active"}
-                          </span>
-                        </div>
-                        <p className={styles.cardDesc}>{r.idea}</p>
-                        {r.gradeLevel && (
-                          <span
-                            style={{
-                              display: "inline-block",
-                              fontSize: 11,
-                              fontWeight: 700,
-                              color: "#2f6175",
-                              background: "#fff8dc",
-                              border: "1px solid #9a772b",
-                              padding: "2px 10px",
-                              borderRadius: 20,
-                              marginBottom: 6,
-                            }}
-                          >
-                            🎓 {r.gradeLevel}
-                          </span>
-                        )}
-                        {r.deliverable && (
-                          <p
-                            style={{
-                              fontSize: 12,
-                              color: "#14532d",
-                              fontWeight: 600,
-                              margin: "0 0 6px",
-                            }}
-                          >
-                            📦 {r.deliverable}
-                          </p>
-                        )}
-                        <RegistrationList itemId={r.id} />
-                        <div className={styles.cardFooter}>
-                          <button
-                            className={styles.joinBtn}
-                            onClick={() => {
-                              setEditingResearch(r);
-                              setShowResearchForm(true);
-                            }}
-                          >
-                            ✏️ Edit
-                          </button>
-                          <button
-                            className={styles.copyBtn}
-                            onClick={() => toggleResearchStage(r)}
-                          >
-                            {r.stage === "completed"
-                              ? "🔄 Mark Active"
-                              : "✅ Mark Completed"}
-                          </button>
-                          <button
-                            className={styles.copyBtn}
-                            onClick={() => deleteResearch(r.id)}
-                            style={{ color: "#a01f13" }}
-                          >
-                            🗑️ Delete
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        )}
-        {/* ── Projects Tab ── */}
-        {activeTab === "projects" && (
-          <div className={styles.section}>
-            {showProjectForm ? (
-              <ProjectForm
-                project={editingProject}
-                onClose={() => {
-                  setShowProjectForm(false);
-                  setEditingProject(null);
-                }}
-              />
-            ) : (
-              <>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: 16,
-                  }}
-                >
-                  <h2 className={styles.sectionTitle}>Your Projects</h2>
                   <button
-                    onClick={() => {
-                      setEditingProject(null);
-                      setShowProjectForm(true);
-                    }}
                     className={styles.createBtn}
+                    onClick={() => {
+                      setActiveTab("content");
+                      startAdd("project");
+                    }}
                   >
                     + Add Project
                   </button>
+                  <button
+                    className={styles.createBtn}
+                    onClick={() => {
+                      setActiveTab("content");
+                      startAdd("showcase");
+                    }}
+                  >
+                    + Add Student Work
+                  </button>
+                  <button
+                    className={styles.logoutBtn}
+                    onClick={() => setActiveTab("availability")}
+                  >
+                    🗓 Set Availability
+                  </button>
                 </div>
-                {projects.length === 0 ? (
-                  <div className={styles.empty}>
-                    <p>💡 No projects posted yet!</p>
-                    <button
-                      onClick={() => {
-                        setEditingProject(null);
-                        setShowProjectForm(true);
-                      }}
-                      className={styles.createBtn}
-                    >
-                      + Post your first project
-                    </button>
-                  </div>
-                ) : (
-                  <div className={styles.grid}>
-                    {projects.map((p) => (
-                      <div key={p.id} className={styles.card}>
-                        <div className={styles.cardTop}>
-                          <h3 className={styles.cardTitle}>{p.title}</h3>
-                          <span
-                            className={`${styles.badge} ${p.stage === "completed" ? styles.draft : styles.active}`}
-                          >
-                            {p.stage === "completed" ? "Completed" : "Active"}
-                          </span>
-                        </div>
-                        <p className={styles.cardDesc}>{p.description}</p>
-                        {p.gradeLevel && (
-                          <span
-                            style={{
-                              display: "inline-block",
-                              fontSize: 11,
-                              fontWeight: 700,
-                              color: "#2f6175",
-                              background: "#fff8dc",
-                              border: "1px solid #9a772b",
-                              padding: "2px 10px",
-                              borderRadius: 20,
-                              marginBottom: 6,
-                            }}
-                          >
-                            🎓 {p.gradeLevel}
-                          </span>
-                        )}
-                        {p.deliverable && (
-                          <p
-                            style={{
-                              fontSize: 12,
-                              color: "#14532d",
-                              fontWeight: 600,
-                              margin: "0 0 6px",
-                            }}
-                          >
-                            📦 {p.deliverable}
-                          </p>
-                        )}
-                        {p.seats ? (
-                          <div className={styles.cardMeta}>
-                            <span>
-                              👥 {p.enrolledCount || 0} / {p.seats} seats
-                            </span>
-                          </div>
-                        ) : null}
-                        <RegistrationList itemId={p.id} />
-                        <div className={styles.cardFooter}>
-                          <button
-                            className={styles.joinBtn}
-                            onClick={() => {
-                              setEditingProject(p);
-                              setShowProjectForm(true);
-                            }}
-                          >
-                            ✏️ Edit
-                          </button>
-                          <button
-                            className={styles.copyBtn}
-                            onClick={() => toggleProjectStage(p)}
-                          >
-                            {p.stage === "completed"
-                              ? "🔄 Mark Active"
-                              : "✅ Mark Completed"}
-                          </button>
-                          <button
-                            className={styles.copyBtn}
-                            onClick={() => deleteProject(p.id)}
-                            style={{ color: "#a01f13" }}
-                          >
-                            🗑️ Delete
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </>
+              </div>
             )}
-          </div>
-        )}
-        {/* ── Showcase Tab ── */}
-        {activeTab === "showcase" && (
-          <div className={styles.section}>
-            {showShowcaseForm ? (
-              <ShowcaseForm
-                entry={editingShowcase}
-                onClose={() => {
-                  setShowShowcaseForm(false);
-                  setEditingShowcase(null);
-                }}
-              />
-            ) : (
-              <>
+
+            {/* ── Content Tab (Research + Projects + Student Work) ── */}
+            {activeTab === "content" && (
+              <div className={styles.section}>
+                {activeForm ? (
+                  activeForm.kind === "research" ? (
+                    <ResearchForm
+                      research={activeForm.item}
+                      onClose={() => setActiveForm(null)}
+                    />
+                  ) : activeForm.kind === "project" ? (
+                    <ProjectForm
+                      project={activeForm.item}
+                      onClose={() => setActiveForm(null)}
+                    />
+                  ) : (
+                    <ShowcaseForm
+                      entry={activeForm.item}
+                      onClose={() => setActiveForm(null)}
+                    />
+                  )
+                ) : (
+                  <>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                        marginBottom: 16,
+                        flexWrap: "wrap",
+                        gap: 12,
+                      }}
+                    >
+                      <div>
+                        <h2 className={styles.sectionTitle} style={{ marginBottom: 4 }}>
+                          Your Content
+                        </h2>
+                        <p style={{ color: "#888", fontSize: 13, margin: 0 }}>
+                          Research, projects, and student work, all in one place.
+                        </p>
+                      </div>
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                        <button
+                          className={styles.createBtn}
+                          onClick={() => startAdd("research")}
+                        >
+                          + Research
+                        </button>
+                        <button
+                          className={styles.createBtn}
+                          onClick={() => startAdd("project")}
+                        >
+                          + Project
+                        </button>
+                        <button
+                          className={styles.createBtn}
+                          onClick={() => startAdd("showcase")}
+                        >
+                          + Student Work
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className={styles.chipRow}>
+                      {[
+                        { id: "all", label: `All (${allContent.length})` },
+                        { id: "research", label: `🔬 Research (${research.length})` },
+                        { id: "project", label: `💡 Projects (${projects.length})` },
+                        { id: "showcase", label: `🏆 Student Work (${showcase.length})` },
+                      ].map((c) => (
+                        <button
+                          key={c.id}
+                          className={`${styles.chip} ${contentFilter === c.id ? styles.chipActive : ""}`}
+                          onClick={() => setContentFilter(c.id)}
+                        >
+                          {c.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {visibleContent.length === 0 ? (
+                      <div className={styles.empty}>
+                        <p>
+                          {contentFilter === "showcase"
+                            ? "🏆 Nothing published yet!"
+                            : contentFilter === "project"
+                              ? "💡 No projects posted yet!"
+                              : contentFilter === "research"
+                                ? "🔬 No research posted yet!"
+                                : "✨ Nothing posted yet!"}
+                        </p>
+                        {contentFilter === "all" ? (
+                          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
+                            <button className={styles.createBtn} onClick={() => startAdd("research")}>
+                              + Add Research
+                            </button>
+                            <button className={styles.createBtn} onClick={() => startAdd("project")}>
+                              + Add Project
+                            </button>
+                            <button className={styles.createBtn} onClick={() => startAdd("showcase")}>
+                              + Add Student Work
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            className={styles.createBtn}
+                            onClick={() => startAdd(contentFilter)}
+                          >
+                            + Add your first{" "}
+                            {contentFilter === "research"
+                              ? "research post"
+                              : contentFilter === "project"
+                                ? "project"
+                                : "Student Work entry"}
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className={styles.grid}>
+                        {visibleContent.map((item) => (
+                          <ContentCard
+                            key={`${item.kind}-${item.id}`}
+                            item={item}
+                            kind={item.kind}
+                            onEdit={() => setActiveForm({ kind: item.kind, item })}
+                            onDelete={() => deleteItem(item.kind, item.id)}
+                            onToggleStage={
+                              item.kind !== "showcase"
+                                ? () => toggleStage(item.kind, item)
+                                : undefined
+                            }
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* ── Availability Tab ── */}
+            {activeTab === "availability" && (
+              <div className={styles.section}>
+                <Availability />
+              </div>
+            )}
+            {/* ── Bookings Tab ── */}
+            {activeTab === "bookings" && (
+              <div className={styles.section}>
+                <BookingRequests />
+              </div>
+            )}
+            {/* ── Verification Tab ── */}
+            {activeTab === "verification" && (
+              <div className={styles.section}>
+                <MentorVerificationForm teacher={teacher} />
+              </div>
+            )}
+            {/* ── Profile Tab ── */}
+            {activeTab === "profile" && (
+              <div className={styles.section}>
                 <div
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: 16,
+                    alignItems: "flex-start",
+                    gap: 16,
+                    flexWrap: "wrap",
                   }}
                 >
                   <div>
-                    <h2 className={styles.sectionTitle} style={{ marginBottom: 4 }}>
-                      Your Student Work
-                    </h2>
-                    <p style={{ color: "#888", fontSize: 13, margin: 0 }}>
-                      Finished student projects, shown publicly as proof of
-                      real outcomes.
+                    <h2 className={styles.sectionTitle}>👤 My Profile</h2>
+                    <p style={{ color: "#888", fontSize: 14, marginBottom: 24 }}>
+                      This information will be displayed on your public tutor
+                      profile.
                     </p>
                   </div>
-                  <button
-                    onClick={() => {
-                      setEditingShowcase(null);
-                      setShowShowcaseForm(true);
-                    }}
-                    className={styles.createBtn}
-                  >
-                    + Add to Student Work
-                  </button>
-                </div>
-                {showcase.length === 0 ? (
-                  <div className={styles.empty}>
-                    <p>🏆 Nothing published yet!</p>
-                    <p style={{ fontSize: 13, color: "#aaa", marginTop: -8 }}>
-                      Once a student finishes a research post or project,
-                      publish their outcome here.
-                    </p>
+                  {!isEditingProfile && (
                     <button
-                      onClick={() => {
-                        setEditingShowcase(null);
-                        setShowShowcaseForm(true);
-                      }}
-                      className={styles.createBtn}
-                    >
-                      + Add your first Student Work entry
-                    </button>
-                  </div>
-                ) : (
-                  <div className={styles.grid}>
-                    {showcase.map((s) => (
-                      <div key={s.id} className={styles.card}>
-                        <div className={styles.cardTop}>
-                          <h3 className={styles.cardTitle}>{s.title}</h3>
-                          <span className={`${styles.badge} ${styles.active}`}>
-                            {s.outputType}
-                          </span>
-                        </div>
-                        <p
-                          style={{
-                            fontSize: 13,
-                            color: "#888",
-                            margin: "0 0 8px",
-                          }}
-                        >
-                          👤 {s.studentName}
-                        </p>
-                        <p className={styles.cardDesc}>{s.summary}</p>
-                        {s.outputUrl && (
-                          <a
-                            href={s.outputUrl}
-                            target='_blank'
-                            rel='noreferrer'
-                            style={{
-                              fontSize: 13,
-                              color: "#2f6175",
-                              textDecoration: "underline",
-                            }}
-                          >
-                            View finished work →
-                          </a>
-                        )}
-                        <div className={styles.cardFooter}>
-                          <button
-                            className={styles.joinBtn}
-                            onClick={() => {
-                              setEditingShowcase(s);
-                              setShowShowcaseForm(true);
-                            }}
-                          >
-                            ✏️ Edit
-                          </button>
-                          <button
-                            className={styles.copyBtn}
-                            onClick={() => deleteShowcaseEntry(s.id)}
-                            style={{ color: "#a01f13" }}
-                          >
-                            🗑️ Delete
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        )}
-        {/* ── Availability Tab ── */}
-        {activeTab === "availability" && (
-          <div className={styles.section}>
-            <Availability />
-          </div>
-        )}
-        {/* ── Bookings Tab ── */}
-        {activeTab === "bookings" && (
-          <div className={styles.section}>
-            <BookingRequests />
-          </div>
-        )}
-        {/* ── Verification Tab ── */}
-        {activeTab === "verification" && (
-          <div className={styles.section}>
-            <MentorVerificationForm teacher={teacher} />
-          </div>
-        )}
-        {/* ── Profile Tab ── */}
-        {activeTab === "profile" && (
-          <div className={styles.section}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-                gap: 16,
-                flexWrap: "wrap",
-              }}
-            >
-              <div>
-                <h2 className={styles.sectionTitle}>👤 My Profile</h2>
-                <p style={{ color: "#888", fontSize: 14, marginBottom: 24 }}>
-                  This information will be displayed on your public tutor
-                  profile.
-                </p>
-              </div>
-              {!isEditingProfile && (
-                <button
-                  onClick={() => setIsEditingProfile(true)}
-                  style={{
-                    padding: "10px 20px",
-                    borderRadius: 8,
-                    border: "none",
-                    background: "#2f6175",
-                    color: "white",
-                    fontSize: 14,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    flexShrink: 0,
-                  }}
-                >
-                  ✏️ Edit
-                </button>
-              )}
-            </div>
-
-            {!isEditingProfile ? (
-              <div style={{ maxWidth: 600 }}>
-                {[
-                  ["Gender", profile.gender],
-                  ["Degree", profile.degree],
-                  ["University / Institution", profile.university],
-                  ["Area of Expertise", profile.expertise],
-                  ["Research Area", profile.researchArea],
-                  [
-                    "Years of Teaching Experience",
-                    profile.yearsOfExperience,
-                  ],
-                  ["Languages Spoken", profile.languages],
-                ].map(([label, value]) => (
-                  <div style={fieldStyle} key={label}>
-                    <p style={labelStyle}>{label}</p>
-                    <p style={{ margin: "4px 0 0", fontSize: 15 }}>
-                      {value || <span style={{ color: "#bbb" }}>Not set</span>}
-                    </p>
-                  </div>
-                ))}
-                <div style={fieldStyle}>
-                  <p style={labelStyle}>Personal Website / LinkedIn</p>
-                  {safeUrl(profile.website) ? (
-                    <a
-                      href={safeUrl(profile.website)}
-                      target='_blank'
-                      rel='noreferrer'
+                      onClick={() => setIsEditingProfile(true)}
                       style={{
-                        display: "block",
-                        marginTop: 4,
-                        fontSize: 15,
-                        color: "#2f6175",
+                        padding: "10px 20px",
+                        borderRadius: 8,
+                        border: "none",
+                        background: "#2f6175",
+                        color: "white",
+                        fontSize: 14,
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        flexShrink: 0,
                       }}
                     >
-                      {profile.website}
-                    </a>
-                  ) : (
-                    <p style={{ margin: "4px 0 0", fontSize: 15, color: "#bbb" }}>
-                      Not set
-                    </p>
+                      ✏️ Edit
+                    </button>
                   )}
                 </div>
-                <div style={fieldStyle}>
-                  <p style={labelStyle}>About Me</p>
-                  <p
-                    style={{
-                      margin: "4px 0 0",
-                      fontSize: 15,
-                      lineHeight: 1.7,
-                      whiteSpace: "pre-wrap",
-                    }}
-                  >
-                    {profile.bio || (
-                      <span style={{ color: "#bbb" }}>Not set</span>
-                    )}
-                  </p>
-                </div>
-              </div>
-            ) : (
-            <div style={{ maxWidth: 600 }}>
-              {/* Gender */}
-              <div style={fieldStyle}>
-                <label style={labelStyle}>
-                  Gender <span style={{ color: "#a01f13" }}>*</span>
-                </label>
-                <select
-                  name='gender'
-                  value={profile.gender}
-                  onChange={handleProfileChange}
-                  style={inputStyle}
-                >
-                  <option value=''>Select gender</option>
-                  <option value='Male'>Male</option>
-                  <option value='Female'>Female</option>
-                </select>
-              </div>
-              {/* Degree */}
-              <div style={fieldStyle}>
-                <label style={labelStyle}>
-                  Degree <span style={{ color: "#a01f13" }}>*</span>
-                </label>
-                <select
-                  name='degree'
-                  value={profile.degree}
-                  onChange={handleProfileChange}
-                  style={inputStyle}
-                >
-                  <option value=''>Select your highest degree</option>
-                  <optgroup label='Secondary Education'>
-                    <option value='High School Diploma'>
-                      High School Diploma
-                    </option>
-                    <option value='GED'>GED</option>
-                  </optgroup>
-                  <optgroup label='Undergraduate'>
-                    <option value="Associate's Degree">
-                      Associate's Degree
-                    </option>
-                    <option value='Bachelor of Arts (BA)'>
-                      Bachelor of Arts (BA)
-                    </option>
-                    <option value='Bachelor of Science (BS)'>
-                      Bachelor of Science (BS)
-                    </option>
-                    <option value='Bachelor of Education (BEd)'>
-                      Bachelor of Education (BEd)
-                    </option>
-                    <option value='Bachelor of Engineering (BEng)'>
-                      Bachelor of Engineering (BEng)
-                    </option>
-                  </optgroup>
-                  <optgroup label='Graduate'>
-                    <option value='Master of Arts (MA)'>
-                      Master of Arts (MA)
-                    </option>
-                    <option value='Master of Science (MS)'>
-                      Master of Science (MS)
-                    </option>
-                    <option value='Master of Education (MEd)'>
-                      Master of Education (MEd)
-                    </option>
-                    <option value='Master of Business Administration (MBA)'>
-                      Master of Business Administration (MBA)
-                    </option>
-                    <option value='Master of Engineering (MEng)'>
-                      Master of Engineering (MEng)
-                    </option>
-                    <option value='Master of Fine Arts (MFA)'>
-                      Master of Fine Arts (MFA)
-                    </option>
-                  </optgroup>
-                  <optgroup label='Doctorate'>
-                    <option value='Doctor of Philosophy (PhD)'>
-                      Doctor of Philosophy (PhD)
-                    </option>
-                    <option value='Doctor of Education (EdD)'>
-                      Doctor of Education (EdD)
-                    </option>
-                    <option value='Doctor of Medicine (MD)'>
-                      Doctor of Medicine (MD)
-                    </option>
-                    <option value='Doctor of Law (JD)'>
-                      Doctor of Law (JD)
-                    </option>
-                    <option value='Doctor of Business Administration (DBA)'>
-                      Doctor of Business Administration (DBA)
-                    </option>
-                    <option value='Doctor of Engineering (DEng)'>
-                      Doctor of Engineering (DEng)
-                    </option>
-                  </optgroup>
-                  <optgroup label='Other'>
-                    <option value='Professional Certification'>
-                      Professional Certification
-                    </option>
-                    <option value='Vocational Training'>
-                      Vocational Training
-                    </option>
-                    <option value='Other'>Other</option>
-                  </optgroup>
-                </select>
-              </div>
 
-              {/* University */}
-              <div style={fieldStyle}>
-                <label style={labelStyle}>
-                  University / Institution{" "}
-                  <span style={{ color: "#a01f13" }}>*</span>
-                </label>
-                <input
-                  name='university'
-                  value={profile.university}
-                  onChange={handleProfileChange}
-                  placeholder='e.g. MIT, Stanford University'
-                  style={inputStyle}
-                />
-              </div>
+                {!isEditingProfile ? (
+                  <div style={{ maxWidth: 600 }}>
+                    {[
+                      ["Gender", profile.gender],
+                      ["Degree", profile.degree],
+                      ["University / Institution", profile.university],
+                      ["Area of Expertise", profile.expertise],
+                      ["Research Area", profile.researchArea],
+                      [
+                        "Years of Teaching Experience",
+                        profile.yearsOfExperience,
+                      ],
+                      ["Languages Spoken", profile.languages],
+                    ].map(([label, value]) => (
+                      <div style={fieldStyle} key={label}>
+                        <p style={labelStyle}>{label}</p>
+                        <p style={{ margin: "4px 0 0", fontSize: 15 }}>
+                          {value || <span style={{ color: "#bbb" }}>Not set</span>}
+                        </p>
+                      </div>
+                    ))}
+                    <div style={fieldStyle}>
+                      <p style={labelStyle}>Personal Website / LinkedIn</p>
+                      {safeUrl(profile.website) ? (
+                        <a
+                          href={safeUrl(profile.website)}
+                          target='_blank'
+                          rel='noreferrer'
+                          style={{
+                            display: "block",
+                            marginTop: 4,
+                            fontSize: 15,
+                            color: "#2f6175",
+                          }}
+                        >
+                          {profile.website}
+                        </a>
+                      ) : (
+                        <p style={{ margin: "4px 0 0", fontSize: 15, color: "#bbb" }}>
+                          Not set
+                        </p>
+                      )}
+                    </div>
+                    <div style={fieldStyle}>
+                      <p style={labelStyle}>About Me</p>
+                      <p
+                        style={{
+                          margin: "4px 0 0",
+                          fontSize: 15,
+                          lineHeight: 1.7,
+                          whiteSpace: "pre-wrap",
+                        }}
+                      >
+                        {profile.bio || (
+                          <span style={{ color: "#bbb" }}>Not set</span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ maxWidth: 600 }}>
+                    {/* Gender */}
+                    <div style={fieldStyle}>
+                      <label style={labelStyle}>
+                        Gender <span style={{ color: "#a01f13" }}>*</span>
+                      </label>
+                      <select
+                        name='gender'
+                        value={profile.gender}
+                        onChange={handleProfileChange}
+                        style={inputStyle}
+                      >
+                        <option value=''>Select gender</option>
+                        <option value='Male'>Male</option>
+                        <option value='Female'>Female</option>
+                      </select>
+                    </div>
+                    {/* Degree */}
+                    <div style={fieldStyle}>
+                      <label style={labelStyle}>
+                        Degree <span style={{ color: "#a01f13" }}>*</span>
+                      </label>
+                      <select
+                        name='degree'
+                        value={profile.degree}
+                        onChange={handleProfileChange}
+                        style={inputStyle}
+                      >
+                        <option value=''>Select your highest degree</option>
+                        <optgroup label='Secondary Education'>
+                          <option value='High School Diploma'>
+                            High School Diploma
+                          </option>
+                          <option value='GED'>GED</option>
+                        </optgroup>
+                        <optgroup label='Undergraduate'>
+                          <option value="Associate's Degree">
+                            Associate's Degree
+                          </option>
+                          <option value='Bachelor of Arts (BA)'>
+                            Bachelor of Arts (BA)
+                          </option>
+                          <option value='Bachelor of Science (BS)'>
+                            Bachelor of Science (BS)
+                          </option>
+                          <option value='Bachelor of Education (BEd)'>
+                            Bachelor of Education (BEd)
+                          </option>
+                          <option value='Bachelor of Engineering (BEng)'>
+                            Bachelor of Engineering (BEng)
+                          </option>
+                        </optgroup>
+                        <optgroup label='Graduate'>
+                          <option value='Master of Arts (MA)'>
+                            Master of Arts (MA)
+                          </option>
+                          <option value='Master of Science (MS)'>
+                            Master of Science (MS)
+                          </option>
+                          <option value='Master of Education (MEd)'>
+                            Master of Education (MEd)
+                          </option>
+                          <option value='Master of Business Administration (MBA)'>
+                            Master of Business Administration (MBA)
+                          </option>
+                          <option value='Master of Engineering (MEng)'>
+                            Master of Engineering (MEng)
+                          </option>
+                          <option value='Master of Fine Arts (MFA)'>
+                            Master of Fine Arts (MFA)
+                          </option>
+                        </optgroup>
+                        <optgroup label='Doctorate'>
+                          <option value='Doctor of Philosophy (PhD)'>
+                            Doctor of Philosophy (PhD)
+                          </option>
+                          <option value='Doctor of Education (EdD)'>
+                            Doctor of Education (EdD)
+                          </option>
+                          <option value='Doctor of Medicine (MD)'>
+                            Doctor of Medicine (MD)
+                          </option>
+                          <option value='Doctor of Law (JD)'>
+                            Doctor of Law (JD)
+                          </option>
+                          <option value='Doctor of Business Administration (DBA)'>
+                            Doctor of Business Administration (DBA)
+                          </option>
+                          <option value='Doctor of Engineering (DEng)'>
+                            Doctor of Engineering (DEng)
+                          </option>
+                        </optgroup>
+                        <optgroup label='Other'>
+                          <option value='Professional Certification'>
+                            Professional Certification
+                          </option>
+                          <option value='Vocational Training'>
+                            Vocational Training
+                          </option>
+                          <option value='Other'>Other</option>
+                        </optgroup>
+                      </select>
+                    </div>
 
-              {/* Expertise */}
-              <div style={fieldStyle}>
-                <label style={labelStyle}>
-                  Area of Expertise <span style={{ color: "#a01f13" }}>*</span>
-                </label>
-                <input
-                  name='expertise'
-                  value={profile.expertise}
-                  onChange={handleProfileChange}
-                  placeholder='e.g. Machine Learning, Web Development'
-                  style={inputStyle}
-                />
-              </div>
+                    {/* University */}
+                    <div style={fieldStyle}>
+                      <label style={labelStyle}>
+                        University / Institution{" "}
+                        <span style={{ color: "#a01f13" }}>*</span>
+                      </label>
+                      <input
+                        name='university'
+                        value={profile.university}
+                        onChange={handleProfileChange}
+                        placeholder='e.g. MIT, Stanford University'
+                        style={inputStyle}
+                      />
+                    </div>
 
-              {/* Research Area */}
-              <div style={fieldStyle}>
-                <label style={labelStyle}>Research Area </label>
-                <input
-                  name='researchArea'
-                  value={profile.researchArea}
-                  onChange={handleProfileChange}
-                  placeholder='e.g. Natural Language Processing, Computer Vision'
-                  style={inputStyle}
-                />
-              </div>
+                    {/* Expertise */}
+                    <div style={fieldStyle}>
+                      <label style={labelStyle}>
+                        Area of Expertise <span style={{ color: "#a01f13" }}>*</span>
+                      </label>
+                      <input
+                        name='expertise'
+                        value={profile.expertise}
+                        onChange={handleProfileChange}
+                        placeholder='e.g. Machine Learning, Web Development'
+                        style={inputStyle}
+                      />
+                    </div>
 
-              {/* Years of Experience */}
-              <div style={fieldStyle}>
-                <label style={labelStyle}>Years of Teaching Experience</label>
-                <input
-                  name='yearsOfExperience'
-                  type='number'
-                  min='0'
-                  value={profile.yearsOfExperience}
-                  onChange={handleProfileChange}
-                  placeholder='e.g. 5'
-                  style={inputStyle}
-                />
-              </div>
+                    {/* Research Area */}
+                    <div style={fieldStyle}>
+                      <label style={labelStyle}>Research Area </label>
+                      <input
+                        name='researchArea'
+                        value={profile.researchArea}
+                        onChange={handleProfileChange}
+                        placeholder='e.g. Natural Language Processing, Computer Vision'
+                        style={inputStyle}
+                      />
+                    </div>
 
-              {/* Languages */}
-              <div style={fieldStyle}>
-                <label style={labelStyle}>
-                  Languages Spoken <span style={{ color: "#a01f13" }}>*</span>
-                </label>
-                <input
-                  name='languages'
-                  value={profile.languages}
-                  onChange={handleProfileChange}
-                  placeholder='e.g. English, Spanish, Mandarin'
-                  style={inputStyle}
-                />
-              </div>
+                    {/* Years of Experience */}
+                    <div style={fieldStyle}>
+                      <label style={labelStyle}>Years of Teaching Experience</label>
+                      <input
+                        name='yearsOfExperience'
+                        type='number'
+                        min='0'
+                        value={profile.yearsOfExperience}
+                        onChange={handleProfileChange}
+                        placeholder='e.g. 5'
+                        style={inputStyle}
+                      />
+                    </div>
 
-              {/* Website */}
-              <div style={fieldStyle}>
-                <label style={labelStyle}>Personal Website / LinkedIn</label>
-                <input
-                  name='website'
-                  value={profile.website}
-                  onChange={handleProfileChange}
-                  placeholder='e.g. https://linkedin.com/in/yourname'
-                  style={inputStyle}
-                />
-              </div>
+                    {/* Languages */}
+                    <div style={fieldStyle}>
+                      <label style={labelStyle}>
+                        Languages Spoken <span style={{ color: "#a01f13" }}>*</span>
+                      </label>
+                      <input
+                        name='languages'
+                        value={profile.languages}
+                        onChange={handleProfileChange}
+                        placeholder='e.g. English, Spanish, Mandarin'
+                        style={inputStyle}
+                      />
+                    </div>
 
-              {/* Bio */}
-              <div style={fieldStyle}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <label style={labelStyle}>About Me</label>
-                  <span
-                    style={{
-                      fontSize: 12,
-                      color: wordCount > 280 ? "#a01f13" : "#aaa",
-                    }}
-                  >
-                    {wordCount} / 500 words
-                  </span>
-                </div>
-                <textarea
-                  name='bio'
-                  value={profile.bio}
-                  onChange={handleProfileChange}
-                  placeholder='Tell students about yourself — your background, teaching style, achievements, and why you love teaching...'
-                  rows={20}
-                  style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }}
-                />
-                {wordCount >= 300 && (
-                  <p style={{ color: "#a01f13", fontSize: 12, marginTop: 4 }}>
-                    Maximum 300 words reached.
-                  </p>
+                    {/* Website */}
+                    <div style={fieldStyle}>
+                      <label style={labelStyle}>Personal Website / LinkedIn</label>
+                      <input
+                        name='website'
+                        value={profile.website}
+                        onChange={handleProfileChange}
+                        placeholder='e.g. https://linkedin.com/in/yourname'
+                        style={inputStyle}
+                      />
+                    </div>
+
+                    {/* Bio */}
+                    <div style={fieldStyle}>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <label style={labelStyle}>About Me</label>
+                        <span
+                          style={{
+                            fontSize: 12,
+                            color: wordCount > 280 ? "#a01f13" : "#aaa",
+                          }}
+                        >
+                          {wordCount} / 500 words
+                        </span>
+                      </div>
+                      <textarea
+                        name='bio'
+                        value={profile.bio}
+                        onChange={handleProfileChange}
+                        placeholder='Tell students about yourself — your background, teaching style, achievements, and why you love teaching...'
+                        rows={20}
+                        style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }}
+                      />
+                      {wordCount >= 300 && (
+                        <p style={{ color: "#a01f13", fontSize: 12, marginTop: 4 }}>
+                          Maximum 300 words reached.
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Save / Cancel buttons */}
+                    <div style={{ display: "flex", gap: 12 }}>
+                      <button
+                        onClick={saveProfile}
+                        disabled={profileSaving}
+                        style={{
+                          padding: "12px 32px",
+                          borderRadius: 8,
+                          border: "none",
+                          background: profileSaved ? "#1f6f4a" : "#2f6175",
+                          color: "white",
+                          fontSize: 15,
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          transition: "background 0.2s",
+                        }}
+                      >
+                        {profileSaving
+                          ? "Saving..."
+                          : profileSaved
+                            ? "Saved!"
+                            : "Save Profile"}
+                      </button>
+                      <button
+                        onClick={cancelProfileEdit}
+                        disabled={profileSaving}
+                        style={{
+                          padding: "12px 32px",
+                          borderRadius: 8,
+                          border: "1px solid #ddd",
+                          background: "white",
+                          color: "#555",
+                          fontSize: 15,
+                          fontWeight: 600,
+                          cursor: "pointer",
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
-
-              {/* Save / Cancel buttons */}
-              <div style={{ display: "flex", gap: 12 }}>
-                <button
-                  onClick={saveProfile}
-                  disabled={profileSaving}
-                  style={{
-                    padding: "12px 32px",
-                    borderRadius: 8,
-                    border: "none",
-                    background: profileSaved ? "#1f6f4a" : "#2f6175",
-                    color: "white",
-                    fontSize: 15,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    transition: "background 0.2s",
-                  }}
-                >
-                  {profileSaving
-                    ? "Saving..."
-                    : profileSaved
-                      ? "Saved!"
-                      : "Save Profile"}
-                </button>
-                <button
-                  onClick={cancelProfileEdit}
-                  disabled={profileSaving}
-                  style={{
-                    padding: "12px 32px",
-                    borderRadius: 8,
-                    border: "1px solid #ddd",
-                    background: "white",
-                    color: "#555",
-                    fontSize: 15,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
             )}
-          </div>
-        )}
-
+          </main>
+        </div>
       </div>
       <Footer />
     </>
