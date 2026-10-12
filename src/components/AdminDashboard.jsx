@@ -30,9 +30,8 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
-  const [tab, setTab] = useState("ads");
+  const [tab, setTab] = useState("research");
 
-  const [ads, setAds] = useState([]);
   const [research, setResearch] = useState([]);
   const [internships, setInternships] = useState([]);
   const [mentors, setMentors] = useState([]);
@@ -43,10 +42,8 @@ export default function AdminDashboard() {
   const [rejectReason, setRejectReason] = useState("");
   const [rejectError, setRejectError] = useState("");
 
-  const [selectedAd, setSelectedAd] = useState(null);
   const [editItem, setEditItem] = useState(null);
   const [editType, setEditType] = useState(null);
-  const [adTab, setAdTab] = useState("pending");
 
   const [addType, setAddType] = useState(null);
   const [addForm, setAddForm] = useState({});
@@ -63,15 +60,6 @@ export default function AdminDashboard() {
     });
     return () => unsub();
   }, []);
-
-  useEffect(() => {
-    if (!user) return;
-    const q = query(collection(db, "adposts"), where("status", "==", adTab));
-    const unsub = onSnapshot(q, (snap) => {
-      setAds(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    });
-    return () => unsub();
-  }, [user, adTab]);
 
   useEffect(() => {
     if (!user) return;
@@ -163,14 +151,6 @@ export default function AdminDashboard() {
   async function handleLogout() {
     await signOut(auth);
     setUser(null);
-  }
-
-  async function handleApprove(adId) {
-    await updateDoc(doc(db, "adposts", adId), { status: "approved" });
-  }
-
-  async function handleReject(adId) {
-    await updateDoc(doc(db, "adposts", adId), { status: "rejected" });
   }
 
   async function approveApplication(mentorId) {
@@ -443,7 +423,6 @@ export default function AdminDashboard() {
         style={{ display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap" }}
       >
         {[
-          { id: "ads", label: "📌 Ads" },
           { id: "research", label: "🔬 Research" },
           { id: "internships", label: "🧪 Internships" },
           { id: "mentors", label: "👩‍🏫 Mentors" },
@@ -469,126 +448,6 @@ export default function AdminDashboard() {
           </button>
         ))}
       </div>
-
-      {/* ── Ads Tab ── */}
-      {tab === "ads" && (
-        <div>
-          <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
-            {["pending", "approved", "rejected"].map((t) => (
-              <button
-                key={t}
-                onClick={() => setAdTab(t)}
-                style={{
-                  padding: "8px 20px",
-                  borderRadius: 20,
-                  border: "none",
-                  background: adTab === t ? "#2f6175" : "#e0e0e0",
-                  color: adTab === t ? "white" : "#555",
-                  cursor: "pointer",
-                  fontWeight: 600,
-                  textTransform: "capitalize",
-                }}
-              >
-                {t === "pending" ? "⏳" : t === "approved" ? "✅" : "❌"} {t}
-              </button>
-            ))}
-          </div>
-          {ads.length === 0 ? (
-            <p style={{ color: "#aaa" }}>No {adTab} ads.</p>
-          ) : (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-                gap: 16,
-              }}
-            >
-              {ads.map((ad) => (
-                <div
-                  key={ad.id}
-                  style={{
-                    background: "white",
-                    borderRadius: 12,
-                    padding: 20,
-                    border: "1px solid #eee",
-                  }}
-                >
-                  {ad.image && (
-                    <img
-                      src={ad.image}
-                      alt={ad.title}
-                      style={{
-                        width: "100%",
-                        height: 160,
-                        objectFit: "cover",
-                        borderRadius: 8,
-                        marginBottom: 12,
-                      }}
-                    />
-                  )}
-                  <h3 style={{ margin: "0 0 6px", fontSize: 16 }}>
-                    {ad.title}
-                  </h3>
-                  {ad.message && (
-                    <p style={{ color: "#555", fontSize: 13, marginBottom: 8 }}>
-                      {ad.message}
-                    </p>
-                  )}
-                  <div
-                    style={{ fontSize: 12, color: "#aaa", marginBottom: 12 }}
-                  >
-                    👤 {ad.name} · {ad.email}
-                  </div>
-                  <button
-                    onClick={() => setSelectedAd(ad)}
-                    style={{
-                      ...btnStyle("#555"),
-                      width: "100%",
-                      marginBottom: 8,
-                    }}
-                  >
-                    👁 View Details
-                  </button>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    {adTab === "pending" && (
-                      <>
-                        <button
-                          onClick={() => handleApprove(ad.id)}
-                          style={{ ...btnStyle("#1f6f4a"), flex: 1 }}
-                        >
-                          ✅ Approve
-                        </button>
-                        <button
-                          onClick={() => handleReject(ad.id)}
-                          style={{ ...btnStyle("#a01f13"), flex: 1 }}
-                        >
-                          ❌ Reject
-                        </button>
-                      </>
-                    )}
-                    {adTab === "approved" && (
-                      <button
-                        onClick={() => handleReject(ad.id)}
-                        style={{ ...btnStyle("#a01f13"), width: "100%" }}
-                      >
-                        ❌ Remove
-                      </button>
-                    )}
-                    {adTab === "rejected" && (
-                      <button
-                        onClick={() => handleApprove(ad.id)}
-                        style={{ ...btnStyle("#1f6f4a"), width: "100%" }}
-                      >
-                        ✅ Approve
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
 
       {/* ── Research Tab ── */}
       {tab === "research" && (
@@ -1271,148 +1130,6 @@ export default function AdminDashboard() {
               ))}
             </div>
           )}
-        </div>
-      )}
-
-      {/* ── Ad Detail Modal ── */}
-      {selectedAd && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 200,
-            padding: 16,
-          }}
-        >
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              padding: 32,
-              width: "100%",
-              maxWidth: 560,
-              maxHeight: "90vh",
-              overflowY: "auto",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 20,
-              }}
-            >
-              <h3 style={{ margin: 0 }}>📋 Ad Details</h3>
-              <button
-                onClick={() => setSelectedAd(null)}
-                style={{
-                  background: "none",
-                  border: "none",
-                  fontSize: 20,
-                  cursor: "pointer",
-                }}
-              >
-                ✕
-              </button>
-            </div>
-            {selectedAd.image && (
-              <img
-                src={selectedAd.image}
-                alt={selectedAd.title}
-                style={{
-                  width: "100%",
-                  height: 220,
-                  objectFit: "cover",
-                  borderRadius: 10,
-                  marginBottom: 16,
-                }}
-              />
-            )}
-            <h2 style={{ margin: "0 0 8px", fontSize: 20 }}>
-              {selectedAd.title}
-            </h2>
-            {selectedAd.message && (
-              <p
-                style={{
-                  fontSize: 14,
-                  color: "#555",
-                  lineHeight: 1.6,
-                  marginBottom: 16,
-                }}
-              >
-                {selectedAd.message}
-              </p>
-            )}
-            {selectedAd.url && (
-              <a
-                href={selectedAd.url}
-                target='_blank'
-                rel='noreferrer'
-                style={{
-                  fontSize: 14,
-                  color: "#2f6175",
-                  display: "block",
-                  marginBottom: 16,
-                }}
-              >
-                🔗 {selectedAd.url}
-              </a>
-            )}
-            <div
-              style={{
-                borderTop: "1px solid #f0f0f0",
-                paddingTop: 16,
-                marginBottom: 16,
-              }}
-            >
-              <p style={{ fontSize: 13, color: "#555", margin: "0 0 4px" }}>
-                👤 {selectedAd.name}
-              </p>
-              <p style={{ fontSize: 13, color: "#555", margin: "0 0 4px" }}>
-                📧 {selectedAd.email}
-              </p>
-              {selectedAd.phone && (
-                <p style={{ fontSize: 13, color: "#555", margin: "0 0 4px" }}>
-                  📞 {selectedAd.phone}
-                </p>
-              )}
-              {(selectedAd.city || selectedAd.state) && (
-                <p style={{ fontSize: 13, color: "#555", margin: 0 }}>
-                  📍{" "}
-                  {[selectedAd.city, selectedAd.state]
-                    .filter(Boolean)
-                    .join(", ")}
-                </p>
-              )}
-            </div>
-            {selectedAd.status === "pending" && (
-              <div style={{ display: "flex", gap: 8 }}>
-                <button
-                  onClick={() => {
-                    handleApprove(selectedAd.id);
-                    setSelectedAd(null);
-                  }}
-                  style={{ ...btnStyle("#1f6f4a"), flex: 1, padding: 12 }}
-                >
-                  ✅ Approve
-                </button>
-                <button
-                  onClick={() => {
-                    handleReject(selectedAd.id);
-                    setSelectedAd(null);
-                  }}
-                  style={{ ...btnStyle("#a01f13"), flex: 1, padding: 12 }}
-                >
-                  ❌ Reject
-                </button>
-              </div>
-            )}
-          </div>
         </div>
       )}
 
