@@ -430,7 +430,7 @@ export default function TeacherProfile() {
     );
   }
 
-  if (!teacher) {
+  if (!teacher || teacher.verificationStatus !== "approved") {
     return (
       <div style={{ minHeight: "100vh", background: "#f9fafb" }}>
         <Navbar />

@@ -54,6 +54,7 @@ export default function TeacherRegister() {
       await setDoc(doc(db, "teachers", user.uid), {
         name: form.name,
         email: form.email,
+        verificationStatus: "incomplete",
         createdAt: new Date(),
       });
 

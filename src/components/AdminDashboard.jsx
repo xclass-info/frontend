@@ -14,6 +14,7 @@ import {
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { Link } from "react-router-dom";
+import { mentorTypeLabel } from "../utils/mentorVerification";
 
 const ADMIN_EMAIL = "xclassinfo@gmail.com";
 
@@ -29,6 +30,9 @@ export default function AdminDashboard() {
   const [research, setResearch] = useState([]);
   const [internships, setInternships] = useState([]);
   const [mentors, setMentors] = useState([]);
+  const pendingApplications = mentors.filter(
+    (m) => m.verificationStatus === "pending_review",
+  );
 
   const [selectedAd, setSelectedAd] = useState(null);
   const [editItem, setEditItem] = useState(null);
@@ -127,6 +131,24 @@ export default function AdminDashboard() {
     await updateDoc(doc(db, "adposts", adId), { status: "rejected" });
   }
 
+  async function approveApplication(mentorId) {
+    await updateDoc(doc(db, "teachers", mentorId), {
+      verificationStatus: "approved",
+      rejectionReason: null,
+    });
+  }
+
+  async function rejectApplication(mentorId) {
+    const reason = window.prompt(
+      "What needs to change before this can be approved? This is shown to the mentor.",
+    );
+    if (reason === null) return; // cancelled
+    await updateDoc(doc(db, "teachers", mentorId), {
+      verificationStatus: "rejected",
+      rejectionReason: reason.trim() || "Please review and resubmit.",
+    });
+  }
+
   async function handleDisable(collection_, id, currentStatus) {
     await updateDoc(doc(db, collection_, id), {
       status: currentStatus === "disabled" ? "published" : "disabled",
@@ -185,6 +207,7 @@ export default function AdminDashboard() {
         ...(addType === "teachers" && {
           photoURL,
           disabled: false,
+          verificationStatus: "approved",
           projects: addForm.projects || [],
         }),
       });
@@ -343,6 +366,10 @@ export default function AdminDashboard() {
           { id: "research", label: "🔬 Research" },
           { id: "internships", label: "🧪 Internships" },
           { id: "mentors", label: "👩‍🏫 Mentors" },
+          {
+            id: "applications",
+            label: `✅ Applications${pendingApplications.length > 0 ? ` (${pendingApplications.length})` : ""}`,
+          },
         ].map((t) => (
           <button
             key={t.id}
@@ -726,6 +753,137 @@ export default function AdminDashboard() {
       )}
 
       {/* ── Mentors Tab ── */}
+      {tab === "applications" && (
+        <div>
+          <p style={{ color: "#888", marginBottom: 16 }}>
+            {pendingApplications.length} pending application
+            {pendingApplications.length === 1 ? "" : "s"}
+          </p>
+          {pendingApplications.length === 0 ? (
+            <p style={{ color: "#aaa" }}>No applications waiting on review.</p>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
+                gap: 16,
+              }}
+            >
+              {pendingApplications.map((mentor) => (
+                <div
+                  key={mentor.id}
+                  style={{
+                    background: "white",
+                    borderRadius: 12,
+                    padding: 20,
+                    border: "1px solid #eee",
+                  }}
+                >
+                  <div style={{ fontWeight: 700, fontSize: 16 }}>
+                    {mentor.name || "(no name)"}
+                  </div>
+                  <div style={{ color: "#888", fontSize: 13, marginBottom: 8 }}>
+                    {mentor.email}
+                  </div>
+                  <span
+                    style={{
+                      fontSize: 11,
+                      background: "#e3eff3",
+                      color: "#2f6175",
+                      padding: "2px 8px",
+                      borderRadius: 20,
+                      display: "inline-block",
+                      marginBottom: 12,
+                    }}
+                  >
+                    {mentorTypeLabel(mentor.mentorType)}
+                  </span>
+
+                  <div style={{ fontSize: 13, color: "#333", marginBottom: 14 }}>
+                    {mentor.mentorType === "phd_student" && (
+                      <div>
+                        Transcript:{" "}
+                        {mentor.transcriptURL ? (
+                          <a
+                            href={mentor.transcriptURL}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            style={{ color: "#2f6175" }}
+                          >
+                            View file
+                          </a>
+                        ) : (
+                          <span style={{ color: "#a01f13" }}>Not uploaded</span>
+                        )}
+                      </div>
+                    )}
+                    {mentor.mentorType === "phd_graduate" && (
+                      <div>
+                        Degree certificate:{" "}
+                        {mentor.degreeCertificateURL ? (
+                          <a
+                            href={mentor.degreeCertificateURL}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            style={{ color: "#2f6175" }}
+                          >
+                            View file
+                          </a>
+                        ) : (
+                          <span style={{ color: "#a01f13" }}>Not uploaded</span>
+                        )}
+                      </div>
+                    )}
+                    {mentor.mentorType === "faculty" && (
+                      <>
+                        <div>
+                          Work email: {mentor.workEmail || "—"}{" "}
+                          {mentor.workEmailVerified ? (
+                            <span style={{ color: "#14532d" }}>✓ Verified</span>
+                          ) : (
+                            <span style={{ color: "#a01f13" }}>Not verified</span>
+                          )}
+                        </div>
+                        <div>
+                          University profile:{" "}
+                          {mentor.universityProfileURL ? (
+                            <a
+                              href={mentor.universityProfileURL}
+                              target='_blank'
+                              rel='noopener noreferrer'
+                              style={{ color: "#2f6175" }}
+                            >
+                              View profile
+                            </a>
+                          ) : (
+                            <span style={{ color: "#a01f13" }}>Not provided</span>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button
+                      style={btnStyle("#14532d")}
+                      onClick={() => approveApplication(mentor.id)}
+                    >
+                      Approve
+                    </button>
+                    <button
+                      style={btnStyle("#a01f13")}
+                      onClick={() => rejectApplication(mentor.id)}
+                    >
+                      Reject
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {tab === "mentors" && (
         <div>
           <div

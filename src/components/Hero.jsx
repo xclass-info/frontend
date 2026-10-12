@@ -49,7 +49,9 @@ export default function Hero() {
     const unsub = onSnapshot(collection(db, "teachers"), (snapshot) => {
       const data = snapshot.docs
         .map((d) => ({ id: d.id, ...d.data() }))
-        .filter((t) => !t.disabled && t.name);
+        .filter(
+          (t) => !t.disabled && t.name && t.verificationStatus === "approved",
+        );
       data.sort((a, b) => {
         const ratingA = typeof a.rating === "number" ? a.rating : -1;
         const ratingB = typeof b.rating === "number" ? b.rating : -1;

@@ -86,7 +86,9 @@ export default function Tutors({ standalone = false }) {
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "teachers"), (snapshot) => {
       const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-      const filtered = data.filter((t) => !t.disabled);
+      const filtered = data.filter(
+        (t) => !t.disabled && t.verificationStatus === "approved",
+      );
       filtered.sort(featuredSort);
       setTeachers(filtered);
       setLoading(false);

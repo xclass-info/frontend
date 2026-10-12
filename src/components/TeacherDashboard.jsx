@@ -7,7 +7,6 @@ import {
   where,
   onSnapshot,
   doc,
-  getDoc,
   updateDoc,
   deleteDoc,
 } from "firebase/firestore";
@@ -20,6 +19,8 @@ import { SkeletonDashboardCard } from "./Skeleton";
 import ResearchForm from "./ResearchForm";
 import ProjectForm from "./ProjectForm";
 import ShowcaseForm from "./ShowcaseForm";
+import MentorVerificationForm from "./MentorVerificationForm";
+import { statusInfo } from "../utils/mentorVerification";
 
 import Footer from "./Footer";
 import { safeUrl } from "../utils/format";
@@ -73,22 +74,31 @@ export default function TeacherDashboard() {
   const [wordCount, setWordCount] = useState(0);
 
   useEffect(() => {
-    const unsubscribeAuth = auth.onAuthStateChanged(async (user) => {
+    let profileLoaded = false;
+    let unsubscribeTeacher = () => {};
+    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
       if (!user) {
         navigate("/teacher/login");
         return;
       }
 
-      const teacherDoc = await getDoc(doc(db, "teachers", user.uid));
-      if (teacherDoc.exists()) {
-        const data = teacherDoc.data();
+      // Live, not a one-time fetch: verification status can change while
+      // this tab is open (admin approves it, or the work-email link gets
+      // clicked in another tab) and the dashboard should reflect that
+      // without a refresh. The profile FORM fields only sync in once,
+      // on first load, so a live update never clobbers an in-progress edit.
+      unsubscribeTeacher = onSnapshot(doc(db, "teachers", user.uid), (snap) => {
+        if (!snap.exists()) return;
+        const data = snap.data();
         setTeacher(data);
-        // Load existing profile data
-        setProfile(profileFromTeacherData(data));
-        setWordCount(
-          (data.bio || "").trim().split(/\s+/).filter(Boolean).length,
-        );
-      }
+        if (!profileLoaded) {
+          profileLoaded = true;
+          setProfile(profileFromTeacherData(data));
+          setWordCount(
+            (data.bio || "").trim().split(/\s+/).filter(Boolean).length,
+          );
+        }
+      });
 
       const researchQuery = query(
         collection(db, "research"),
@@ -122,7 +132,10 @@ export default function TeacherDashboard() {
       };
     });
 
-    return () => unsubscribeAuth();
+    return () => {
+      unsubscribeAuth();
+      unsubscribeTeacher();
+    };
   }, []);
 
   function cancelProfileEdit() {
@@ -316,6 +329,50 @@ export default function TeacherDashboard() {
             </button>
           </div>
         </div>
+        {/* Verification banner */}
+        {teacher?.verificationStatus !== "approved" && (
+          <button
+            onClick={() => setActiveTab("verification")}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+              gap: 12,
+              background: statusInfo(teacher?.verificationStatus).bg,
+              border: `1px solid ${statusInfo(teacher?.verificationStatus).color}33`,
+              borderRadius: 10,
+              padding: "12px 18px",
+              marginBottom: 20,
+              cursor: "pointer",
+              textAlign: "left",
+            }}
+          >
+            <span
+              style={{
+                fontSize: 14,
+                fontWeight: 600,
+                color: statusInfo(teacher?.verificationStatus).color,
+              }}
+            >
+              {teacher?.verificationStatus === "pending_review"
+                ? "⏳ Your mentor application is under review."
+                : teacher?.verificationStatus === "rejected"
+                  ? "⚠️ Your application needs changes before it can be approved."
+                  : "🔒 Complete your mentor verification to go live and start getting matched with students."}
+            </span>
+            <span
+              style={{
+                fontSize: 13,
+                fontWeight: 700,
+                color: statusInfo(teacher?.verificationStatus).color,
+                whiteSpace: "nowrap",
+              }}
+            >
+              Go to Verification →
+            </span>
+          </button>
+        )}
         {/* Tabs */}
         <div
           style={{
@@ -332,6 +389,7 @@ export default function TeacherDashboard() {
             { id: "showcase", label: "🏆 Student Work" },
             { id: "availability", label: "🗓 Availability" },
             { id: "bookings", label: "📬 Bookings" },
+            { id: "verification", label: "✅ Verification" },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -733,6 +791,12 @@ export default function TeacherDashboard() {
         {activeTab === "bookings" && (
           <div className={styles.section}>
             <BookingRequests />
+          </div>
+        )}
+        {/* ── Verification Tab ── */}
+        {activeTab === "verification" && (
+          <div className={styles.section}>
+            <MentorVerificationForm teacher={teacher} />
           </div>
         )}
         {/* ── Profile Tab ── */}

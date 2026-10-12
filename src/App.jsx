@@ -20,6 +20,7 @@ import ProjectDetail from "./components/ProjectDetail";
 import ShowcaseListing from "./components/ShowcaseListing";
 import ExploreResources from "./components/ExploreResources";
 import TellUsWhatYouNeed from "./components/TellUsWhatYouNeed";
+import VerifyMentorEmail from "./components/VerifyMentorEmail";
 import StudentLogin from "./components/StudentLogin";
 import StudentRegister from "./components/StudentRegister";
 import StudentDashboard from "./components/StudentDashboard";
@@ -113,6 +114,7 @@ export default function App() {
         <Route path='/showcase' element={<ShowcaseListing />} />
         <Route path='/explore' element={<ExploreResources />} />
         <Route path='/tell-us-what-you-need' element={<TellUsWhatYouNeed />} />
+        <Route path='/verify-mentor-email' element={<VerifyMentorEmail />} />
         <Route path='/internship' element={<InternshipListing />} />
         <Route path='/about' element={<AboutUs />} />
         <Route path='/contact' element={<ContactUs />} />
