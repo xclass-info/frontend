@@ -12,7 +12,11 @@ import {
   addDoc,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  signOut,
+  sendPasswordResetEmail,
+} from "firebase/auth";
 import { Link } from "react-router-dom";
 import { mentorTypeLabel } from "../utils/mentorVerification";
 
@@ -24,6 +28,8 @@ export default function AdminDashboard() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
   const [tab, setTab] = useState("ads");
 
   const [ads, setAds] = useState([]);
@@ -105,6 +111,7 @@ export default function AdminDashboard() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setResetSent(false);
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
       if (result.user.email !== ADMIN_EMAIL) {
@@ -112,9 +119,41 @@ export default function AdminDashboard() {
         setError("You are not authorized as admin.");
       }
     } catch (err) {
-      setError("Invalid email or password.");
+      if (err.code === "auth/too-many-requests") {
+        setError(
+          "Too many failed attempts. Wait a few minutes, or reset your password below.",
+        );
+      } else if (err.code === "auth/invalid-email") {
+        setError("That doesn't look like a valid email address.");
+      } else if (err.code === "auth/user-disabled") {
+        setError("This account has been disabled.");
+      } else {
+        setError("Invalid email or password.");
+      }
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleForgotPassword() {
+    if (!email.trim()) {
+      setError("Enter your admin email above first, then click Forgot password.");
+      return;
+    }
+    setResetLoading(true);
+    setError("");
+    setResetSent(false);
+    try {
+      await sendPasswordResetEmail(auth, email.trim());
+      setResetSent(true);
+    } catch (err) {
+      if (err.code === "auth/invalid-email") {
+        setError("That doesn't look like a valid email address.");
+      } else {
+        setError("Could not send reset email. Please try again.");
+      }
+    } finally {
+      setResetLoading(false);
     }
   }
 
@@ -282,6 +321,12 @@ export default function AdminDashboard() {
               {error}
             </p>
           )}
+          {resetSent && (
+            <p style={{ color: "#1f6f4a", fontSize: 13, marginBottom: 12 }}>
+              Password reset email sent to {email.trim()}. Check your inbox
+              (and spam folder).
+            </p>
+          )}
           <form onSubmit={handleLogin}>
             <input
               type='email'
@@ -329,6 +374,25 @@ export default function AdminDashboard() {
               {loading ? "Logging in..." : "Login →"}
             </button>
           </form>
+          <button
+            type='button'
+            onClick={handleForgotPassword}
+            disabled={resetLoading}
+            style={{
+              display: "block",
+              width: "100%",
+              marginTop: 14,
+              background: "none",
+              border: "none",
+              color: "#2f6175",
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: "pointer",
+              textAlign: "center",
+            }}
+          >
+            {resetLoading ? "Sending..." : "Forgot password?"}
+          </button>
         </div>
       </div>
     );
