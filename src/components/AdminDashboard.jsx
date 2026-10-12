@@ -53,6 +53,25 @@ export default function AdminDashboard() {
   const [imagePreview, setImagePreview] = useState(null);
   const [imageUploading, setImageUploading] = useState(false);
 
+  // Filters & sorting for each tab (client-side, data is already loaded)
+  const [researchSearch, setResearchSearch] = useState("");
+  const [researchStatusFilter, setResearchStatusFilter] = useState("all");
+  const [researchSort, setResearchSort] = useState("newest");
+
+  const [internshipSearch, setInternshipSearch] = useState("");
+  const [internshipStatusFilter, setInternshipStatusFilter] = useState("all");
+  const [internshipSort, setInternshipSort] = useState("newest");
+
+  const [mentorSearch, setMentorSearch] = useState("");
+  const [mentorStatusFilter, setMentorStatusFilter] = useState("all");
+  const [mentorVerificationFilter, setMentorVerificationFilter] =
+    useState("all");
+  const [mentorSort, setMentorSort] = useState("name");
+
+  const [applicationSearch, setApplicationSearch] = useState("");
+  const [applicationTypeFilter, setApplicationTypeFilter] = useState("all");
+  const [applicationSort, setApplicationSort] = useState("oldest");
+
   useEffect(() => {
     const unsub = auth.onAuthStateChanged((u) => {
       if (u && u.email === ADMIN_EMAIL) setUser(u);
@@ -395,6 +414,109 @@ export default function AdminDashboard() {
     );
   }
 
+  // ── Filters & sorting (client-side, data is already fully loaded) ──
+  const filterInputStyle = {
+    padding: "8px 12px",
+    borderRadius: 8,
+    border: "1px solid #ddd",
+    fontSize: 13,
+    fontFamily: "inherit",
+  };
+
+  function sortByDate(list, field, direction) {
+    return [...list].sort((a, b) => {
+      const ta = a[field]?.toMillis?.() ?? 0;
+      const tb = b[field]?.toMillis?.() ?? 0;
+      return direction === "oldest" ? ta - tb : tb - ta;
+    });
+  }
+
+  let visibleResearch = research.filter((r) => {
+    if (
+      researchStatusFilter === "active" &&
+      r.status === "disabled"
+    )
+      return false;
+    if (researchStatusFilter === "disabled" && r.status !== "disabled")
+      return false;
+    const q = researchSearch.trim().toLowerCase();
+    if (!q) return true;
+    return [r.title, r.idea, r.teacherName]
+      .filter(Boolean)
+      .some((s) => s.toLowerCase().includes(q));
+  });
+  visibleResearch =
+    researchSort === "title"
+      ? [...visibleResearch].sort((a, b) =>
+          (a.title || "").localeCompare(b.title || ""),
+        )
+      : sortByDate(visibleResearch, "createdAt", researchSort);
+
+  let visibleInternships = internships.filter((i) => {
+    if (internshipStatusFilter === "active" && i.status === "disabled")
+      return false;
+    if (internshipStatusFilter === "disabled" && i.status !== "disabled")
+      return false;
+    const q = internshipSearch.trim().toLowerCase();
+    if (!q) return true;
+    return [i.title, i.field, i.teacherName]
+      .filter(Boolean)
+      .some((s) => s.toLowerCase().includes(q));
+  });
+  visibleInternships =
+    internshipSort === "title"
+      ? [...visibleInternships].sort((a, b) =>
+          (a.title || "").localeCompare(b.title || ""),
+        )
+      : internshipSort === "deadline"
+        ? [...visibleInternships].sort((a, b) =>
+            (a.deadline || "").localeCompare(b.deadline || ""),
+          )
+        : sortByDate(visibleInternships, "createdAt", internshipSort);
+
+  let visibleMentors = mentors.filter((m) => {
+    if (mentorStatusFilter === "active" && m.disabled) return false;
+    if (mentorStatusFilter === "disabled" && !m.disabled) return false;
+    if (
+      mentorVerificationFilter !== "all" &&
+      (m.verificationStatus || "not_started") !== mentorVerificationFilter
+    )
+      return false;
+    const q = mentorSearch.trim().toLowerCase();
+    if (!q) return true;
+    return [m.name, m.university, m.expertise]
+      .filter(Boolean)
+      .some((s) => s.toLowerCase().includes(q));
+  });
+  visibleMentors =
+    mentorSort === "name"
+      ? [...visibleMentors].sort((a, b) =>
+          (a.name || "").localeCompare(b.name || ""),
+        )
+      : mentorSort === "university"
+        ? [...visibleMentors].sort((a, b) =>
+            (a.university || "").localeCompare(b.university || ""),
+          )
+        : sortByDate(visibleMentors, "createdAt", mentorSort);
+
+  let visibleApplications = pendingApplications.filter((m) => {
+    if (applicationTypeFilter !== "all" && m.mentorType !== applicationTypeFilter)
+      return false;
+    const q = applicationSearch.trim().toLowerCase();
+    if (!q) return true;
+    return [m.name, m.email].filter(Boolean).some((s) => s.toLowerCase().includes(q));
+  });
+  visibleApplications =
+    applicationSort === "name"
+      ? [...visibleApplications].sort((a, b) =>
+          (a.name || "").localeCompare(b.name || ""),
+        )
+      : [...visibleApplications].sort((a, b) => {
+          const ta = a.submittedAt?.toMillis?.() ?? a.createdAt?.toMillis?.() ?? 0;
+          const tb = b.submittedAt?.toMillis?.() ?? b.createdAt?.toMillis?.() ?? 0;
+          return applicationSort === "oldest" ? ta - tb : tb - ta;
+        });
+
   // ── Admin dashboard ──
   return (
     <div style={{ minHeight: "100vh", background: "#f9fafb", padding: 32 }}>
@@ -461,7 +583,7 @@ export default function AdminDashboard() {
             }}
           >
             <p style={{ color: "#888", margin: 0 }}>
-              {research.length} research entries
+              {visibleResearch.length} of {research.length} research entries
             </p>
             <button
               onClick={() => {
@@ -473,8 +595,42 @@ export default function AdminDashboard() {
               + Add Research
             </button>
           </div>
-          {research.length === 0 ? (
-            <p style={{ color: "#aaa" }}>No research yet.</p>
+          <div
+            style={{
+              display: "flex",
+              gap: 10,
+              marginBottom: 16,
+              flexWrap: "wrap",
+            }}
+          >
+            <input
+              type='text'
+              placeholder='Search title, idea, mentor...'
+              value={researchSearch}
+              onChange={(e) => setResearchSearch(e.target.value)}
+              style={{ ...filterInputStyle, flex: "1 1 220px" }}
+            />
+            <select
+              value={researchStatusFilter}
+              onChange={(e) => setResearchStatusFilter(e.target.value)}
+              style={filterInputStyle}
+            >
+              <option value='all'>All statuses</option>
+              <option value='active'>Active</option>
+              <option value='disabled'>Disabled</option>
+            </select>
+            <select
+              value={researchSort}
+              onChange={(e) => setResearchSort(e.target.value)}
+              style={filterInputStyle}
+            >
+              <option value='newest'>Newest first</option>
+              <option value='oldest'>Oldest first</option>
+              <option value='title'>Title (A-Z)</option>
+            </select>
+          </div>
+          {visibleResearch.length === 0 ? (
+            <p style={{ color: "#aaa" }}>No research matches these filters.</p>
           ) : (
             <div
               style={{
@@ -483,7 +639,7 @@ export default function AdminDashboard() {
                 gap: 16,
               }}
             >
-              {research.map((r) => (
+              {visibleResearch.map((r) => (
                 <div
                   key={r.id}
                   style={{
@@ -570,7 +726,7 @@ export default function AdminDashboard() {
             }}
           >
             <p style={{ color: "#888", margin: 0 }}>
-              {internships.length} internships
+              {visibleInternships.length} of {internships.length} internships
             </p>
             <button
               onClick={() => {
@@ -593,8 +749,45 @@ export default function AdminDashboard() {
               + Add Internship
             </button>
           </div>
-          {internships.length === 0 ? (
-            <p style={{ color: "#aaa" }}>No internships yet.</p>
+          <div
+            style={{
+              display: "flex",
+              gap: 10,
+              marginBottom: 16,
+              flexWrap: "wrap",
+            }}
+          >
+            <input
+              type='text'
+              placeholder='Search title, field, mentor...'
+              value={internshipSearch}
+              onChange={(e) => setInternshipSearch(e.target.value)}
+              style={{ ...filterInputStyle, flex: "1 1 220px" }}
+            />
+            <select
+              value={internshipStatusFilter}
+              onChange={(e) => setInternshipStatusFilter(e.target.value)}
+              style={filterInputStyle}
+            >
+              <option value='all'>All statuses</option>
+              <option value='active'>Active</option>
+              <option value='disabled'>Disabled</option>
+            </select>
+            <select
+              value={internshipSort}
+              onChange={(e) => setInternshipSort(e.target.value)}
+              style={filterInputStyle}
+            >
+              <option value='newest'>Newest first</option>
+              <option value='oldest'>Oldest first</option>
+              <option value='deadline'>Deadline (soonest)</option>
+              <option value='title'>Title (A-Z)</option>
+            </select>
+          </div>
+          {visibleInternships.length === 0 ? (
+            <p style={{ color: "#aaa" }}>
+              No internships match these filters.
+            </p>
           ) : (
             <div
               style={{
@@ -603,7 +796,7 @@ export default function AdminDashboard() {
                 gap: 16,
               }}
             >
-              {internships.map((intern) => (
+              {visibleInternships.map((intern) => (
                 <div
                   key={intern.id}
                   style={{
@@ -696,11 +889,50 @@ export default function AdminDashboard() {
       {tab === "applications" && (
         <div>
           <p style={{ color: "#888", marginBottom: 16 }}>
-            {pendingApplications.length} pending application
-            {pendingApplications.length === 1 ? "" : "s"}
+            {visibleApplications.length} of {pendingApplications.length}{" "}
+            pending application{pendingApplications.length === 1 ? "" : "s"}
           </p>
-          {pendingApplications.length === 0 ? (
-            <p style={{ color: "#aaa" }}>No applications waiting on review.</p>
+          <div
+            style={{
+              display: "flex",
+              gap: 10,
+              marginBottom: 16,
+              flexWrap: "wrap",
+            }}
+          >
+            <input
+              type='text'
+              placeholder='Search name or email...'
+              value={applicationSearch}
+              onChange={(e) => setApplicationSearch(e.target.value)}
+              style={{ ...filterInputStyle, flex: "1 1 220px" }}
+            />
+            <select
+              value={applicationTypeFilter}
+              onChange={(e) => setApplicationTypeFilter(e.target.value)}
+              style={filterInputStyle}
+            >
+              <option value='all'>All types</option>
+              <option value='phd_student'>PhD Student</option>
+              <option value='phd_graduate'>PhD Graduate</option>
+              <option value='faculty'>Faculty</option>
+            </select>
+            <select
+              value={applicationSort}
+              onChange={(e) => setApplicationSort(e.target.value)}
+              style={filterInputStyle}
+            >
+              <option value='oldest'>Oldest first</option>
+              <option value='newest'>Newest first</option>
+              <option value='name'>Name (A-Z)</option>
+            </select>
+          </div>
+          {visibleApplications.length === 0 ? (
+            <p style={{ color: "#aaa" }}>
+              {pendingApplications.length === 0
+                ? "No applications waiting on review."
+                : "No applications match these filters."}
+            </p>
           ) : (
             <div
               style={{
@@ -709,7 +941,7 @@ export default function AdminDashboard() {
                 gap: 16,
               }}
             >
-              {pendingApplications.map((mentor) => (
+              {visibleApplications.map((mentor) => (
                 <div
                   key={mentor.id}
                   style={{
@@ -932,7 +1164,9 @@ export default function AdminDashboard() {
               marginBottom: 16,
             }}
           >
-            <p style={{ color: "#888", margin: 0 }}>{mentors.length} mentors</p>
+            <p style={{ color: "#888", margin: 0 }}>
+              {visibleMentors.length} of {mentors.length} mentors
+            </p>
             <button
               onClick={() => {
                 setAddType("teachers");
@@ -958,8 +1192,55 @@ export default function AdminDashboard() {
               + Add Mentor
             </button>
           </div>
-          {mentors.length === 0 ? (
-            <p style={{ color: "#aaa" }}>No mentors yet.</p>
+          <div
+            style={{
+              display: "flex",
+              gap: 10,
+              marginBottom: 16,
+              flexWrap: "wrap",
+            }}
+          >
+            <input
+              type='text'
+              placeholder='Search name, university, expertise...'
+              value={mentorSearch}
+              onChange={(e) => setMentorSearch(e.target.value)}
+              style={{ ...filterInputStyle, flex: "1 1 220px" }}
+            />
+            <select
+              value={mentorStatusFilter}
+              onChange={(e) => setMentorStatusFilter(e.target.value)}
+              style={filterInputStyle}
+            >
+              <option value='all'>All statuses</option>
+              <option value='active'>Active</option>
+              <option value='disabled'>Disabled</option>
+            </select>
+            <select
+              value={mentorVerificationFilter}
+              onChange={(e) => setMentorVerificationFilter(e.target.value)}
+              style={filterInputStyle}
+            >
+              <option value='all'>All verification</option>
+              <option value='approved'>Approved</option>
+              <option value='pending_review'>Pending Review</option>
+              <option value='rejected'>Rejected</option>
+              <option value='incomplete'>Incomplete</option>
+              <option value='not_started'>Not Started</option>
+            </select>
+            <select
+              value={mentorSort}
+              onChange={(e) => setMentorSort(e.target.value)}
+              style={filterInputStyle}
+            >
+              <option value='name'>Name (A-Z)</option>
+              <option value='university'>University (A-Z)</option>
+              <option value='newest'>Newest first</option>
+              <option value='oldest'>Oldest first</option>
+            </select>
+          </div>
+          {visibleMentors.length === 0 ? (
+            <p style={{ color: "#aaa" }}>No mentors match these filters.</p>
           ) : (
             <div
               style={{
@@ -968,7 +1249,7 @@ export default function AdminDashboard() {
                 gap: 16,
               }}
             >
-              {mentors.map((mentor) => (
+              {visibleMentors.map((mentor) => (
                 <div
                   key={mentor.id}
                   style={{
