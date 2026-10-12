@@ -39,6 +39,7 @@ export default function AdminDashboard() {
   const pendingApplications = mentors.filter(
     (m) => m.verificationStatus === "pending_review",
   );
+  const [reviewMessages, setReviewMessages] = useState({});
 
   const [selectedAd, setSelectedAd] = useState(null);
   const [editItem, setEditItem] = useState(null);
@@ -170,21 +171,26 @@ export default function AdminDashboard() {
     await updateDoc(doc(db, "adposts", adId), { status: "rejected" });
   }
 
-  async function approveApplication(mentorId) {
+  async function approveApplication(mentorId, message) {
     await updateDoc(doc(db, "teachers", mentorId), {
       verificationStatus: "approved",
       rejectionReason: null,
+      approvalMessage: (message || "").trim() || null,
     });
   }
 
-  async function rejectApplication(mentorId) {
-    const reason = window.prompt(
-      "What needs to change before this can be approved? This is shown to the mentor.",
-    );
-    if (reason === null) return; // cancelled
+  async function rejectApplication(mentorId, message) {
+    const trimmed = (message || "").trim();
+    if (!trimmed) {
+      alert(
+        "Please add a message explaining what needs to change before rejecting.",
+      );
+      return;
+    }
     await updateDoc(doc(db, "teachers", mentorId), {
       verificationStatus: "rejected",
-      rejectionReason: reason.trim() || "Please review and resubmit.",
+      rejectionReason: trimmed,
+      approvalMessage: null,
     });
   }
 
@@ -927,16 +933,43 @@ export default function AdminDashboard() {
                     )}
                   </div>
 
+                  <textarea
+                    placeholder='Message to mentor (optional to approve, required to reject)'
+                    value={reviewMessages[mentor.id] || ""}
+                    onChange={(e) =>
+                      setReviewMessages((prev) => ({
+                        ...prev,
+                        [mentor.id]: e.target.value,
+                      }))
+                    }
+                    rows={2}
+                    style={{
+                      width: "100%",
+                      padding: 8,
+                      borderRadius: 6,
+                      border: "1px solid #ddd",
+                      fontSize: 13,
+                      marginBottom: 10,
+                      fontFamily: "inherit",
+                      resize: "vertical",
+                      boxSizing: "border-box",
+                    }}
+                  />
+
                   <div style={{ display: "flex", gap: 8 }}>
                     <button
                       style={btnStyle("#14532d")}
-                      onClick={() => approveApplication(mentor.id)}
+                      onClick={() =>
+                        approveApplication(mentor.id, reviewMessages[mentor.id])
+                      }
                     >
                       Approve
                     </button>
                     <button
                       style={btnStyle("#a01f13")}
-                      onClick={() => rejectApplication(mentor.id)}
+                      onClick={() =>
+                        rejectApplication(mentor.id, reviewMessages[mentor.id])
+                      }
                     >
                       Reject
                     </button>
