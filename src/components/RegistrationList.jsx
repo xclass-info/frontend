@@ -25,7 +25,13 @@ export default function RegistrationList({ itemId }) {
     return () => unsub();
   }, [itemId]);
 
-  if (regs.length === 0) return null;
+  if (regs.length === 0) {
+    return (
+      <div style={{ marginBottom: 12, fontSize: 13, color: "#94a3b8", fontWeight: 700 }}>
+        👥 No registrations yet
+      </div>
+    );
+  }
 
   return (
     <div style={{ marginBottom: 12 }}>
