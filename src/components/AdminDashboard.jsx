@@ -19,6 +19,7 @@ import {
 } from "firebase/auth";
 import { Link } from "react-router-dom";
 import { mentorTypeLabel } from "../utils/mentorVerification";
+import { loadStudentRegistrations } from "../utils/studentData";
 
 const ADMIN_EMAIL = "zhenhepan@gmail.com";
 
@@ -30,8 +31,9 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
-  const [tab, setTab] = useState("research");
+  const [tab, setTab] = useState("overview");
 
+  const [students, setStudents] = useState([]);
   const [research, setResearch] = useState([]);
   const [internships, setInternships] = useState([]);
   const [mentors, setMentors] = useState([]);
@@ -54,6 +56,13 @@ export default function AdminDashboard() {
   const [imageUploading, setImageUploading] = useState(false);
 
   // Filters & sorting for each tab (client-side, data is already loaded)
+  const [studentSearch, setStudentSearch] = useState("");
+  const [studentSort, setStudentSort] = useState("name");
+
+  const [studentDetail, setStudentDetail] = useState(null); // selected student or null
+  const [studentRegistrations, setStudentRegistrations] = useState([]);
+  const [studentRegsLoading, setStudentRegsLoading] = useState(false);
+
   const [researchSearch, setResearchSearch] = useState("");
   const [researchStatusFilter, setResearchStatusFilter] = useState("all");
   const [researchSort, setResearchSort] = useState("newest");
@@ -79,6 +88,14 @@ export default function AdminDashboard() {
     });
     return () => unsub();
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    const unsub = onSnapshot(collection(db, "students"), (snap) => {
+      setStudents(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    });
+    return () => unsub();
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -204,6 +221,14 @@ export default function AdminDashboard() {
     setRejectTarget(null);
   }
 
+  async function openStudentDetail(student) {
+    setStudentDetail(student);
+    setStudentRegsLoading(true);
+    const rows = await loadStudentRegistrations(student.email, student.id);
+    setStudentRegistrations(rows);
+    setStudentRegsLoading(false);
+  }
+
   async function handleDisable(collection_, id, currentStatus) {
     await updateDoc(doc(db, collection_, id), {
       status: currentStatus === "disabled" ? "published" : "disabled",
@@ -225,7 +250,6 @@ export default function AdminDashboard() {
     setImageUploading(true);
     try {
       const { id, ...data } = editItem;
-      console.log("Saving:", id, data); // ← add this
       if (imageFile && editType === "teachers") {
         const url = await uploadMentorImage(imageFile, id);
         data.photoURL = url;
@@ -418,6 +442,22 @@ export default function AdminDashboard() {
     });
   }
 
+  let visibleStudents = students.filter((s) => {
+    const q = studentSearch.trim().toLowerCase();
+    if (!q) return true;
+    return [s.name, s.email].filter(Boolean).some((v) => v.toLowerCase().includes(q));
+  });
+  visibleStudents =
+    studentSort === "name"
+      ? [...visibleStudents].sort((a, b) =>
+          (a.name || "").localeCompare(b.name || ""),
+        )
+      : studentSort === "grade"
+        ? [...visibleStudents].sort((a, b) =>
+            (a.grade || "").localeCompare(b.grade || ""),
+          )
+        : sortByDate(visibleStudents, "createdAt", studentSort);
+
   let visibleResearch = research.filter((r) => {
     if (
       researchStatusFilter === "active" &&
@@ -504,6 +544,25 @@ export default function AdminDashboard() {
           return applicationSort === "oldest" ? ta - tb : tb - ta;
         });
 
+  const navItemsRaw = [
+    { id: "overview", label: "🏠 Overview" },
+    { id: "students", label: "🎓 Students", group: "People" },
+    { id: "mentors", label: "👩‍🏫 Mentors", group: "People" },
+    {
+      id: "applications",
+      label: `✅ Applications${pendingApplications.length > 0 ? ` (${pendingApplications.length})` : ""}`,
+      group: "People",
+    },
+    { id: "research", label: "🔬 Research", group: "Content" },
+    { id: "internships", label: "🧪 Internships", group: "Content" },
+  ];
+  let lastNavGroup = null;
+  const navItems = navItemsRaw.map((item) => {
+    const showGroupLabel = Boolean(item.group && item.group !== lastNavGroup);
+    lastNavGroup = item.group || lastNavGroup;
+    return { ...item, showGroupLabel };
+  });
+
   // ── Admin dashboard ──
   return (
     <div style={{ minHeight: "100vh", background: "#f9fafb", padding: 32 }}>
@@ -527,38 +586,227 @@ export default function AdminDashboard() {
         </button>
       </div>
 
-      {/* Main Tabs */}
-      <div
-        style={{ display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap" }}
-      >
-        {[
-          { id: "research", label: "🔬 Research" },
-          { id: "internships", label: "🧪 Internships" },
-          { id: "mentors", label: "👩‍🏫 Mentors" },
-          {
-            id: "applications",
-            label: `✅ Applications${pendingApplications.length > 0 ? ` (${pendingApplications.length})` : ""}`,
-          },
-        ].map((t) => (
-          <button
-            key={t.id}
-            onClick={() => setTab(t.id)}
-            style={{
-              padding: "8px 20px",
-              borderRadius: 20,
-              border: "none",
-              background: tab === t.id ? "#2f6175" : "#e0e0e0",
-              color: tab === t.id ? "white" : "#555",
-              cursor: "pointer",
-              fontWeight: 600,
-            }}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <div style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
+        {/* Sidebar nav */}
+        <nav
+          style={{
+            width: 200,
+            flexShrink: 0,
+            background: "white",
+            borderRadius: 12,
+            border: "1px solid #eee",
+            padding: "16px 12px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            position: "sticky",
+            top: 24,
+          }}
+        >
+          {navItems.map((item) => (
+            <div key={item.id}>
+              {item.showGroupLabel && (
+                <p
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: "#aaa",
+                    textTransform: "uppercase",
+                    letterSpacing: 0.5,
+                    padding: "12px 12px 4px",
+                    margin: 0,
+                  }}
+                >
+                  {item.group}
+                </p>
+              )}
+              <button
+                onClick={() => setTab(item.id)}
+                style={{
+                  display: "block",
+                  width: "100%",
+                  textAlign: "left",
+                  padding: "10px 12px",
+                  borderRadius: 8,
+                  border: "none",
+                  background: tab === item.id ? "#2f6175" : "transparent",
+                  color: tab === item.id ? "white" : "#555",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  fontSize: 14,
+                }}
+              >
+                {item.label}
+              </button>
+            </div>
+          ))}
+        </nav>
 
-      {/* ── Research Tab ── */}
+        <main style={{ flex: 1, minWidth: 0 }}>
+          {/* ── Overview Tab ── */}
+          {tab === "overview" && (
+            <div>
+              <h3 style={{ marginTop: 0 }}>Overview</h3>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 16,
+                  flexWrap: "wrap",
+                  marginBottom: 8,
+                }}
+              >
+                {[
+                  { label: "Students", count: students.length, go: "students" },
+                  { label: "Mentors", count: mentors.length, go: "mentors" },
+                  {
+                    label: "Pending Applications",
+                    count: pendingApplications.length,
+                    go: "applications",
+                  },
+                  { label: "Research", count: research.length, go: "research" },
+                  {
+                    label: "Internships",
+                    count: internships.length,
+                    go: "internships",
+                  },
+                ].map((stat) => (
+                  <button
+                    key={stat.label}
+                    onClick={() => setTab(stat.go)}
+                    style={{
+                      background: "white",
+                      borderRadius: 12,
+                      border: "1px solid #eee",
+                      padding: "20px 24px",
+                      minWidth: 140,
+                      textAlign: "left",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <p style={{ margin: 0, fontSize: 28, fontWeight: 700 }}>
+                      {stat.count}
+                    </p>
+                    <p style={{ margin: "4px 0 0", color: "#888", fontSize: 13 }}>
+                      {stat.label}
+                    </p>
+                  </button>
+                ))}
+              </div>
+              {pendingApplications.length > 0 && (
+                <p style={{ color: "#888", fontSize: 14 }}>
+                  {pendingApplications.length} mentor application
+                  {pendingApplications.length === 1 ? "" : "s"} waiting on
+                  review —{" "}
+                  <button
+                    onClick={() => setTab("applications")}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#2f6175",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      padding: 0,
+                      fontSize: 14,
+                    }}
+                  >
+                    Review now →
+                  </button>
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* ── Students Tab ── */}
+          {tab === "students" && (
+            <div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 16,
+                }}
+              >
+                <p style={{ color: "#888", margin: 0 }}>
+                  {visibleStudents.length} of {students.length} students
+                </p>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 10,
+                  marginBottom: 16,
+                  flexWrap: "wrap",
+                }}
+              >
+                <input
+                  type='text'
+                  placeholder='Search name or email...'
+                  value={studentSearch}
+                  onChange={(e) => setStudentSearch(e.target.value)}
+                  style={{ ...filterInputStyle, flex: "1 1 220px" }}
+                />
+                <select
+                  value={studentSort}
+                  onChange={(e) => setStudentSort(e.target.value)}
+                  style={filterInputStyle}
+                >
+                  <option value='name'>Name (A-Z)</option>
+                  <option value='grade'>Grade (A-Z)</option>
+                  <option value='newest'>Newest first</option>
+                  <option value='oldest'>Oldest first</option>
+                </select>
+              </div>
+              {visibleStudents.length === 0 ? (
+                <p style={{ color: "#aaa" }}>No students match these filters.</p>
+              ) : (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                    gap: 16,
+                  }}
+                >
+                  {visibleStudents.map((s) => (
+                    <div
+                      key={s.id}
+                      style={{
+                        background: "white",
+                        borderRadius: 12,
+                        padding: 20,
+                        border: "1px solid #eee",
+                      }}
+                    >
+                      <h3 style={{ margin: "0 0 4px", fontSize: 15 }}>
+                        {s.name || "(no name)"}
+                      </h3>
+                      <p style={{ fontSize: 13, color: "#888", marginBottom: 8 }}>
+                        {s.email}
+                      </p>
+                      <p style={{ fontSize: 12, color: "#888", marginBottom: 4 }}>
+                        🎓 {s.grade || "—"}
+                      </p>
+                      {s.phone && (
+                        <p
+                          style={{ fontSize: 12, color: "#888", marginBottom: 12 }}
+                        >
+                          📞 {s.phone}
+                        </p>
+                      )}
+                      <button
+                        onClick={() => openStudentDetail(s)}
+                        style={{ ...btnStyle("#2f6175"), width: "100%" }}
+                      >
+                        View Activity
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── Research Tab ── */}
       {tab === "research" && (
         <div>
           <div
@@ -863,7 +1111,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* ── Mentors Tab ── */}
+      {/* ── Applications Tab ── */}
       {tab === "applications" && (
         <div>
           <p style={{ color: "#888", marginBottom: 16 }}>
@@ -1031,104 +1279,6 @@ export default function AdminDashboard() {
               ))}
             </div>
           )}
-        </div>
-      )}
-
-      {/* ── Reject Application Modal ── */}
-      {rejectTarget && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 200,
-            padding: 16,
-          }}
-        >
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              padding: 32,
-              width: "100%",
-              maxWidth: 480,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 12,
-              }}
-            >
-              <h3 style={{ margin: 0 }}>Reject Application</h3>
-              <button
-                onClick={() => setRejectTarget(null)}
-                style={{
-                  background: "none",
-                  border: "none",
-                  fontSize: 20,
-                  cursor: "pointer",
-                }}
-              >
-                ✕
-              </button>
-            </div>
-            <p style={{ color: "#888", fontSize: 13, marginBottom: 12 }}>
-              Explain what needs to change before this can be approved. This
-              is shown to the mentor.
-            </p>
-            <textarea
-              autoFocus
-              value={rejectReason}
-              onChange={(e) => {
-                setRejectReason(e.target.value);
-                setRejectError("");
-              }}
-              rows={4}
-              placeholder='e.g. "The uploaded transcript is not legible, please re-upload a clearer scan."'
-              style={{
-                width: "100%",
-                padding: 10,
-                borderRadius: 8,
-                border: "1px solid #ddd",
-                fontSize: 14,
-                fontFamily: "inherit",
-                resize: "vertical",
-                boxSizing: "border-box",
-                marginBottom: 8,
-              }}
-            />
-            {rejectError && (
-              <p style={{ color: "#a01f13", fontSize: 13, marginBottom: 12 }}>
-                {rejectError}
-              </p>
-            )}
-            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-              <button
-                onClick={() => setRejectTarget(null)}
-                style={{
-                  padding: "10px 20px",
-                  borderRadius: 8,
-                  border: "1px solid #ddd",
-                  background: "white",
-                  color: "#555",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-              >
-                Cancel
-              </button>
-              <button onClick={submitRejectModal} style={btnStyle("#a01f13")}>
-                Reject Application
-              </button>
-            </div>
-          </div>
         </div>
       )}
 
@@ -1365,6 +1515,279 @@ export default function AdminDashboard() {
               ))}
             </div>
           )}
+        </div>
+      )}
+        </main>
+      </div>
+
+      {/* ── Reject Application Modal ── */}
+      {rejectTarget && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 200,
+            padding: 16,
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              borderRadius: 16,
+              padding: 32,
+              width: "100%",
+              maxWidth: 480,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 12,
+              }}
+            >
+              <h3 style={{ margin: 0 }}>Reject Application</h3>
+              <button
+                onClick={() => setRejectTarget(null)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: 20,
+                  cursor: "pointer",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <p style={{ color: "#888", fontSize: 13, marginBottom: 12 }}>
+              Explain what needs to change before this can be approved. This
+              is shown to the mentor.
+            </p>
+            <textarea
+              autoFocus
+              value={rejectReason}
+              onChange={(e) => {
+                setRejectReason(e.target.value);
+                setRejectError("");
+              }}
+              rows={4}
+              placeholder='e.g. "The uploaded transcript is not legible, please re-upload a clearer scan."'
+              style={{
+                width: "100%",
+                padding: 10,
+                borderRadius: 8,
+                border: "1px solid #ddd",
+                fontSize: 14,
+                fontFamily: "inherit",
+                resize: "vertical",
+                boxSizing: "border-box",
+                marginBottom: 8,
+              }}
+            />
+            {rejectError && (
+              <p style={{ color: "#a01f13", fontSize: 13, marginBottom: 12 }}>
+                {rejectError}
+              </p>
+            )}
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+              <button
+                onClick={() => setRejectTarget(null)}
+                style={{
+                  padding: "10px 20px",
+                  borderRadius: 8,
+                  border: "1px solid #ddd",
+                  background: "white",
+                  color: "#555",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button onClick={submitRejectModal} style={btnStyle("#a01f13")}>
+                Reject Application
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Student Detail Modal ── */}
+      {studentDetail && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 200,
+            padding: 16,
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              borderRadius: 16,
+              padding: 32,
+              width: "100%",
+              maxWidth: 560,
+              maxHeight: "90vh",
+              overflowY: "auto",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 12,
+              }}
+            >
+              <h3 style={{ margin: 0 }}>{studentDetail.name || "(no name)"}</h3>
+              <button
+                onClick={() => {
+                  setStudentDetail(null);
+                  setStudentRegistrations([]);
+                }}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: 20,
+                  cursor: "pointer",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div
+              style={{
+                borderBottom: "1px solid #f0f0f0",
+                paddingBottom: 12,
+                marginBottom: 16,
+              }}
+            >
+              <p style={{ fontSize: 13, color: "#555", margin: "0 0 4px" }}>
+                📧 {studentDetail.email}
+              </p>
+              <p style={{ fontSize: 13, color: "#555", margin: "0 0 4px" }}>
+                🎓 {studentDetail.grade || "—"}
+              </p>
+              {studentDetail.phone && (
+                <p style={{ fontSize: 13, color: "#555", margin: "0 0 4px" }}>
+                  📞 {studentDetail.phone}
+                </p>
+              )}
+              {studentDetail.createdAt && (
+                <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
+                  Member since{" "}
+                  {studentDetail.createdAt.toDate?.().toLocaleDateString()}
+                </p>
+              )}
+            </div>
+
+            {studentRegsLoading ? (
+              <p style={{ color: "#aaa" }}>Loading activity...</p>
+            ) : (
+              <>
+                {["research", "project"].map((kind) => {
+                  const rows = studentRegistrations.filter(
+                    (r) => r.reg.kind === kind,
+                  );
+                  return (
+                    <div key={kind} style={{ marginBottom: 20 }}>
+                      <h4 style={{ margin: "0 0 10px", fontSize: 14 }}>
+                        {kind === "research" ? "🔬 Research" : "💡 Projects"}
+                      </h4>
+                      {rows.length === 0 ? (
+                        <p style={{ color: "#aaa", fontSize: 13 }}>
+                          No {kind === "research" ? "research" : "project"}{" "}
+                          registrations.
+                        </p>
+                      ) : (
+                        rows.map(({ reg, item, mentorName }) => (
+                          <div
+                            key={reg.id}
+                            style={{
+                              background: "#f9fafb",
+                              borderRadius: 8,
+                              padding: 12,
+                              marginBottom: 8,
+                              border: "1px solid #eee",
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "flex-start",
+                                gap: 8,
+                                marginBottom: 4,
+                              }}
+                            >
+                              <Link
+                                to={`/${kind === "research" ? "research" : "projects"}/${reg.itemId}`}
+                                style={{
+                                  fontSize: 13,
+                                  fontWeight: 700,
+                                  color: "#2f6175",
+                                }}
+                              >
+                                {reg.itemTitle}
+                              </Link>
+                              {item && (
+                                <span
+                                  style={{
+                                    fontSize: 11,
+                                    fontWeight: 700,
+                                    color:
+                                      item.stage === "completed"
+                                        ? "#64748b"
+                                        : "#14532d",
+                                    background:
+                                      item.stage === "completed"
+                                        ? "#f1f5f9"
+                                        : "rgba(22,101,52,0.08)",
+                                    padding: "2px 8px",
+                                    borderRadius: 20,
+                                    whiteSpace: "nowrap",
+                                  }}
+                                >
+                                  {item.stage === "completed"
+                                    ? "Completed"
+                                    : "Active"}
+                                </span>
+                              )}
+                            </div>
+                            <p
+                              style={{
+                                fontSize: 12,
+                                color: "#888",
+                                margin: "0 0 2px",
+                              }}
+                            >
+                              👩‍🏫 {mentorName || "Unknown mentor"}
+                            </p>
+                            <p style={{ fontSize: 11, color: "#aaa", margin: 0 }}>
+                              Registered{" "}
+                              {reg.createdAt?.toDate?.().toLocaleDateString()}
+                            </p>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  );
+                })}
+              </>
+            )}
+          </div>
         </div>
       )}
 
