@@ -10,6 +10,7 @@ import { formatMentorName } from "../utils/mentorName";
 import { seatsStatus } from "../utils/format";
 import { GRADE_RANGE_OPTIONS } from "../utils/gradeRange";
 import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
+import { useScrollReveal } from "../utils/useScrollReveal";
 
 const labelStyle = {
   fontSize: 12,
@@ -73,6 +74,7 @@ export default function ProjectListing() {
   const [seatsOnly, setSeatsOnly] = useState(false);
   const [selectedStages, setSelectedStages] = useState([...STAGE_OPTIONS]);
   const [sortBy, setSortBy] = useState("newest");
+  const pageRef = useScrollReveal([loading, projects]);
 
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "projects"), (snap) => {
@@ -199,7 +201,7 @@ export default function ProjectListing() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
+    <div ref={pageRef} style={{ minHeight: "100vh", background: "var(--bg)" }}>
       <Navbar />
       <div
         style={{
@@ -391,11 +393,12 @@ export default function ProjectListing() {
                 gap: 24,
               }}
             >
-              {filtered.map((p) => {
+              {filtered.map((p, idx) => {
                 const stage = STAGE_BADGE[p.stage] || STAGE_BADGE.active;
                 return (
                   <div
                     key={p.id}
+                    className='reveal'
                     onClick={() => navigate(`/projects/${p.id}`)}
                     style={{
                       background: "white",
@@ -403,7 +406,9 @@ export default function ProjectListing() {
                       padding: 24,
                       boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
                       cursor: "pointer",
-                      transition: "transform 0.2s, box-shadow 0.2s",
+                      transition:
+                        "transform 0.2s, box-shadow 0.2s, opacity 0.6s ease, transform 0.6s ease",
+                      transitionDelay: `${Math.min(idx, 8) * 60}ms`,
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.transform = "translateY(-4px)";

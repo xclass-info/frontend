@@ -1,5 +1,5 @@
 // src/components/Tutors.jsx
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { db } from "../firebase";
 import { collection, onSnapshot } from "firebase/firestore";
 import styles from "./Tutors.module.css";
@@ -9,6 +9,7 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import InitialsAvatar from "./InitialsAvatar";
 import { formatMentorName } from "../utils/mentorName";
+import { useScrollReveal } from "../utils/useScrollReveal";
 
 const SORT_OPTIONS = [
   { value: "featured", label: "Featured" },
@@ -51,8 +52,6 @@ export default function Tutors({ standalone = false }) {
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const sectionRef = useRef(null);
-
   const [research, setResearch] = useState([]);
   const [projects, setProjects] = useState([]);
 
@@ -62,27 +61,10 @@ export default function Tutors({ standalone = false }) {
   const [sortBy, setSortBy] = useState("featured");
   const [visibleCount, setVisibleCount] = useState(20);
 
-  // Self-contained scroll-fade-in for this section's own .reveal elements -
   // this component is used both embedded on the homepage (which sets up its
   // own page-wide observer) and standalone at /tutors (which has no such
   // observer), so it can't rely on a parent to make its cards visible.
-  useEffect(() => {
-    const root = sectionRef.current;
-    if (!root) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.15 },
-    );
-    root.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, [loading, teachers]);
+  const sectionRef = useScrollReveal([loading, teachers]);
 
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "teachers"), (snapshot) => {

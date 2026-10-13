@@ -9,6 +9,7 @@ import Footer from "./Footer";
 import { formatMentorName } from "../utils/mentorName";
 import { GRADE_RANGE_OPTIONS } from "../utils/gradeRange";
 import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
+import { useScrollReveal } from "../utils/useScrollReveal";
 
 const labelStyle = {
   fontSize: 12,
@@ -72,6 +73,7 @@ export default function ResearchListing() {
   const [seatsOnly, setSeatsOnly] = useState(false);
   const [selectedStages, setSelectedStages] = useState([...STAGE_OPTIONS]);
   const [sortBy, setSortBy] = useState("newest");
+  const pageRef = useScrollReveal([loading, research]);
 
   useEffect(() => {
     const q = query(
@@ -210,7 +212,7 @@ export default function ResearchListing() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
+    <div ref={pageRef} style={{ minHeight: "100vh", background: "var(--bg)" }}>
       <Navbar />
       <div
         style={{
@@ -402,11 +404,12 @@ export default function ResearchListing() {
                 gap: 24,
               }}
             >
-              {filtered.map((r) => {
+              {filtered.map((r, idx) => {
                 const stage = STAGE_BADGE[r.stage] || STAGE_BADGE.active;
                 return (
                   <div
                     key={r.id}
+                    className='reveal'
                     onClick={() => navigate(`/research/${r.id}`)}
                     style={{
                       background: "white",
@@ -414,7 +417,9 @@ export default function ResearchListing() {
                       padding: 24,
                       boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
                       cursor: "pointer",
-                      transition: "transform 0.2s, box-shadow 0.2s",
+                      transition:
+                        "transform 0.2s, box-shadow 0.2s, opacity 0.6s ease, transform 0.6s ease",
+                      transitionDelay: `${Math.min(idx, 8) * 60}ms`,
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.transform = "translateY(-4px)";

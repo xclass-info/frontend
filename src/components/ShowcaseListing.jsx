@@ -10,12 +10,14 @@ import { Link } from "react-router-dom";
 import { SkeletonClassCard } from "./Skeleton";
 import { formatMentorName } from "../utils/mentorName";
 import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
+import { useScrollReveal } from "../utils/useScrollReveal";
 
 export default function ShowcaseListing() {
   const [entries, setEntries] = useState([]);
   const [teachers, setTeachers] = useState({});
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const pageRef = useScrollReveal([loading, entries]);
 
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "showcase"), (snap) => {
@@ -90,7 +92,7 @@ export default function ShowcaseListing() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f9fafb" }}>
+    <div ref={pageRef} style={{ minHeight: "100vh", background: "var(--bg)" }}>
       <Navbar />
       <div
         style={{ maxWidth: 1100, margin: "0 auto", padding: "100px 24px 48px" }}
@@ -156,7 +158,7 @@ export default function ShowcaseListing() {
             <p>😴 No finished projects published yet. Check back soon!</p>
           </div>
         ) : filtered.length === 0 ? (
-          <div style={{ textAlign: "center", color: "#aaa", padding: 40 }}>
+          <div style={{ textAlign: "center", color: "var(--muted)", padding: 40 }}>
             <p>No projects with that output type yet.</p>
           </div>
         ) : (
@@ -167,14 +169,26 @@ export default function ShowcaseListing() {
               gap: 24,
             }}
           >
-            {filtered.map((s) => (
+            {filtered.map((s, idx) => (
               <div
                 key={s.id}
+                className='reveal'
                 style={{
                   background: "white",
                   borderRadius: 16,
                   padding: 24,
                   boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
+                  transition:
+                    "transform 0.2s, box-shadow 0.2s, opacity 0.6s ease, transform 0.6s ease",
+                  transitionDelay: `${Math.min(idx, 8) * 60}ms`,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-4px)";
+                  e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.12)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.07)";
                 }}
               >
                 <span
@@ -182,8 +196,8 @@ export default function ShowcaseListing() {
                     display: "inline-block",
                     fontSize: 11,
                     fontWeight: 700,
-                    color: "#14532d",
-                    background: "rgba(22,101,52,0.08)",
+                    color: "var(--mint)",
+                    background: "rgba(31,111,74,0.08)",
                     padding: "3px 10px",
                     borderRadius: 20,
                     marginBottom: 12,
