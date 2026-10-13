@@ -24,7 +24,7 @@ export function SeatsRow({ kind, item, onRegister, extra }) {
       }}
     >
       {showCount && (
-        <span style={{ fontSize: 14, color: "#555", fontWeight: 600 }}>
+        <span style={{ fontSize: 14, color: "var(--muted)", fontWeight: 600 }}>
           👥 {seatsStatus(totalSeats(kind, item), item.enrolledCount)}
           {extra}
         </span>
@@ -157,8 +157,8 @@ export function RegisterModal({ kind, item, student, onClose, onRegistered }) {
 
             <div
               style={{
-                background: "#f9fafb",
-                border: "1px solid #eee",
+                background: "var(--bg)",
+                border: "1px solid var(--border)",
                 borderRadius: 10,
                 padding: "12px 14px",
                 marginBottom: 16,
@@ -167,7 +167,7 @@ export function RegisterModal({ kind, item, student, onClose, onRegistered }) {
               <p
                 style={{
                   fontSize: 12,
-                  color: "#aaa",
+                  color: "var(--muted)",
                   fontWeight: 600,
                   textTransform: "uppercase",
                   letterSpacing: "0.03em",
@@ -176,15 +176,15 @@ export function RegisterModal({ kind, item, student, onClose, onRegistered }) {
               >
                 Registering as
               </p>
-              <p style={{ margin: 0, fontWeight: 700, color: "#1a1a2e" }}>
+              <p style={{ margin: 0, fontWeight: 700, color: "var(--text)" }}>
                 {student.name}
               </p>
-              <p style={{ margin: "2px 0 0", fontSize: 14, color: "#666" }}>
+              <p style={{ margin: "2px 0 0", fontSize: 14, color: "var(--muted)" }}>
                 {student.email}
               </p>
             </div>
             {formError && (
-              <p style={{ color: "red", fontSize: 13, margin: "0 0 12px" }}>
+              <p style={{ color: "var(--pink)", fontSize: 13, margin: "0 0 12px" }}>
                 {formError}
               </p>
             )}

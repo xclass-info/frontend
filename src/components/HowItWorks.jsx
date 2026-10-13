@@ -5,25 +5,25 @@ const STEPS = [
     icon: "🔍",
     title: "Choose a research area",
     desc: "Pick from neuroscience, AI, public health, bioinformatics, and more.",
-    color: "#34d399",
+    color: "#427e94",
   },
   {
     icon: "🧑‍🔬",
     title: "Get matched with a mentor",
     desc: "Connect with a PhD mentor from a top university who guides your project.",
-    color: "#427e94",
+    color: "#9a772b",
   },
   {
     icon: "🎥",
     title: "Do the research",
     desc: "Work 1-on-1 with your mentor via live video sessions, chat, and shared docs.",
-    color: "#6d3f6b",
+    color: "#427e94",
   },
   {
     icon: "📄",
     title: "Present & publish",
     desc: "Turn your project into a paper, presentation, or portfolio piece.",
-    color: "#a0527a",
+    color: "#9a772b",
   },
 ];
 

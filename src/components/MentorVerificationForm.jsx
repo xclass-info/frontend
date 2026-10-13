@@ -47,7 +47,7 @@ const inputStyle = {
 
 const labelStyle = {
   fontSize: 13,
-  color: "#888",
+  color: "#94a3b8",
   fontWeight: 600,
   display: "block",
   marginBottom: 6,
@@ -201,9 +201,10 @@ export default function MentorVerificationForm({ teacher }) {
 
   const cardStyle = {
     background: "white",
-    borderRadius: 16,
+    border: "2px solid #e2e8f0",
+    borderTop: "4px solid #2f6175",
+    borderRadius: 12,
     padding: 28,
-    boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
     maxWidth: 560,
   };
 
@@ -213,9 +214,17 @@ export default function MentorVerificationForm({ teacher }) {
       <div style={cardStyle}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
           <span style={{ fontSize: 28 }}>✅</span>
-          <h2 style={{ margin: 0, fontSize: 20 }}>You're verified</h2>
+          <h2
+            style={{
+              margin: 0,
+              fontSize: 20,
+              fontFamily: "'Source Serif 4', Georgia, serif",
+            }}
+          >
+            You're verified
+          </h2>
         </div>
-        <p style={{ color: "#666", fontSize: 14, lineHeight: 1.6, marginBottom: 16 }}>
+        <p style={{ color: "#64748b", fontSize: 14, lineHeight: 1.6, marginBottom: 16 }}>
           Your mentor profile is live and visible to students.
         </p>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
@@ -235,10 +244,10 @@ export default function MentorVerificationForm({ teacher }) {
         <div style={{ marginBottom: 12 }}>
           <StatusPill status='pending_review' />
         </div>
-        <h2 style={{ margin: "0 0 8px", fontSize: 20 }}>
+        <h2 style={{ margin: "0 0 8px", fontSize: 20, fontFamily: "'Source Serif 4', Georgia, serif" }}>
           Your application is under review
         </h2>
-        <p style={{ color: "#666", fontSize: 14, lineHeight: 1.6 }}>
+        <p style={{ color: "#64748b", fontSize: 14, lineHeight: 1.6 }}>
           We're reviewing your {mentorTypeLabel(teacher.mentorType).toLowerCase()}{" "}
           application. You'll be notified once it's approved - usually within
           a couple of days.
@@ -253,10 +262,10 @@ export default function MentorVerificationForm({ teacher }) {
   if (!teacher.mentorType) {
     return (
       <div style={cardStyle}>
-        <h2 style={{ margin: "0 0 4px", fontSize: 20 }}>
+        <h2 style={{ margin: "0 0 4px", fontSize: 20, fontFamily: "'Source Serif 4', Georgia, serif" }}>
           Complete your mentor verification
         </h2>
-        <p style={{ color: "#666", fontSize: 14, marginBottom: 20 }}>
+        <p style={{ color: "#64748b", fontSize: 14, marginBottom: 20 }}>
           Your profile won't be visible to students until this is approved.
           Which best describes you?
         </p>
@@ -278,7 +287,7 @@ export default function MentorVerificationForm({ teacher }) {
               <p style={{ margin: "0 0 2px", fontWeight: 700, fontSize: 15 }}>
                 {t.label}
               </p>
-              <p style={{ margin: 0, fontSize: 13, color: "#888" }}>
+              <p style={{ margin: 0, fontSize: 13, color: "#94a3b8" }}>
                 {t.blurb}
               </p>
             </button>
@@ -319,7 +328,13 @@ export default function MentorVerificationForm({ teacher }) {
           marginBottom: 4,
         }}
       >
-        <h2 style={{ margin: 0, fontSize: 20 }}>
+        <h2
+          style={{
+            margin: 0,
+            fontSize: 20,
+            fontFamily: "'Source Serif 4', Georgia, serif",
+          }}
+        >
           {mentorTypeLabel(teacher.mentorType)}
         </h2>
         <button
@@ -336,7 +351,7 @@ export default function MentorVerificationForm({ teacher }) {
           Not this? Change
         </button>
       </div>
-      <p style={{ color: "#666", fontSize: 14, marginBottom: 20 }}>
+      <p style={{ color: "#64748b", fontSize: 14, marginBottom: 20 }}>
         {MENTOR_TYPES.find((t) => t.value === teacher.mentorType)?.requirement}
       </p>
 
@@ -408,7 +423,7 @@ export default function MentorVerificationForm({ teacher }) {
               ✅ Email verified
             </p>
           ) : teacher.workEmailToken ? (
-            <p style={{ fontSize: 13, color: "#888", margin: "0 0 16px" }}>
+            <p style={{ fontSize: 13, color: "#94a3b8", margin: "0 0 16px" }}>
               📧 Check your inbox for a verification link.
             </p>
           ) : null}

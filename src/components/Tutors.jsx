@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import InitialsAvatar from "./InitialsAvatar";
+import { formatMentorName } from "../utils/mentorName";
 
 const SORT_OPTIONS = [
   { value: "featured", label: "Featured" },
@@ -24,7 +25,7 @@ const checkboxRow = {
   alignItems: "center",
   gap: 8,
   fontSize: 14,
-  color: "#333",
+  color: "var(--muted)",
   marginBottom: 8,
   cursor: "pointer",
 };
@@ -227,11 +228,10 @@ export default function Tutors({ standalone = false }) {
         </div>
 
         <h1 style={{ margin: "0 0 8px", fontSize: 26 }}>
-          {teacher.name?.startsWith("Prof.")
-            ? teacher.name?.split(" ").slice(0, 2).join(" ")
-            : teacher.name?.startsWith("Dr.")
-              ? `Dr. ${teacher.name?.split(" ").pop()}`
-              : `Dr. ${teacher.name?.split(" ").pop()}`}
+          {formatMentorName(teacher.name, {
+            mentorType: teacher.mentorType,
+            degree: teacher.degree,
+          })}
         </h1>
 
         <div
@@ -247,8 +247,8 @@ export default function Tutors({ standalone = false }) {
             <span
               style={{
                 fontSize: 11,
-                background: "#f0f4ff",
-                color: "#2f6175",
+                background: "var(--surface)",
+                color: "var(--muted)",
                 padding: "2px 10px",
                 borderRadius: 20,
                 fontWeight: 600,
@@ -261,8 +261,8 @@ export default function Tutors({ standalone = false }) {
             <span
               style={{
                 fontSize: 11,
-                background: "#f0fdf4",
-                color: "#1f6f4a",
+                background: "var(--primary-soft)",
+                color: "var(--primary-hover)",
                 padding: "2px 10px",
                 borderRadius: 20,
                 fontWeight: 600,
@@ -276,8 +276,8 @@ export default function Tutors({ standalone = false }) {
           <span
             style={{
               fontSize: 11,
-              background: "#fdf4ff",
-              color: "#9333ea",
+              background: "rgba(154,119,43,0.1)",
+              color: "var(--accent)",
               padding: "2px 10px",
               borderRadius: 20,
               fontWeight: 600,
@@ -291,7 +291,7 @@ export default function Tutors({ standalone = false }) {
           <p
             style={{
               fontSize: 13,
-              color: "#555",
+              color: "var(--muted)",
               marginBottom: 6,
               textAlign: "center",
               fontWeight: 600,
@@ -307,7 +307,7 @@ export default function Tutors({ standalone = false }) {
           <p
             style={{
               fontSize: 12,
-              color: "#888",
+              color: "var(--muted)",
               marginBottom: 6,
               textAlign: "center",
             }}
@@ -317,7 +317,7 @@ export default function Tutors({ standalone = false }) {
           </p>
         )}
 
-        <p style={{ fontSize: 12, color: "#aaa", marginTop: 8 }}>
+        <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 8 }}>
           Click to view full profile →
         </p>
       </div>
@@ -331,7 +331,7 @@ export default function Tutors({ standalone = false }) {
         <section id='tutors' ref={sectionRef} className={styles.section}>
           <div className={styles.inner}>
             <div className={`${styles.header} reveal`}>
-              <h2 className={styles.title}>👩‍🏫 Meet Our Mentors</h2>
+              <h2 className={styles.title}>Meet Our Research Mentors</h2>
               <p className={styles.sub}>
                 Expert mentors ready to help you learn anything.
               </p>
@@ -543,7 +543,7 @@ export default function Tutors({ standalone = false }) {
               </select>
             </div>
 
-            <p style={{ color: "#888", fontSize: 13, margin: "0 0 20px" }}>
+            <p style={{ color: "var(--muted)", fontSize: 13, margin: "0 0 20px" }}>
               {filteredTeachers.length} of {teachers.length} mentor
               {teachers.length === 1 ? "" : "s"} match your filters
             </p>

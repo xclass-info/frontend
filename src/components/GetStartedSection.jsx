@@ -32,7 +32,7 @@ export default function GetStartedSection() {
           <Link
             to='/tell-us-what-you-need'
             className={styles.bigButton}
-            style={{ "--btn-accent": "#8a6a25" }}
+            style={{ "--btn-accent": "#9a772b" }}
           >
             💬 On-demand Learning
           </Link>

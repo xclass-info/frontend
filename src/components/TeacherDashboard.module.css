@@ -56,7 +56,7 @@
   font-weight: 700;
   color: #64748b;
   cursor: pointer;
-  font-family: "Nunito", sans-serif;
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
   margin-bottom: 4px;
 }
 
@@ -92,7 +92,7 @@
   font-weight: 700;
   color: #64748b;
   cursor: pointer;
-  font-family: "Nunito", sans-serif;
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
 }
 
 .chipActive,
@@ -160,7 +160,7 @@
   text-decoration: none;
   border: none;
   cursor: pointer;
-  font-family: "Nunito", sans-serif;
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
   transition: all 0.15s;
 }
 
@@ -178,7 +178,7 @@
   font-size: 1.1rem;
   font-weight: 800;
   cursor: pointer;
-  font-family: "Nunito", sans-serif;
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
   transition: all 0.15s;
 }
 
@@ -298,18 +298,6 @@
   background: transparent;
 }
 
-.registration {
-  color: #92400e;
-  border-color: rgba(217, 119, 6, 0.3);
-  background: rgba(217, 119, 6, 0.08);
-}
-
-.completed {
-  color: #1e40af;
-  border-color: rgba(37, 99, 235, 0.3);
-  background: rgba(37, 99, 235, 0.08);
-}
-
 .cardDesc {
   font-size: 1rem;
   color: #64748b;
@@ -344,7 +332,7 @@
   font-weight: 800;
   text-decoration: none;
   text-align: center;
-  font-family: "Nunito", sans-serif;
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
   transition: all 0.15s;
 }
 
@@ -363,7 +351,7 @@
   font-size: 0.95rem;
   font-weight: 800;
   cursor: pointer;
-  font-family: "Nunito", sans-serif;
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
   transition: all 0.15s;
 }
 

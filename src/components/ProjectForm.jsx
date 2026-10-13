@@ -329,7 +329,7 @@ export default function ProjectForm({ project, onClose }) {
                 cursor: "pointer",
                 fontWeight: 800,
                 fontSize: "1rem",
-                fontFamily: "Nunito, sans-serif",
+                fontFamily: "'Open Sans', Helvetica, Arial, sans-serif",
               }}
             >
               Cancel

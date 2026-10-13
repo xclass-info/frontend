@@ -129,7 +129,7 @@ export default function StudentLogin() {
   }
 
   const notice = {
-    color: "#1f6f4a",
+    color: "var(--mint)",
     fontSize: 14,
     marginBottom: 12,
     textAlign: "center",

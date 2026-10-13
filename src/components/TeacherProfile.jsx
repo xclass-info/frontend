@@ -29,8 +29,8 @@ const cardStyle = {
 const itemStyle = {
   padding: 20,
   borderRadius: 12,
-  background: "#f9fafb",
-  border: "1px solid #eee",
+  background: "var(--bg)",
+  border: "1px solid var(--border)",
   transition: "transform 0.15s, box-shadow 0.15s, border-color 0.15s",
 };
 
@@ -42,7 +42,7 @@ function liftOn(e) {
 function liftOff(e) {
   e.currentTarget.style.transform = "translateY(0)";
   e.currentTarget.style.boxShadow = "none";
-  e.currentTarget.style.borderColor = "#eee";
+  e.currentTarget.style.borderColor = "var(--border)";
 }
 
 // Small eyebrow + serif heading, reused above each portfolio section -
@@ -68,7 +68,7 @@ function SectionHeading({ eyebrow, title }) {
           fontFamily: "'Source Serif 4', Georgia, serif",
           fontSize: 22,
           fontWeight: 700,
-          color: "#1a1a1a",
+          color: "var(--text)",
         }}
       >
         {title}
@@ -86,15 +86,15 @@ const BADGES = {
   },
   active: {
     label: "Active",
-    color: "#14532d",
-    bg: "rgba(22,101,52,0.08)",
-    border: "rgba(22,101,52,0.3)",
+    color: "var(--mint)",
+    bg: "rgba(31,111,74,0.08)",
+    border: "rgba(31,111,74,0.3)",
   },
   completed: {
     label: "Completed",
-    color: "#1e40af",
-    bg: "rgba(37,99,235,0.08)",
-    border: "rgba(37,99,235,0.3)",
+    color: "var(--muted)",
+    bg: "var(--surface)",
+    border: "var(--border)",
   },
 };
 
@@ -173,12 +173,12 @@ function KeywordsLine({ items }) {
     <p
       style={{
         fontSize: 12,
-        color: "#888",
+        color: "var(--muted)",
         margin: "10px 0 0",
         lineHeight: 1.6,
       }}
     >
-      <span style={{ fontWeight: 700, color: "#555" }}>Keywords: </span>
+      <span style={{ fontWeight: 700, color: "var(--muted)" }}>Keywords: </span>
       {list.join(", ")}
     </p>
   );
@@ -198,7 +198,7 @@ function ResearchItem({ r, onRegister, expertiseTags }) {
   const bodyStyle = {
     margin: 0,
     fontSize: 13,
-    color: "#555",
+    color: "var(--muted)",
     lineHeight: 1.6,
     whiteSpace: "pre-wrap",
   };
@@ -213,13 +213,13 @@ function ResearchItem({ r, onRegister, expertiseTags }) {
           marginBottom: 6,
         }}
       >
-        <h4 style={{ margin: 0, fontSize: 15, color: "#333" }}>{r.title}</h4>
+        <h4 style={{ margin: 0, fontSize: 15, color: "var(--text)" }}>{r.title}</h4>
         <StatusBadge status={r.stage} />
       </div>
       <p
         style={{
           ...bodyStyle,
-          color: "#666",
+          color: "var(--muted)",
           ...(open
             ? {}
             : {
@@ -233,7 +233,7 @@ function ResearchItem({ r, onRegister, expertiseTags }) {
         {r.idea}
       </p>
       {r.prerequisites && (
-        <p style={{ fontSize: 12, color: "#888", margin: "0 0 4px" }}>
+        <p style={{ fontSize: 12, color: "var(--muted)", margin: "0 0 4px" }}>
           ✅ Prerequisites: {r.prerequisites}
         </p>
       )}
@@ -419,7 +419,7 @@ export default function TeacherProfile() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: "100vh", background: "#f9fafb" }}>
+      <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
         <Navbar />
         <div
           style={{ padding: "120px 32px", textAlign: "center", color: "#aaa" }}
@@ -432,7 +432,7 @@ export default function TeacherProfile() {
 
   if (!teacher || teacher.verificationStatus !== "approved") {
     return (
-      <div style={{ minHeight: "100vh", background: "#f9fafb" }}>
+      <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
         <Navbar />
         <div style={{ padding: "120px 32px", textAlign: "center" }}>
           <p>Teacher not found.</p>
@@ -487,7 +487,7 @@ export default function TeacherProfile() {
   ].filter(Boolean);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f9fafb" }}>
+    <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
       <Navbar />
 
       <div
@@ -571,7 +571,7 @@ export default function TeacherProfile() {
                   fontFamily: "'Source Serif 4', Georgia, serif",
                   fontSize: 24,
                   fontWeight: 700,
-                  color: "#1a1a1a",
+                  color: "var(--text)",
                 }}
               >
                 {displayName}
@@ -581,7 +581,7 @@ export default function TeacherProfile() {
               </p>
 
               {(teacher.degree || teacher.university) && (
-                <p style={{ margin: "0 0 18px", fontSize: 13.5, color: "#888" }}>
+                <p style={{ margin: "0 0 18px", fontSize: 13.5, color: "var(--muted)" }}>
                   {[teacher.degree, teacher.university]
                     .filter(Boolean)
                     .join(" at ")}
@@ -651,7 +651,7 @@ export default function TeacherProfile() {
                       >
                         {s.value}
                       </p>
-                      <p style={{ margin: 0, fontSize: 11, color: "#999", lineHeight: 1.3 }}>
+                      <p style={{ margin: 0, fontSize: 11, color: "var(--muted)", lineHeight: 1.3 }}>
                         {s.label}
                       </p>
                     </div>
@@ -687,7 +687,7 @@ export default function TeacherProfile() {
                     flexDirection: "column",
                     gap: 6,
                     fontSize: 12.5,
-                    color: "#999",
+                    color: "var(--muted)",
                   }}
                 >
                   {teacher.gender && <span>{teacher.gender}</span>}
@@ -719,7 +719,7 @@ export default function TeacherProfile() {
                 <p
                   style={{
                     fontSize: 14.5,
-                    color: "#555",
+                    color: "var(--muted)",
                     lineHeight: 1.75,
                     margin: 0,
                   }}
@@ -767,7 +767,7 @@ export default function TeacherProfile() {
                       marginBottom: 6,
                     }}
                   >
-                    <h4 style={{ margin: 0, fontSize: 15, color: "#333" }}>
+                    <h4 style={{ margin: 0, fontSize: 15, color: "var(--text)" }}>
                       {project.title}
                     </h4>
                     {project.stage && <StatusBadge status={project.stage} />}
@@ -778,13 +778,13 @@ export default function TeacherProfile() {
                       style={{
                         margin: 0,
                         fontSize: 13,
-                        color: "#666",
+                        color: "var(--muted)",
                         lineHeight: 1.6,
                       }}
                     />
                   )}
                   {project.prerequisites && (
-                    <p style={{ fontSize: 12, color: "#888", margin: "6px 0 0" }}>
+                    <p style={{ fontSize: 12, color: "var(--muted)", margin: "6px 0 0" }}>
                       ✅ Prerequisites: {project.prerequisites}
                     </p>
                   )}
@@ -827,7 +827,7 @@ export default function TeacherProfile() {
                         style={{
                           margin: 0,
                           fontSize: 13,
-                          color: "#555",
+                          color: "var(--muted)",
                           lineHeight: 1.6,
                         }}
                       />
@@ -874,7 +874,7 @@ export default function TeacherProfile() {
                 <h3 style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}>
                   Booking Request Sent!
                 </h3>
-                <p style={{ color: "#888", marginBottom: 20 }}>
+                <p style={{ color: "var(--muted)", marginBottom: 20 }}>
                   {teacher.name} will confirm your session soon.
                 </p>
                 <button
@@ -927,7 +927,7 @@ export default function TeacherProfile() {
 
                 <h4 style={{ marginBottom: 8 }}>Select a Slot</h4>
                 {slots.length === 0 ? (
-                  <p style={{ color: "#888", fontSize: 14, marginBottom: 16 }}>
+                  <p style={{ color: "var(--muted)", fontSize: 14, marginBottom: 16 }}>
                     No available slots.
                   </p>
                 ) : (
@@ -973,13 +973,13 @@ export default function TeacherProfile() {
                     width: "100%",
                     padding: 10,
                     borderRadius: 8,
-                    border: `1px solid ${errors.name ? "red" : "#ddd"}`,
+                    border: `1px solid ${errors.name ? "var(--pink)" : "var(--border)"}`,
                     marginBottom: 8,
                     boxSizing: "border-box",
                   }}
                 />
                 {errors.name && (
-                  <p style={{ color: "red", fontSize: 12, marginBottom: 8 }}>
+                  <p style={{ color: "var(--pink)", fontSize: 12, marginBottom: 8 }}>
                     {errors.name}
                   </p>
                 )}
@@ -996,13 +996,13 @@ export default function TeacherProfile() {
                     width: "100%",
                     padding: 10,
                     borderRadius: 8,
-                    border: `1px solid ${errors.email ? "red" : "#ddd"}`,
+                    border: `1px solid ${errors.email ? "var(--pink)" : "var(--border)"}`,
                     marginBottom: 16,
                     boxSizing: "border-box",
                   }}
                 />
                 {errors.email && (
-                  <p style={{ color: "red", fontSize: 12, marginBottom: 8 }}>
+                  <p style={{ color: "var(--pink)", fontSize: 12, marginBottom: 8 }}>
                     {errors.email}
                   </p>
                 )}

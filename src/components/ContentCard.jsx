@@ -13,8 +13,8 @@ function kindTagStyle() {
     display: "inline-block",
     fontSize: 11,
     fontWeight: 800,
-    color: "#2f6175",
-    background: "#e3eff3",
+    color: "var(--primary-hover)",
+    background: "var(--primary-soft)",
     padding: "2px 10px",
     borderRadius: 20,
     marginBottom: 6,
@@ -27,9 +27,9 @@ function gradeDeliverableStyle(variant) {
       display: "inline-block",
       fontSize: 11,
       fontWeight: 700,
-      color: "#2f6175",
-      background: "#fff8dc",
-      border: "1px solid #9a772b",
+      color: "var(--primary-hover)",
+      background: "var(--surface)",
+      border: "1px solid var(--accent)",
       padding: "2px 10px",
       borderRadius: 20,
       marginRight: 6,
@@ -38,7 +38,7 @@ function gradeDeliverableStyle(variant) {
   }
   return {
     fontSize: 12,
-    color: "#14532d",
+    color: "var(--mint)",
     fontWeight: 600,
     margin: "0 0 6px",
   };
@@ -79,7 +79,7 @@ export default function ContentCard({ item, kind, onEdit, onDelete, onToggleStag
 
       {kind === "showcase" && (
         <>
-          <p style={{ fontSize: 13, color: "#888", margin: "0 0 8px" }}>
+          <p style={{ fontSize: 13, color: "#64748b", margin: "0 0 8px" }}>
             👤 {item.studentName}
           </p>
           {safeUrl(item.outputUrl) && (

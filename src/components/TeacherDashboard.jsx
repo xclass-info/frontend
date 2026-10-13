@@ -252,7 +252,7 @@ export default function TeacherDashboard() {
     width: "100%",
     padding: "10px 12px",
     borderRadius: 8,
-    border: "1px solid #ddd",
+    border: "1px solid #e2e8f0",
     fontSize: 14,
     boxSizing: "border-box",
     marginTop: 4,
@@ -261,7 +261,7 @@ export default function TeacherDashboard() {
 
   const labelStyle = {
     fontSize: 13,
-    color: "#888",
+    color: "#64748b",
     fontWeight: 600,
   };
 
@@ -509,7 +509,7 @@ export default function TeacherDashboard() {
                         <h2 className={styles.sectionTitle} style={{ marginBottom: 4 }}>
                           Your Content
                         </h2>
-                        <p style={{ color: "#888", fontSize: 13, margin: 0 }}>
+                        <p style={{ color: "#64748b", fontSize: 13, margin: 0 }}>
                           Research, projects, and student work, all in one place.
                         </p>
                       </div>
@@ -644,7 +644,7 @@ export default function TeacherDashboard() {
                 >
                   <div>
                     <h2 className={styles.sectionTitle}>👤 My Profile</h2>
-                    <p style={{ color: "#888", fontSize: 14, marginBottom: 24 }}>
+                    <p style={{ color: "#64748b", fontSize: 14, marginBottom: 24 }}>
                       This information will be displayed on your public tutor
                       profile.
                     </p>
@@ -686,7 +686,7 @@ export default function TeacherDashboard() {
                       <div style={fieldStyle} key={label}>
                         <p style={labelStyle}>{label}</p>
                         <p style={{ margin: "4px 0 0", fontSize: 15 }}>
-                          {value || <span style={{ color: "#bbb" }}>Not set</span>}
+                          {value || <span style={{ color: "#94a3b8" }}>Not set</span>}
                         </p>
                       </div>
                     ))}
@@ -707,7 +707,7 @@ export default function TeacherDashboard() {
                           {profile.website}
                         </a>
                       ) : (
-                        <p style={{ margin: "4px 0 0", fontSize: 15, color: "#bbb" }}>
+                        <p style={{ margin: "4px 0 0", fontSize: 15, color: "#94a3b8" }}>
                           Not set
                         </p>
                       )}
@@ -723,7 +723,7 @@ export default function TeacherDashboard() {
                         }}
                       >
                         {profile.bio || (
-                          <span style={{ color: "#bbb" }}>Not set</span>
+                          <span style={{ color: "#94a3b8" }}>Not set</span>
                         )}
                       </p>
                     </div>
@@ -927,10 +927,10 @@ export default function TeacherDashboard() {
                         <span
                           style={{
                             fontSize: 12,
-                            color: wordCount > 280 ? "#a01f13" : "#aaa",
+                            color: wordCount > 280 ? "var(--pink)" : "#94a3b8",
                           }}
                         >
-                          {wordCount} / 500 words
+                          {wordCount} / 300 words
                         </span>
                       </div>
                       <textarea
@@ -977,9 +977,9 @@ export default function TeacherDashboard() {
                         style={{
                           padding: "12px 32px",
                           borderRadius: 8,
-                          border: "1px solid #ddd",
+                          border: "1px solid #e2e8f0",
                           background: "white",
-                          color: "#555",
+                          color: "#64748b",
                           fontSize: 15,
                           fontWeight: 600,
                           cursor: "pointer",

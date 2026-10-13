@@ -13,7 +13,7 @@ import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
 
 const labelStyle = {
   fontSize: 12,
-  color: "#aaa",
+  color: "var(--muted)",
   margin: "0 0 4px",
   fontWeight: 600,
   textTransform: "uppercase",
@@ -22,7 +22,7 @@ const labelStyle = {
 
 const clampStyle = (lines) => ({
   fontSize: 13,
-  color: "#555",
+  color: "var(--muted)",
   margin: 0,
   lineHeight: 1.5,
   display: "-webkit-box",
@@ -32,8 +32,8 @@ const clampStyle = (lines) => ({
 });
 
 const STAGE_BADGE = {
-  active: { label: "Active", color: "#14532d", bg: "rgba(22,101,52,0.08)" },
-  completed: { label: "Completed", color: "#1e40af", bg: "rgba(37,99,235,0.08)" },
+  active: { label: "Active", color: "var(--mint)", bg: "rgba(31,111,74,0.08)" },
+  completed: { label: "Completed", color: "var(--muted)", bg: "var(--surface)" },
 };
 const STAGE_OPTIONS = ["active", "completed"];
 
@@ -47,7 +47,7 @@ const checkboxRow = {
   alignItems: "center",
   gap: 8,
   fontSize: 14,
-  color: "#333",
+  color: "var(--muted)",
   marginBottom: 8,
   cursor: "pointer",
 };
@@ -172,7 +172,7 @@ export default function ProjectListing() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: "100vh", background: "#f9fafb" }}>
+      <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
         <Navbar />
         <div
           style={{ maxWidth: 1100, margin: "0 auto", padding: "100px 24px 48px" }}
@@ -194,7 +194,7 @@ export default function ProjectListing() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f9fafb" }}>
+    <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
       <Navbar />
       <div
         style={{
@@ -295,10 +295,17 @@ export default function ProjectListing() {
         {/* Main content */}
         <div style={{ flex: "1 1 600px", minWidth: 0 }}>
           <div style={{ textAlign: "center", marginBottom: 24 }}>
-            <h1 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: 8 }}>
+            <h1
+              style={{
+                fontFamily: "'Source Serif 4', Georgia, serif",
+                fontSize: "2rem",
+                fontWeight: 700,
+                marginBottom: 8,
+              }}
+            >
               💡 Projects
             </h1>
-            <p style={{ color: "#666", fontSize: "1rem" }}>
+            <p style={{ color: "var(--muted)", fontSize: "1rem" }}>
               Explore hands-on projects you can work on with our mentors.
             </p>
           </div>
@@ -344,17 +351,17 @@ export default function ProjectListing() {
             </select>
           </div>
 
-          <p style={{ color: "#888", fontSize: 13, margin: "0 0 20px" }}>
+          <p style={{ color: "var(--muted)", fontSize: 13, margin: "0 0 20px" }}>
             {filtered.length} of {projects.length} project
             {projects.length === 1 ? "" : "s"} match your filters
           </p>
 
           {projects.length === 0 ? (
-            <div style={{ textAlign: "center", color: "#aaa", padding: 40 }}>
+            <div style={{ textAlign: "center", color: "var(--muted)", padding: 40 }}>
               <p>😴 No projects posted yet. Check back soon!</p>
             </div>
           ) : filtered.length === 0 ? (
-            <div style={{ textAlign: "center", color: "#aaa", padding: 40 }}>
+            <div style={{ textAlign: "center", color: "var(--muted)", padding: 40 }}>
               <p>No projects match your filters.</p>
               <button
                 onClick={clearFilters}
@@ -413,7 +420,7 @@ export default function ProjectListing() {
                         marginBottom: 12,
                       }}
                     >
-                      <h3 style={{ fontSize: 16, fontWeight: 700, color: "#333", margin: 0 }}>
+                      <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--text)", margin: 0 }}>
                         {p.title}
                       </h3>
                       <span
@@ -437,9 +444,9 @@ export default function ProjectListing() {
                           display: "inline-block",
                           fontSize: 11,
                           fontWeight: 700,
-                          color: "#2f6175",
-                          background: "#fff8dc",
-                          border: "1px solid #9a772b",
+                          color: "var(--primary-hover)",
+                          background: "var(--surface)",
+                          border: "1px solid var(--accent)",
                           padding: "2px 10px",
                           borderRadius: 20,
                           marginBottom: 12,
@@ -463,7 +470,7 @@ export default function ProjectListing() {
                       <p
                         style={{
                           fontSize: 12,
-                          color: "#14532d",
+                          color: "var(--mint)",
                           fontWeight: 600,
                           margin: "0 0 8px",
                         }}
@@ -476,7 +483,7 @@ export default function ProjectListing() {
                       <p
                         style={{
                           fontSize: 12,
-                          color: "#888",
+                          color: "var(--muted)",
                           margin: "0 0 8px",
                         }}
                       >
@@ -488,7 +495,7 @@ export default function ProjectListing() {
                       <p
                         style={{
                           fontSize: 12,
-                          color: "#555",
+                          color: "var(--muted)",
                           fontWeight: 600,
                           margin: "0 0 12px",
                         }}
@@ -504,7 +511,7 @@ export default function ProjectListing() {
                         alignItems: "center",
                       }}
                     >
-                      <span style={{ fontSize: 12, color: "#888" }}>
+                      <span style={{ fontSize: 12, color: "var(--muted)" }}>
                         👩‍🏫 Mentored by: {mentorLabel(p)}
                       </span>
                       <span
