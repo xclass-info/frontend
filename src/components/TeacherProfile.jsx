@@ -14,7 +14,7 @@ import {
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { safeUrl } from "../utils/format";
-import { SeatsRow, RegisterModal } from "./RegisterControls";
+import { SeatsRow, RegisterModal, LoginPrompt } from "./RegisterControls";
 import { useStudentAuth } from "../utils/useStudentAuth";
 import InitialsAvatar from "./InitialsAvatar";
 import { formatMentorName } from "../utils/mentorName";
@@ -311,6 +311,7 @@ export default function TeacherProfile() {
   const [research, setResearch] = useState([]);
   const [projects, setProjects] = useState([]);
   const [registering, setRegistering] = useState(null);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   useEffect(() => {
     const unsub = onSnapshot(doc(db, "teachers", teacherId), (snap) => {
@@ -362,8 +363,10 @@ export default function TeacherProfile() {
   function openRegister(kind, item) {
     // Registering requires a logged-in student account, so it can be tied
     // to the student's record and reliably show up on their dashboard.
+    // Rather than silently redirecting to login, show an inline prompt so
+    // the choice (log in vs sign up) is explicit.
     if (!student) {
-      navigate("/student/login", { state: { from: location.pathname } });
+      setShowLoginPrompt(true);
       return;
     }
     setRegistering({ kind, item });
@@ -1039,6 +1042,28 @@ export default function TeacherProfile() {
           onClose={() => setRegistering(null)}
           onRegistered={markRegistered}
         />
+      )}
+      {showLoginPrompt && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 200,
+            padding: 16,
+          }}
+          onClick={() => setShowLoginPrompt(false)}
+        >
+          <div
+            style={{ maxWidth: 360, width: "100%" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <LoginPrompt from={location.pathname} />
+          </div>
+        </div>
       )}
       <Footer />
     </div>

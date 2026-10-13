@@ -1,12 +1,12 @@
 // src/components/ResearchDetail.jsx
 import { useEffect, useState } from "react";
-import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { formatMentorName } from "../utils/mentorName";
-import { SeatsRow, RegisterModal } from "./RegisterControls";
+import { SeatsRow, RegisterModal, LoginPrompt } from "./RegisterControls";
 import { useStudentAuth } from "../utils/useStudentAuth";
 
 const sectionLabel = {
@@ -30,22 +30,24 @@ const sectionBody = {
 
 export default function ResearchDetail() {
   const { researchId } = useParams();
-  const navigate = useNavigate();
   const location = useLocation();
   const { student } = useStudentAuth();
   const [research, setResearch] = useState(undefined); // undefined = loading
   const [mentor, setMentor] = useState(null);
   const [registering, setRegistering] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   function markRegistered() {
     setResearch((r) => ({ ...r, enrolledCount: (r.enrolledCount || 0) + 1 }));
   }
 
   // Registering requires a logged-in student account, so it can be tied to
-  // the student's record and reliably show up on their dashboard.
+  // the student's record and reliably show up on their dashboard. Rather
+  // than silently redirecting to login with no warning, show an inline
+  // prompt so the choice (log in vs sign up) is explicit.
   function openRegister() {
     if (!student) {
-      navigate("/student/login", { state: { from: location.pathname } });
+      setShowLoginPrompt(true);
       return;
     }
     setRegistering(true);
@@ -220,6 +222,7 @@ export default function ResearchDetail() {
                 item={research}
                 onRegister={openRegister}
               />
+              {showLoginPrompt && <LoginPrompt from={location.pathname} />}
             </div>
           ) : null}
 

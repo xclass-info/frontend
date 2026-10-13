@@ -2,8 +2,63 @@
 // Shared "Apply now" button + signup modal for research and projects.
 // Used on the mentor profile page and on the research detail page.
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { seatsStatus } from "../utils/format";
 import { seatsLeft, totalSeats, registerForItem } from "../utils/registration";
+
+// Shown in place of a silent redirect when a logged-out visitor clicks
+// "Apply now" - explains why, and lets them choose log in vs sign up
+// instead of being yanked to another page with no warning.
+export function LoginPrompt({ from }) {
+  return (
+    <div
+      style={{
+        marginTop: 10,
+        background: "var(--surface)",
+        border: "1px solid var(--border)",
+        borderRadius: 10,
+        padding: "14px 16px",
+      }}
+    >
+      <p style={{ margin: "0 0 10px", fontSize: 14, color: "var(--text)" }}>
+        You'll need a student account to register for this.
+      </p>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <Link
+          to='/student/login'
+          state={{ from }}
+          style={{
+            padding: "8px 18px",
+            borderRadius: 8,
+            background: "#2f6175",
+            color: "white",
+            fontWeight: 700,
+            fontSize: 14,
+            textDecoration: "none",
+          }}
+        >
+          Log in
+        </Link>
+        <Link
+          to='/student/register'
+          state={{ from }}
+          style={{
+            padding: "8px 18px",
+            borderRadius: 8,
+            border: "1px solid var(--border)",
+            background: "white",
+            color: "var(--primary-hover)",
+            fontWeight: 700,
+            fontSize: 14,
+            textDecoration: "none",
+          }}
+        >
+          Sign up
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 // Seat count plus an Apply now button while seats remain. Research posts
 // only ever have a single seat, so the count is redundant there - just the

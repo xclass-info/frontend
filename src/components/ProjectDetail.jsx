@@ -1,12 +1,12 @@
 // src/components/ProjectDetail.jsx
 import { useEffect, useState } from "react";
-import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { formatMentorName } from "../utils/mentorName";
-import { SeatsRow, RegisterModal } from "./RegisterControls";
+import { SeatsRow, RegisterModal, LoginPrompt } from "./RegisterControls";
 import { useStudentAuth } from "../utils/useStudentAuth";
 
 const sectionLabel = {
@@ -30,12 +30,12 @@ const sectionBody = {
 
 export default function ProjectDetail() {
   const { projectId } = useParams();
-  const navigate = useNavigate();
   const location = useLocation();
   const { student } = useStudentAuth();
   const [project, setProject] = useState(undefined); // undefined = loading
   const [mentor, setMentor] = useState(null);
   const [registering, setRegistering] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   function markRegistered() {
     setProject((p) => ({ ...p, enrolledCount: (p.enrolledCount || 0) + 1 }));
@@ -43,7 +43,7 @@ export default function ProjectDetail() {
 
   function openRegister() {
     if (!student) {
-      navigate("/student/login", { state: { from: location.pathname } });
+      setShowLoginPrompt(true);
       return;
     }
     setRegistering(true);
@@ -217,6 +217,7 @@ export default function ProjectDetail() {
                 item={project}
                 onRegister={openRegister}
               />
+              {showLoginPrompt && <LoginPrompt from={location.pathname} />}
             </div>
           ) : null}
 
