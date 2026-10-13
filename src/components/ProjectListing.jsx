@@ -87,7 +87,7 @@ export default function ProjectListing() {
       .then((snap) => {
         const map = {};
         snap.docs.forEach((d) => {
-          map[d.id] = d.data().name;
+          map[d.id] = d.data();
         });
         setTeachers(map);
       })
@@ -95,8 +95,13 @@ export default function ProjectListing() {
   }, []);
 
   function mentorName(p) {
-    const liveName = teachers[p.teacherId];
-    if (liveName) return formatMentorName(liveName);
+    const liveMentor = teachers[p.teacherId];
+    if (liveMentor?.name) {
+      return formatMentorName(liveMentor.name, {
+        mentorType: liveMentor.mentorType,
+        degree: liveMentor.degree,
+      });
+    }
     return p.teacherName && p.teacherName !== "Teacher"
       ? p.teacherName
       : "Mentor";

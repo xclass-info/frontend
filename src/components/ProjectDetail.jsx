@@ -62,7 +62,7 @@ export default function ProjectDetail() {
         if (!cancelled) setProject(data);
         const teacherSnap = await getDoc(doc(db, "teachers", data.teacherId));
         if (!cancelled && teacherSnap.exists() && teacherSnap.data().name) {
-          setMentor({ id: teacherSnap.id, name: teacherSnap.data().name });
+          setMentor({ id: teacherSnap.id, ...teacherSnap.data() });
         }
       } catch (err) {
         console.error(err);
@@ -109,7 +109,10 @@ export default function ProjectDetail() {
   }
 
   const mentorLabel = mentor
-    ? formatMentorName(mentor.name)
+    ? formatMentorName(mentor.name, {
+        mentorType: mentor.mentorType,
+        degree: mentor.degree,
+      })
     : project.teacherName && project.teacherName !== "Teacher"
       ? project.teacherName
       : "Mentor";

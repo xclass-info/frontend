@@ -45,7 +45,7 @@ function badgeFor(kind, item) {
 }
 
 function RegistrationCard({ row }) {
-  const { reg, item, mentorName } = row;
+  const { reg, item, mentorName, mentorType, mentorDegree } = row;
   const description = item ? item.idea || item.description : null;
   const [badgeClass, badgeLabel] = item ? badgeFor(reg.kind, item) : [];
 
@@ -80,7 +80,10 @@ function RegistrationCard({ row }) {
               to={`/teacher/${reg.teacherId}`}
               style={{ color: "#2f6175", textDecoration: "underline" }}
             >
-              {formatMentorName(mentorName)}
+              {formatMentorName(mentorName, {
+                mentorType,
+                degree: mentorDegree,
+              })}
             </Link>
           </span>
         )}

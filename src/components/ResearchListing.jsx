@@ -90,7 +90,7 @@ export default function ResearchListing() {
       .then((snap) => {
         const map = {};
         snap.docs.forEach((d) => {
-          map[d.id] = d.data().name;
+          map[d.id] = d.data();
         });
         setTeachers(map);
       })
@@ -100,8 +100,13 @@ export default function ResearchListing() {
   // Mentor's live name from their profile; the name saved on the post is
   // only a fallback (older posts stored the literal string "Teacher").
   function mentorName(r) {
-    const liveName = teachers[r.teacherId];
-    if (liveName) return formatMentorName(liveName);
+    const liveMentor = teachers[r.teacherId];
+    if (liveMentor?.name) {
+      return formatMentorName(liveMentor.name, {
+        mentorType: liveMentor.mentorType,
+        degree: liveMentor.degree,
+      });
+    }
     return r.teacherName && r.teacherName !== "Teacher"
       ? r.teacherName
       : "Mentor";

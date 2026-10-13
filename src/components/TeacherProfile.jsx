@@ -17,6 +17,7 @@ import { safeUrl } from "../utils/format";
 import { SeatsRow, RegisterModal } from "./RegisterControls";
 import { useStudentAuth } from "../utils/useStudentAuth";
 import InitialsAvatar from "./InitialsAvatar";
+import { formatMentorName } from "../utils/mentorName";
 
 const cardStyle = {
   background: "white",
@@ -466,9 +467,10 @@ export default function TeacherProfile() {
     ),
   ];
 
-  const displayName = teacher.name?.startsWith("Prof.")
-    ? teacher.name?.split(" ").slice(0, 2).join(" ")
-    : `Dr. ${teacher.name?.split(" ").pop()}`;
+  const displayName = formatMentorName(teacher.name, {
+    mentorType: teacher.mentorType,
+    degree: teacher.degree,
+  });
 
   const projectsTotal = projects.length + (teacher.projects?.length || 0);
   const stats = [

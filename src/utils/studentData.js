@@ -57,6 +57,8 @@ export async function loadStudentRegistrations(email, uid) {
         reg,
         item: itemSnap?.exists() ? { id: itemSnap.id, ...itemSnap.data() } : null,
         mentorName: teacherSnap?.exists() ? teacherSnap.data().name : null,
+        mentorType: teacherSnap?.exists() ? teacherSnap.data().mentorType : null,
+        mentorDegree: teacherSnap?.exists() ? teacherSnap.data().degree : null,
       };
     }),
   );

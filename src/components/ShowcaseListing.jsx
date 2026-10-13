@@ -34,7 +34,7 @@ export default function ShowcaseListing() {
       .then((snap) => {
         const map = {};
         snap.docs.forEach((d) => {
-          map[d.id] = d.data().name;
+          map[d.id] = d.data();
         });
         setTeachers(map);
       })
@@ -42,13 +42,16 @@ export default function ShowcaseListing() {
   }, []);
 
   function mentorLabel(s) {
-    const liveName = teachers[s.teacherId];
-    const name = liveName
-      ? formatMentorName(liveName)
+    const liveMentor = teachers[s.teacherId];
+    const name = liveMentor?.name
+      ? formatMentorName(liveMentor.name, {
+          mentorType: liveMentor.mentorType,
+          degree: liveMentor.degree,
+        })
       : s.teacherName && s.teacherName !== "Teacher"
         ? s.teacherName
         : "Mentor";
-    if (!liveName) return name;
+    if (!liveMentor?.name) return name;
     return (
       <Link
         to={`/teacher/${s.teacherId}`}
