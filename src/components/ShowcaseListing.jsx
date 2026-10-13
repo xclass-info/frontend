@@ -11,6 +11,7 @@ import { SkeletonClassCard } from "./Skeleton";
 import { formatMentorName } from "../utils/mentorName";
 import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
 import { useScrollReveal } from "../utils/useScrollReveal";
+import { TopicIcon } from "../utils/topicIcons";
 
 export default function ShowcaseListing() {
   const [entries, setEntries] = useState([]);
@@ -191,6 +192,9 @@ export default function ShowcaseListing() {
                   e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.07)";
                 }}
               >
+                <div style={{ marginBottom: 14 }}>
+                  <TopicIcon seed={s.id} />
+                </div>
                 <span
                   style={{
                     display: "inline-block",

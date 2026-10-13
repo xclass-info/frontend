@@ -11,6 +11,7 @@ import { seatsStatus } from "../utils/format";
 import { GRADE_RANGE_OPTIONS } from "../utils/gradeRange";
 import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
 import { useScrollReveal } from "../utils/useScrollReveal";
+import { TopicIcon } from "../utils/topicIcons";
 
 const labelStyle = {
   fontSize: 12,
@@ -421,6 +422,9 @@ export default function ProjectListing() {
                         "0 2px 12px rgba(0,0,0,0.07)";
                     }}
                   >
+                    <div style={{ marginBottom: 14 }}>
+                      <TopicIcon seed={p.id} />
+                    </div>
                     <div
                       style={{
                         display: "flex",

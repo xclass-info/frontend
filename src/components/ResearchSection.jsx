@@ -10,6 +10,7 @@ import {
   limit,
   orderBy,
 } from "firebase/firestore";
+import { TopicIcon } from "../utils/topicIcons";
 
 export default function ResearchSection() {
   const navigate = useNavigate();
@@ -56,10 +57,10 @@ export default function ResearchSection() {
               key={r.id}
               className='reveal'
               style={{
-                background: "#f9fafb",
+                background: "var(--bg)",
                 borderRadius: 16,
                 padding: 24,
-                border: "1px solid #eee",
+                border: "1px solid var(--border)",
                 cursor: "pointer",
                 transition: "transform 0.25s, box-shadow 0.25s, border-color 0.25s",
               }}
@@ -74,18 +75,21 @@ export default function ResearchSection() {
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "translateY(0)";
                 e.currentTarget.style.boxShadow = "none";
-                e.currentTarget.style.borderColor = "#eee";
+                e.currentTarget.style.borderColor = "var(--border)";
               }}
             >
+              <div style={{ marginBottom: 12 }}>
+                <TopicIcon seed={r.id} size={38} />
+              </div>
               <h3
                 style={{
                   fontSize: 15,
                   fontWeight: 700,
                   marginBottom: 10,
-                  color: "#333",
+                  color: "var(--text)",
                 }}
               >
-                🔬 {r.title}
+                {r.title}
               </h3>
               <p
                 style={{

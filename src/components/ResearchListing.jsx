@@ -10,6 +10,7 @@ import { formatMentorName } from "../utils/mentorName";
 import { GRADE_RANGE_OPTIONS } from "../utils/gradeRange";
 import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
 import { useScrollReveal } from "../utils/useScrollReveal";
+import { TopicIcon } from "../utils/topicIcons";
 
 const labelStyle = {
   fontSize: 12,
@@ -432,6 +433,9 @@ export default function ResearchListing() {
                         "0 2px 12px rgba(0,0,0,0.07)";
                     }}
                   >
+                    <div style={{ marginBottom: 14 }}>
+                      <TopicIcon seed={r.id} />
+                    </div>
                     <div
                       style={{
                         display: "flex",
