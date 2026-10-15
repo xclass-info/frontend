@@ -13,7 +13,7 @@ import {
 } from "firebase/firestore";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import { safeUrl } from "../utils/format";
+import { safeUrl, LESSON_STRUCTURE_LABEL } from "../utils/format";
 import { SeatsRow, RegisterModal, LoginPrompt } from "./RegisterControls";
 import { useStudentAuth } from "../utils/useStudentAuth";
 import InitialsAvatar from "./InitialsAvatar";
@@ -238,6 +238,9 @@ function ResearchItem({ r, onRegister, expertiseTags }) {
           ✅ Prerequisites: {r.prerequisites}
         </p>
       )}
+      <p style={{ fontSize: 12, color: "var(--muted)", fontWeight: 600, margin: "0 0 4px" }}>
+        🕐 {LESSON_STRUCTURE_LABEL}
+      </p>
       <KeywordsLine
         items={[r.gradeLevel, r.deliverable, ...expertiseTags]}
       />
@@ -793,6 +796,9 @@ export default function TeacherProfile() {
                       ✅ Prerequisites: {project.prerequisites}
                     </p>
                   )}
+                  <p style={{ fontSize: 12, color: "var(--muted)", fontWeight: 600, margin: "6px 0 0" }}>
+                    🕐 {LESSON_STRUCTURE_LABEL}
+                  </p>
                   <KeywordsLine
                     items={[
                       project.gradeLevel,

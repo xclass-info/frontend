@@ -6,6 +6,7 @@ import { doc, getDoc } from "firebase/firestore";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { formatMentorName } from "../utils/mentorName";
+import { LESSON_STRUCTURE_LABEL } from "../utils/format";
 import { SeatsRow, RegisterModal, LoginPrompt } from "./RegisterControls";
 import { useStudentAuth } from "../utils/useStudentAuth";
 
@@ -175,6 +176,10 @@ export default function ResearchDetail() {
               🎓 {research.gradeLevel}
             </span>
           )}
+
+          <p style={{ fontSize: 14, color: "var(--muted)", fontWeight: 600, margin: "0 0 8px" }}>
+            🕐 {LESSON_STRUCTURE_LABEL}
+          </p>
 
           <p style={{ fontSize: 15, color: "#888", margin: "0 0 8px" }}>
             👩‍🏫 Mentored by:{" "}

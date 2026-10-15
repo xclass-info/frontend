@@ -7,7 +7,7 @@ import { SkeletonClassCard } from "./Skeleton";
 import { useNavigate, Link } from "react-router-dom";
 import Footer from "./Footer";
 import { formatMentorName } from "../utils/mentorName";
-import { seatsStatus } from "../utils/format";
+import { seatsStatus, LESSON_STRUCTURE_LABEL } from "../utils/format";
 import { GRADE_RANGE_OPTIONS } from "../utils/gradeRange";
 import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
 import { useScrollReveal } from "../utils/useScrollReveal";
@@ -469,6 +469,17 @@ export default function ProjectListing() {
                         🎓 {p.gradeLevel}
                       </span>
                     )}
+
+                    <p
+                      style={{
+                        fontSize: 12,
+                        color: "var(--muted)",
+                        fontWeight: 600,
+                        margin: "0 0 12px",
+                      }}
+                    >
+                      🕐 {LESSON_STRUCTURE_LABEL}
+                    </p>
 
                     <div style={{ marginBottom: 12 }}>
                       <p style={labelStyle}>Description</p>

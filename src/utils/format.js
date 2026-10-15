@@ -19,3 +19,7 @@ export function lessonWeekday(dateStr) {
 export function safeUrl(url) {
   return /^https?:\/\//i.test((url || "").trim()) ? url.trim() : null;
 }
+
+// Every research/project mentorship follows the same fixed structure -
+// shown on listing cards and detail pages, not a per-post field.
+export const LESSON_STRUCTURE_LABEL = "10 lessons · 1 hour each";

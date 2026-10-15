@@ -11,6 +11,7 @@ import { GRADE_RANGE_OPTIONS } from "../utils/gradeRange";
 import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
 import { useScrollReveal } from "../utils/useScrollReveal";
 import { TopicIcon } from "../utils/topicIcons";
+import { LESSON_STRUCTURE_LABEL } from "../utils/format";
 
 const labelStyle = {
   fontSize: 12,
@@ -480,6 +481,17 @@ export default function ResearchListing() {
                         🎓 {r.gradeLevel}
                       </span>
                     )}
+
+                    <p
+                      style={{
+                        fontSize: 12,
+                        color: "var(--muted)",
+                        fontWeight: 600,
+                        margin: "0 0 12px",
+                      }}
+                    >
+                      🕐 {LESSON_STRUCTURE_LABEL}
+                    </p>
 
                     <div style={{ marginBottom: 12 }}>
                       <p style={labelStyle}>Idea</p>
