@@ -1,11 +1,8 @@
 .hero {
   min-height: 50vh;
-  padding: 72px 6% 56px;
   background: #1f3a42;
   position: relative;
   overflow: hidden;
-  display: flex;
-  align-items: center;
 }
 
 .videoBg {
@@ -27,19 +24,6 @@
   z-index: 0;
 }
 
-.videoOverlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    120deg,
-    rgba(18, 34, 40, 0.9) 0%,
-    rgba(31, 58, 66, 0.78) 45%,
-    rgba(47, 97, 117, 0.45) 100%
-  );
-  z-index: 1;
-  pointer-events: none;
-}
-
 @media (max-width: 900px) {
   .videoBg {
     display: none;
@@ -49,6 +33,11 @@
   }
 }
 
+.heroText {
+  background: var(--bg);
+  padding: 64px 6% 16px;
+}
+
 .inner {
   max-width: 1200px;
   margin: 0 auto;
@@ -56,8 +45,6 @@
   align-items: center;
   gap: 80px;
   width: 100%;
-  position: relative;
-  z-index: 2;
 }
 
 .content {
@@ -94,13 +81,13 @@
   font-size: clamp(2.6rem, 5.5vw, 4.4rem);
   line-height: 1.05;
   letter-spacing: -0.015em;
-  color: #ffffff;
+  color: var(--text);
   margin-bottom: 20px;
 }
 
 .sub {
   font-size: 1.05rem;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--muted);
   font-weight: 600;
   line-height: 1.75;
   margin-bottom: 36px;
@@ -122,13 +109,13 @@
 .statNum {
   font-family: "Source Serif 4", Georgia, serif;
   font-size: 1.6rem;
-  color: #e8c468;
+  color: var(--coral);
 }
 
 .statLabel {
   font-size: 0.78rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--muted);
 }
 
 .mentorShowcase {

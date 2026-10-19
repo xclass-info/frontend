@@ -79,9 +79,10 @@ export default function Hero() {
         className={styles.posterMobile}
         style={{ backgroundImage: "url(/hero-poster.jpg)" }}
       />
-      <div className={styles.videoOverlay} />
+    </section>
+
+    <section className={styles.heroText}>
       <div className={styles.inner}>
-        {/* Left content */}
         <div className={styles.content}>
           <div className={styles.tag}>
             <span className={styles.tagDot} />
