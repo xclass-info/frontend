@@ -144,7 +144,16 @@ export default function ProjectDetail() {
             boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
           }}
         >
-          <InfoSlide kind='project' item={project} />
+          <h1
+            style={{
+              fontSize: "1.9rem",
+              lineHeight: 1.3,
+              margin: "0 0 16px",
+              color: "#1a1a2e",
+            }}
+          >
+            {project.title}
+          </h1>
 
           <p style={{ fontSize: 15, color: "#888", margin: "0 0 8px" }}>
             👩‍🏫 Mentored by:{" "}
@@ -189,6 +198,8 @@ export default function ProjectDetail() {
               {project.description}
             </p>
           </div>
+
+          <InfoSlide kind='project' item={project} />
 
           <div style={{ marginBottom: 8 }}>
             <p style={sectionLabel}>What Students Will Learn</p>
