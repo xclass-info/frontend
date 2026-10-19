@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebase";
 import { collection, onSnapshot } from "firebase/firestore";
 import styles from "./Hero.module.css";
 import InitialsAvatar from "./InitialsAvatar";
+
+const HeroScene = lazy(() => import("./HeroScene"));
 
 function mentorTags(teacher) {
   const raw = [teacher.expertise, teacher.researchArea]
@@ -68,6 +70,11 @@ export default function Hero() {
       <div className={styles.blob1} />
       <div className={styles.blob2} />
       <div className={styles.blob3} />
+      <div className={styles.scene3d}>
+        <Suspense fallback={null}>
+          <HeroScene />
+        </Suspense>
+      </div>
       <div className={styles.inner}>
         {/* Left content */}
         <div className={styles.content}>

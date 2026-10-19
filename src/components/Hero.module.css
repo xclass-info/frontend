@@ -8,6 +8,18 @@
   align-items: center;
 }
 
+.scene3d {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .scene3d {
+    display: none;
+  }
+}
+
 .blob1 {
   position: absolute;
   top: 10%;
