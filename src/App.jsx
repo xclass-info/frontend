@@ -76,8 +76,8 @@ function HomePage() {
   return (
     <>
       <Navbar />
-      <GetStartedSection />
       <Hero />
+      <GetStartedSection />
       <HowItWorks />
       <ResearchPrograms />
       <ResearchSection />
