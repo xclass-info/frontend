@@ -64,6 +64,7 @@ export default function Hero() {
   }, []);
 
   return (
+    <>
     <section className={styles.hero}>
       <video
         className={styles.videoBg}
@@ -132,83 +133,85 @@ export default function Hero() {
             ))}
           </div>
         </div>
-
-        {/* Right visual */}
-        {mentor && (
-          <div className={styles.visual}>
-            {/* Mentor card */}
-            <div className={styles.terminal}>
-              <div className={styles.termBar}>
-                {mentor.photoURL ? (
-                  <img
-                    src={mentor.photoURL}
-                    alt={mentor.name}
-                    className={styles.tutorAvatar}
-                    style={{ objectFit: "cover" }}
-                  />
-                ) : (
-                  <InitialsAvatar
-                    name={mentor.name}
-                    seed={mentor.id}
-                    className={styles.tutorAvatar}
-                    fontSize='1.1rem'
-                  />
-                )}
-                <div style={{ minWidth: 0, flex: 1 }}>
-                  <div className={styles.tutorName}>{mentor.name}</div>
-                  <div
-                    className={styles.tutorSubject}
-                    style={{
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {(mentor.expertise || mentor.researchArea || "Research Mentor").trim()}
-                  </div>
-                </div>
-                <div className={styles.tutorBadge}>{mentorBadge(mentor)}</div>
-              </div>
-              <div className={styles.termBody}>
-                <div className={styles.tutorStats}>
-                  {mentorStats(mentor).map(([num, label]) => (
-                    <div className={styles.tutorStat} key={label}>
-                      <span className={styles.tutorStatNum}>{num}</span>
-                      <span className={styles.tutorStatLabel}>{label}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className={styles.tutorTags}>
-                  {mentorTags(mentor).map((t) => (
-                    <span key={t} className={styles.tutorTag}>
-                      {t}
-                    </span>
-                  ))}
-                </div>
-                <button
-                  className={styles.bookBtn}
-                  onClick={() => navigate(`/teacher/${mentor.id}`)}
-                >
-                  View Profile →
-                </button>
-              </div>
-            </div>
-
-            {/* Live session pill */}
-            <div className={styles.aiPill}>
-              <div className={styles.aiIcon}>🔬</div>
-              <div>
-                <strong>Live Session in Progress</strong>
-                <p>
-                  {mentorTags(mentor)[0] || "Research"} Journal Club · 8
-                  students joined
-                </p>
-              </div>
-              <div className={styles.liveDot} />
-            </div>
-          </div>
-        )}
       </div>
     </section>
+
+    {mentor && (
+      <section className={styles.mentorShowcase}>
+        <div className={styles.visual}>
+          {/* Mentor card */}
+          <div className={styles.terminal}>
+            <div className={styles.termBar}>
+              {mentor.photoURL ? (
+                <img
+                  src={mentor.photoURL}
+                  alt={mentor.name}
+                  className={styles.tutorAvatar}
+                  style={{ objectFit: "cover" }}
+                />
+              ) : (
+                <InitialsAvatar
+                  name={mentor.name}
+                  seed={mentor.id}
+                  className={styles.tutorAvatar}
+                  fontSize='1.1rem'
+                />
+              )}
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div className={styles.tutorName}>{mentor.name}</div>
+                <div
+                  className={styles.tutorSubject}
+                  style={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {(mentor.expertise || mentor.researchArea || "Research Mentor").trim()}
+                </div>
+              </div>
+              <div className={styles.tutorBadge}>{mentorBadge(mentor)}</div>
+            </div>
+            <div className={styles.termBody}>
+              <div className={styles.tutorStats}>
+                {mentorStats(mentor).map(([num, label]) => (
+                  <div className={styles.tutorStat} key={label}>
+                    <span className={styles.tutorStatNum}>{num}</span>
+                    <span className={styles.tutorStatLabel}>{label}</span>
+                  </div>
+                ))}
+              </div>
+              <div className={styles.tutorTags}>
+                {mentorTags(mentor).map((t) => (
+                  <span key={t} className={styles.tutorTag}>
+                    {t}
+                  </span>
+                ))}
+              </div>
+              <button
+                className={styles.bookBtn}
+                onClick={() => navigate(`/teacher/${mentor.id}`)}
+              >
+                View Profile →
+              </button>
+            </div>
+          </div>
+
+          {/* Live session pill */}
+          <div className={styles.aiPill}>
+            <div className={styles.aiIcon}>🔬</div>
+            <div>
+              <strong>Live Session in Progress</strong>
+              <p>
+                {mentorTags(mentor)[0] || "Research"} Journal Club · 8
+                students joined
+              </p>
+            </div>
+            <div className={styles.liveDot} />
+          </div>
+        </div>
+      </section>
+      )}
+    </>
   );
 }
