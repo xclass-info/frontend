@@ -34,7 +34,7 @@ export default function ResearchSection() {
   if (loading || research.length === 0) return null;
 
   return (
-    <section style={{ padding: "120px 24px 80px 24px", background: "white" }}>
+    <section style={{ padding: "120px 24px 110px 24px", background: "white" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div className='reveal' style={{ textAlign: "center", marginBottom: 48 }}>
           <h2 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: 8 }}>

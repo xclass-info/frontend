@@ -14,8 +14,8 @@
   --primary-hover: #2f6175;
   --primary-soft: #e3eff3;
   --accent: #9a772b;
-  --bg: #f8fafb;
-  --surface: #eef6f9;
+  --bg: #faf8f4;
+  --surface: #f3efe6;
   --card: #ffffff;
   --border: #d5dde2;
   --coral: #427e94;
@@ -88,23 +88,19 @@ body::before {
   gap: 8px;
   font-size: 0.75rem;
   font-weight: 800;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--primary-hover);
   margin-bottom: 14px;
-  background: var(--primary-soft);
-  padding: 5px 14px;
-  border-radius: 50px;
-  border: 1px solid var(--border);
 }
 
 h2 {
   font-family: "Source Serif 4", Georgia, serif;
-  font-size: clamp(1.8rem, 3.2vw, 2.8rem);
+  font-size: clamp(2.1rem, 3.8vw, 3.4rem);
   font-weight: 700;
-  line-height: 1.15;
+  line-height: 1.08;
   margin-bottom: 14px;
-  letter-spacing: 0;
+  letter-spacing: -0.01em;
   color: var(--accent);
 }
 
@@ -113,7 +109,7 @@ h2 {
   max-width: 540px;
   font-size: 1rem;
   line-height: 1.75;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .btn-primary {
