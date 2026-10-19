@@ -1,99 +1,192 @@
-// A one-glance visual summary ("slide") for a research/project detail
+// A bold, presentation-style "slide" summary for a research/project detail
 // page - synthesized entirely from the post's own fields (title,
-// idea/description, grade level, deliverable, schedule), not a separate
-// downloadable file. Sits above the detailed Idea/Impact/Schedule sections.
-import { TopicIcon } from "../utils/topicIcons";
-import { LESSON_STRUCTURE_LABEL } from "../utils/format";
+// idea/description, impact/learning, deliverable, grade level, schedule),
+// not a separate downloadable file. Sits above the detailed Idea/Impact/
+// Schedule sections. Styled in the site's own teal/gold brand rather than
+// an arbitrary new palette, so it doesn't reintroduce the kind of
+// inconsistency the rest of the site was just cleaned up of.
+import { pickIcon } from "../utils/topicIcons";
 import { locationLabel } from "../utils/schedule";
+import { LESSON_STRUCTURE_LABEL } from "../utils/format";
 
-function FactChip({ label, value }) {
-  if (!value) return null;
+const TAGLINE = "Real research. Real mentorship. Your curiosity leads.";
+
+function MetaItem({ icon, children }) {
   return (
-    <div
-      style={{
-        background: "white",
-        border: "1px solid var(--border)",
-        borderRadius: 10,
-        padding: "8px 14px",
-        minWidth: 120,
-      }}
-    >
-      <p
-        style={{
-          margin: "0 0 2px",
-          fontSize: 10,
-          fontWeight: 700,
-          textTransform: "uppercase",
-          letterSpacing: "0.05em",
-          color: "var(--muted)",
-        }}
-      >
-        {label}
-      </p>
-      <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "var(--text)" }}>
-        {value}
-      </p>
-    </div>
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+      <span>{icon}</span>
+      {children}
+    </span>
   );
 }
 
 export default function InfoSlide({ kind, item }) {
   const summary = kind === "research" ? item.idea : item.description;
+  const secondary = kind === "research" ? item.impact : item.learning;
+  const { Icon } = pickIcon(item.id);
 
   return (
     <div
       style={{
-        background: "linear-gradient(135deg, var(--primary-soft), white)",
-        border: "1px solid var(--border)",
-        borderRadius: 16,
-        padding: 28,
+        background: "linear-gradient(135deg, #1f3a42, #2f6175)",
+        borderRadius: 20,
+        padding: "36px 40px",
         marginBottom: 28,
         display: "flex",
-        flexDirection: "column",
-        gap: 18,
+        flexWrap: "wrap",
+        gap: 32,
+        alignItems: "center",
+        color: "white",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <TopicIcon seed={item.id} size={56} />
-        <div>
+      <div style={{ flex: "3 1 320px", minWidth: 0 }}>
+        <p
+          style={{
+            margin: "0 0 10px",
+            fontSize: 12,
+            fontWeight: 800,
+            textTransform: "uppercase",
+            letterSpacing: "0.1em",
+            color: "#e8c468",
+          }}
+        >
+          {kind === "research" ? "Student Research Project" : "Student Project"}
+        </p>
+        <h2
+          style={{
+            margin: "0 0 16px",
+            fontFamily: "'Source Serif 4', Georgia, serif",
+            fontSize: "1.9rem",
+            fontWeight: 800,
+            lineHeight: 1.15,
+          }}
+        >
+          {item.title}
+        </h2>
+
+        {summary && (
           <p
             style={{
-              margin: 0,
-              fontSize: 11,
-              fontWeight: 700,
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-              color: "var(--accent)",
+              margin: "0 0 20px",
+              fontSize: 15,
+              lineHeight: 1.65,
+              color: "rgba(255,255,255,0.85)",
+              maxWidth: 560,
             }}
           >
-            {kind === "research" ? "Research Overview" : "Project Overview"}
+            {summary}
           </p>
-          <h2
-            style={{
-              margin: "2px 0 0",
-              fontFamily: "'Source Serif 4', Georgia, serif",
-              fontSize: 24,
-              color: "var(--text)",
-            }}
-          >
-            {item.title}
-          </h2>
+        )}
+
+        {(secondary || item.deliverable) && (
+          <>
+            <p
+              style={{
+                margin: "0 0 10px",
+                fontSize: 11,
+                fontWeight: 800,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                color: "#9fe0cf",
+              }}
+            >
+              What You'll Do
+            </p>
+            <ul
+              style={{
+                margin: "0 0 20px",
+                padding: 0,
+                listStyle: "none",
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+              }}
+            >
+              {secondary && (
+                <li
+                  style={{
+                    fontSize: 14,
+                    lineHeight: 1.6,
+                    color: "rgba(255,255,255,0.85)",
+                    paddingLeft: 22,
+                    position: "relative",
+                  }}
+                >
+                  <span style={{ position: "absolute", left: 0, color: "#9fe0cf" }}>✓</span>
+                  {secondary}
+                </li>
+              )}
+              {item.deliverable && (
+                <li
+                  style={{
+                    fontSize: 14,
+                    lineHeight: 1.6,
+                    color: "rgba(255,255,255,0.85)",
+                    paddingLeft: 22,
+                    position: "relative",
+                  }}
+                >
+                  <span style={{ position: "absolute", left: 0, color: "#9fe0cf" }}>✓</span>
+                  Produce a {item.deliverable}
+                </li>
+              )}
+            </ul>
+          </>
+        )}
+
+        <div
+          style={{
+            display: "flex",
+            gap: 18,
+            flexWrap: "wrap",
+            fontSize: 12.5,
+            color: "rgba(255,255,255,0.65)",
+            marginBottom: 18,
+          }}
+        >
+          {item.gradeLevel && <MetaItem icon='🎓'>{item.gradeLevel}</MetaItem>}
+          <MetaItem icon='🕐'>{LESSON_STRUCTURE_LABEL}</MetaItem>
+          {item.scheduleLocation && <span>{locationLabel(item.scheduleLocation)}</span>}
         </div>
+
+        <p
+          style={{
+            margin: 0,
+            fontSize: 14,
+            fontWeight: 700,
+            color: "#c9b8e8",
+          }}
+        >
+          {TAGLINE}
+        </p>
       </div>
 
-      {summary && (
-        <p style={{ margin: 0, fontSize: 15, color: "var(--muted)", lineHeight: 1.6 }}>
-          {summary}
-        </p>
-      )}
-
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-        <FactChip label="Grade Level" value={item.gradeLevel} />
-        <FactChip label="You'll Produce" value={item.deliverable} />
-        <FactChip label="Format" value={LESSON_STRUCTURE_LABEL} />
-        {item.scheduleLocation && (
-          <FactChip label="Location" value={locationLabel(item.scheduleLocation)} />
-        )}
+      <div
+        style={{
+          flex: "1 1 140px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minWidth: 140,
+        }}
+      >
+        <div
+          style={{
+            width: 150,
+            height: 150,
+            borderRadius: "50%",
+            background: "rgba(255,255,255,0.08)",
+            border: "1px solid rgba(255,255,255,0.15)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#e8c468",
+          }}
+        >
+          <Icon size={72} />
+        </div>
       </div>
     </div>
   );

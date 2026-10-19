@@ -72,14 +72,21 @@ function hashSeed(seed) {
   return h;
 }
 
+// Same deterministic pick (icon + a teal/gold flag) that TopicIcon uses
+// internally, exposed directly for callers that want to apply their own
+// colors (e.g. a dark-background "slide" treatment) instead of the
+// light-background pastel circle below.
+export function pickIcon(seed) {
+  const h = hashSeed(seed);
+  return { Icon: ICONS[h % ICONS.length], teal: (h >> 3) % 2 === 0 };
+}
+
 // Topic badge: a colored circle with one of the line icons above, picked
 // deterministically from `seed` (an item id/title - same input always
 // gives the same icon+color). Alternates teal/gold so a grid of cards
 // doesn't read as one flat color.
 export function TopicIcon({ seed, size = 44 }) {
-  const h = hashSeed(seed);
-  const Icon = ICONS[h % ICONS.length];
-  const teal = (h >> 3) % 2 === 0;
+  const { Icon, teal } = pickIcon(seed);
   const bg = teal ? "var(--primary-soft)" : "rgba(154,119,43,0.12)";
   const fg = teal ? "var(--primary-hover)" : "var(--accent)";
   return (
