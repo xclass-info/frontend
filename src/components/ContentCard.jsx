@@ -1,6 +1,6 @@
 import styles from "./TeacherDashboard.module.css";
 import RegistrationList from "./RegistrationList";
-import { safeUrl } from "../utils/format";
+import { safeUrl, LESSON_STRUCTURE_LABEL } from "../utils/format";
 
 const KIND_LABEL = {
   research: "🔬 Research",
@@ -67,6 +67,12 @@ export default function ContentCard({ item, kind, onEdit, onDelete, onToggleStag
       )}
       {item.deliverable && (
         <p style={gradeDeliverableStyle("deliverable")}>📦 {item.deliverable}</p>
+      )}
+
+      {kind !== "showcase" && (
+        <p style={{ fontSize: 12, color: "#64748b", fontWeight: 600, margin: "0 0 6px" }}>
+          🕐 {LESSON_STRUCTURE_LABEL}
+        </p>
       )}
 
       {kind === "project" && item.seats ? (

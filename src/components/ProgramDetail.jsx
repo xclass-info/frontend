@@ -5,6 +5,7 @@ import { db } from "../firebase";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import { LESSON_STRUCTURE_LABEL } from "../utils/format";
 
 const programData = {
   neuroscience: {
@@ -781,6 +782,9 @@ export default function ProgramDetail() {
                   >
                     {r.idea}
                   </p>
+                  <p style={{ fontSize: 11, color: "#64748b", fontWeight: 600, margin: "8px 0 0" }}>
+                    🕐 {LESSON_STRUCTURE_LABEL}
+                  </p>
                 </div>
               ))}
             </div>
@@ -879,6 +883,9 @@ export default function ProgramDetail() {
                     }}
                   >
                     {p.description}
+                  </p>
+                  <p style={{ fontSize: 11, color: "#64748b", fontWeight: 600, margin: "8px 0 0" }}>
+                    🕐 {LESSON_STRUCTURE_LABEL}
                   </p>
                 </div>
               ))}

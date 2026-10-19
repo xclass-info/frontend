@@ -11,6 +11,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { TopicIcon } from "../utils/topicIcons";
+import { LESSON_STRUCTURE_LABEL } from "../utils/format";
 
 export default function ResearchSection() {
   const navigate = useNavigate();
@@ -114,6 +115,16 @@ export default function ResearchSection() {
                 }}
               >
                 Impact: {r.impact.substring(0, 80)}...
+              </p>
+              <p
+                style={{
+                  fontSize: 11,
+                  color: "var(--muted)",
+                  fontWeight: 600,
+                  margin: "8px 0 0",
+                }}
+              >
+                🕐 {LESSON_STRUCTURE_LABEL}
               </p>
             </div>
           ))}
