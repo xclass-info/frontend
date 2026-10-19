@@ -6,6 +6,7 @@
 // an arbitrary new palette, so it doesn't reintroduce the kind of
 // inconsistency the rest of the site was just cleaned up of.
 import { pickIcon } from "../utils/topicIcons";
+import { pickTheme } from "../utils/slideThemes";
 import { locationLabel } from "../utils/schedule";
 import { LESSON_STRUCTURE_LABEL } from "../utils/format";
 
@@ -24,11 +25,12 @@ export default function InfoSlide({ kind, item }) {
   const summary = kind === "research" ? item.idea : item.description;
   const secondary = kind === "research" ? item.impact : item.learning;
   const { Icon } = pickIcon(item.id);
+  const theme = pickTheme(item.id);
 
   return (
     <div
       style={{
-        background: "linear-gradient(135deg, #1f3a42, #2f6175)",
+        background: theme.gradient,
         borderRadius: 20,
         padding: "36px 40px",
         marginBottom: 28,
@@ -49,7 +51,7 @@ export default function InfoSlide({ kind, item }) {
             fontWeight: 800,
             textTransform: "uppercase",
             letterSpacing: "0.1em",
-            color: "#e8c468",
+            color: theme.eyebrow,
           }}
         >
           {kind === "research" ? "Student Research Project" : "Student Project"}
@@ -89,7 +91,7 @@ export default function InfoSlide({ kind, item }) {
                 fontWeight: 800,
                 textTransform: "uppercase",
                 letterSpacing: "0.08em",
-                color: "#9fe0cf",
+                color: theme.accent,
               }}
             >
               What You'll Do
@@ -114,7 +116,7 @@ export default function InfoSlide({ kind, item }) {
                     position: "relative",
                   }}
                 >
-                  <span style={{ position: "absolute", left: 0, color: "#9fe0cf" }}>✓</span>
+                  <span style={{ position: "absolute", left: 0, color: theme.accent }}>✓</span>
                   {secondary}
                 </li>
               )}
@@ -128,7 +130,7 @@ export default function InfoSlide({ kind, item }) {
                     position: "relative",
                   }}
                 >
-                  <span style={{ position: "absolute", left: 0, color: "#9fe0cf" }}>✓</span>
+                  <span style={{ position: "absolute", left: 0, color: theme.accent }}>✓</span>
                   Produce a {item.deliverable}
                 </li>
               )}
@@ -156,7 +158,7 @@ export default function InfoSlide({ kind, item }) {
             margin: 0,
             fontSize: 14,
             fontWeight: 700,
-            color: "#c9b8e8",
+            color: theme.tagline,
           }}
         >
           {TAGLINE}
@@ -182,7 +184,7 @@ export default function InfoSlide({ kind, item }) {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            color: "#e8c468",
+            color: theme.iconColor,
           }}
         >
           <Icon size={72} />
