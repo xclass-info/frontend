@@ -11,6 +11,7 @@ import {
 import styles from "./TeacherAuth.module.css";
 import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
 import { GRADE_RANGE_OPTIONS } from "../utils/gradeRange";
+import { LOCATION_OPTIONS } from "../utils/schedule";
 
 const WORD_LIMITS = { title: 100, idea: 500, impact: 300, details: 300 };
 
@@ -38,6 +39,9 @@ export default function ResearchForm({ research, onClose }) {
     deliverable: research?.deliverable || "",
     gradeLevel: research?.gradeLevel || "",
     prerequisites: research?.prerequisites || "",
+    scheduleStartDate: research?.scheduleStartDate || "",
+    scheduleTime: research?.scheduleTime || "",
+    scheduleLocation: research?.scheduleLocation || "online",
   });
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -58,6 +62,8 @@ export default function ResearchForm({ research, onClose }) {
     if (!form.impact.trim()) newErrors.impact = "Required";
     if (!form.deliverable) newErrors.deliverable = "Required";
     if (!form.gradeLevel) newErrors.gradeLevel = "Required";
+    if (!form.scheduleStartDate) newErrors.scheduleStartDate = "Required";
+    if (!form.scheduleTime) newErrors.scheduleTime = "Required";
     return newErrors;
   }
 
@@ -83,6 +89,9 @@ export default function ResearchForm({ research, onClose }) {
         deliverable: form.deliverable,
         gradeLevel: form.gradeLevel,
         prerequisites: form.prerequisites.trim() || null,
+        scheduleStartDate: form.scheduleStartDate,
+        scheduleTime: form.scheduleTime,
+        scheduleLocation: form.scheduleLocation,
       };
       if (isEditing) {
         await updateDoc(doc(db, "research", research.id), {
@@ -306,6 +315,52 @@ export default function ResearchForm({ research, onClose }) {
             placeholder='e.g. Basic Python, Algebra 1'
             style={{ fontSize: "1.1rem" }}
           />
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label}>Schedule *</label>
+          <p style={{ color: "#888", fontSize: 13, margin: "0 0 10px" }}>
+            10 weekly lessons, 1 hour each, starting from this date/time.
+          </p>
+          <div className={styles.row}>
+            <div>
+              <input
+                className={`${styles.input} ${errors.scheduleStartDate ? styles.inputError : ""}`}
+                type='date'
+                name='scheduleStartDate'
+                value={form.scheduleStartDate}
+                onChange={handleChange}
+              />
+              {errors.scheduleStartDate && (
+                <p className={styles.errorMsg}>{errors.scheduleStartDate}</p>
+              )}
+            </div>
+            <div>
+              <input
+                className={`${styles.input} ${errors.scheduleTime ? styles.inputError : ""}`}
+                type='time'
+                name='scheduleTime'
+                value={form.scheduleTime}
+                onChange={handleChange}
+              />
+              {errors.scheduleTime && (
+                <p className={styles.errorMsg}>{errors.scheduleTime}</p>
+              )}
+            </div>
+          </div>
+          <select
+            className={styles.input}
+            name='scheduleLocation'
+            value={form.scheduleLocation}
+            onChange={handleChange}
+            style={{ marginTop: 10 }}
+          >
+            {LOCATION_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div style={{ display: "flex", gap: 12 }}>

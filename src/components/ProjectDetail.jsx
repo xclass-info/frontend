@@ -7,6 +7,7 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { formatMentorName } from "../utils/mentorName";
 import { LESSON_STRUCTURE_LABEL } from "../utils/format";
+import { computeLessonDates, formatLessonSlot, locationLabel } from "../utils/schedule";
 import { SeatsRow, RegisterModal, LoginPrompt } from "./RegisterControls";
 import { useStudentAuth } from "../utils/useStudentAuth";
 
@@ -245,6 +246,40 @@ export default function ProjectDetail() {
               {project.learning}
             </p>
           </div>
+
+          {project.scheduleStartDate && project.scheduleTime && (
+            <div style={{ marginBottom: 8 }}>
+              <p style={sectionLabel}>Schedule</p>
+              <div style={{ background: "#f9fafb", borderRadius: 10, padding: 18 }}>
+                <p
+                  style={{
+                    margin: "0 0 12px",
+                    fontSize: 14,
+                    fontWeight: 700,
+                    color: "var(--primary-hover)",
+                  }}
+                >
+                  {locationLabel(project.scheduleLocation)}
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {computeLessonDates(
+                    project.scheduleStartDate,
+                    project.scheduleTime,
+                  ).map((d, i) => (
+                    <div
+                      key={i}
+                      style={{ display: "flex", gap: 10, fontSize: 14, color: "var(--muted)" }}
+                    >
+                      <span style={{ fontWeight: 700, color: "var(--text)", minWidth: 72 }}>
+                        Lesson {i + 1}
+                      </span>
+                      <span>{formatLessonSlot(d)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       {registering && student && (
