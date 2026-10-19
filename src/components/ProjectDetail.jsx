@@ -6,8 +6,8 @@ import { doc, getDoc } from "firebase/firestore";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { formatMentorName } from "../utils/mentorName";
-import { LESSON_STRUCTURE_LABEL } from "../utils/format";
 import { computeLessonDates, formatLessonSlot, locationLabel } from "../utils/schedule";
+import InfoSlide from "./InfoSlide";
 import { SeatsRow, RegisterModal, LoginPrompt } from "./RegisterControls";
 import { useStudentAuth } from "../utils/useStudentAuth";
 
@@ -144,38 +144,7 @@ export default function ProjectDetail() {
             boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
           }}
         >
-          <h1
-            style={{
-              fontSize: "1.9rem",
-              lineHeight: 1.3,
-              margin: "0 0 12px",
-              color: "#1a1a2e",
-            }}
-          >
-            {project.title}
-          </h1>
-
-          {project.gradeLevel && (
-            <span
-              style={{
-                display: "inline-block",
-                fontSize: 12,
-                fontWeight: 700,
-                color: "#2f6175",
-                background: "#fff8dc",
-                border: "1px solid #9a772b",
-                padding: "3px 12px",
-                borderRadius: 20,
-                marginBottom: 12,
-              }}
-            >
-              🎓 {project.gradeLevel}
-            </span>
-          )}
-
-          <p style={{ fontSize: 14, color: "var(--muted)", fontWeight: 600, margin: "0 0 8px" }}>
-            🕐 {LESSON_STRUCTURE_LABEL}
-          </p>
+          <InfoSlide kind='project' item={project} />
 
           <p style={{ fontSize: 15, color: "#888", margin: "0 0 8px" }}>
             👩‍🏫 Mentored by:{" "}
@@ -190,19 +159,6 @@ export default function ProjectDetail() {
               mentorLabel
             )}
           </p>
-
-          {project.deliverable && (
-            <p
-              style={{
-                fontSize: 14,
-                color: "#14532d",
-                fontWeight: 600,
-                margin: "0 0 16px",
-              }}
-            >
-              📦 You'll produce: {project.deliverable}
-            </p>
-          )}
 
           {project.prerequisites && (
             <p
