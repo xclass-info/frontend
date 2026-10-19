@@ -1,6 +1,6 @@
 .hero {
-  min-height: 100vh;
-  padding: 120px 6% 110px;
+  min-height: 50vh;
+  padding: 72px 6% 56px;
   background: #1f3a42;
   position: relative;
   overflow: hidden;
@@ -337,7 +337,7 @@
 
 @media (max-width: 560px) {
   .hero {
-    padding: 100px 4% 60px;
+    padding: 60px 4% 40px;
   }
   .stats {
     gap: 16px;
