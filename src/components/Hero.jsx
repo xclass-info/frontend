@@ -1,11 +1,9 @@
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebase";
 import { collection, onSnapshot } from "firebase/firestore";
 import styles from "./Hero.module.css";
 import InitialsAvatar from "./InitialsAvatar";
-
-const HeroScene = lazy(() => import("./HeroScene"));
 
 function mentorTags(teacher) {
   const raw = [teacher.expertise, teacher.researchArea]
@@ -67,14 +65,20 @@ export default function Hero() {
 
   return (
     <section className={styles.hero}>
-      <div className={styles.blob1} />
-      <div className={styles.blob2} />
-      <div className={styles.blob3} />
-      <div className={styles.scene3d}>
-        <Suspense fallback={null}>
-          <HeroScene />
-        </Suspense>
-      </div>
+      <video
+        className={styles.videoBg}
+        src='/hero-bg.mp4'
+        poster='/hero-poster.jpg'
+        autoPlay
+        muted
+        loop
+        playsInline
+      />
+      <div
+        className={styles.posterMobile}
+        style={{ backgroundImage: "url(/hero-poster.jpg)" }}
+      />
+      <div className={styles.videoOverlay} />
       <div className={styles.inner}>
         {/* Left content */}
         <div className={styles.content}>
@@ -82,11 +86,7 @@ export default function Hero() {
             <span className={styles.tagDot} />
             🔬 Online · All ages · Real research
           </div>
-          <h1 className={styles.h1}>
-            <span className='grad-text'>
-              Turn curiosity into real research 🔬
-            </span>
-          </h1>
+          <h1 className={styles.h1}>Turn curiosity into real research 🔬</h1>
           <p className={styles.sub}>
             Get matched 1-on-1 with a PhD research mentor in neuroscience, AI,
             bioinformatics, and more — and work on real research, not just

@@ -1,56 +1,51 @@
 .hero {
   min-height: 100vh;
   padding: 120px 6% 110px;
-  background: var(--surface);
+  background: #1f3a42;
   position: relative;
   overflow: hidden;
   display: flex;
   align-items: center;
 }
 
-.scene3d {
+.videoBg {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.posterMobile {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+}
+
+.videoOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    rgba(18, 34, 40, 0.9) 0%,
+    rgba(31, 58, 66, 0.78) 45%,
+    rgba(47, 97, 117, 0.45) 100%
+  );
+  z-index: 1;
   pointer-events: none;
 }
 
 @media (max-width: 900px) {
-  .scene3d {
+  .videoBg {
     display: none;
   }
-}
-
-.blob1 {
-  position: absolute;
-  top: 10%;
-  right: -5%;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(66, 126, 148, 0.15), transparent);
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.blob2 {
-  position: absolute;
-  bottom: 10%;
-  left: -5%;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(154, 119, 43, 0.15), transparent);
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.blob3 {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(circle, rgba(47, 97, 117, 0.12), transparent);
-  border-radius: 50%;
-  pointer-events: none;
+  .posterMobile {
+    display: block;
+  }
 }
 
 .inner {
@@ -60,6 +55,8 @@
   align-items: center;
   gap: 80px;
   width: 100%;
+  position: relative;
+  z-index: 2;
 }
 
 .content {
@@ -96,13 +93,13 @@
   font-size: clamp(2.6rem, 5.5vw, 4.4rem);
   line-height: 1.05;
   letter-spacing: -0.015em;
-  color: var(--text);
+  color: #ffffff;
   margin-bottom: 20px;
 }
 
 .sub {
   font-size: 1.05rem;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.85);
   font-weight: 600;
   line-height: 1.75;
   margin-bottom: 36px;
@@ -124,13 +121,13 @@
 .statNum {
   font-family: "Source Serif 4", Georgia, serif;
   font-size: 1.6rem;
-  color: var(--coral);
+  color: #e8c468;
 }
 
 .statLabel {
   font-size: 0.78rem;
   font-weight: 700;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.65);
 }
 
 .visual {
