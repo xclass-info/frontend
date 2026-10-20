@@ -12,6 +12,7 @@ import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
 import { useScrollReveal } from "../utils/useScrollReveal";
 import { TopicIcon } from "../utils/topicIcons";
 import { LESSON_STRUCTURE_LABEL } from "../utils/format";
+import { toPrereqArray } from "../utils/prerequisites";
 
 const labelStyle = {
   fontSize: 12,
@@ -516,7 +517,7 @@ export default function ResearchListing() {
                       </p>
                     )}
 
-                    {r.prerequisites && (
+                    {toPrereqArray(r.prerequisites).length > 0 && (
                       <p
                         style={{
                           fontSize: 12,
@@ -524,7 +525,7 @@ export default function ResearchListing() {
                           margin: "0 0 8px",
                         }}
                       >
-                        ✅ Prerequisites: {r.prerequisites}
+                        ✅ Prerequisites: {toPrereqArray(r.prerequisites).join(", ")}
                       </p>
                     )}
 

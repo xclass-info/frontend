@@ -12,6 +12,8 @@ import styles from "./TeacherAuth.module.css";
 import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
 import { GRADE_RANGE_OPTIONS } from "../utils/gradeRange";
 import { LOCATION_OPTIONS } from "../utils/schedule";
+import { toPrereqArray, MAX_PREREQUISITES } from "../utils/prerequisites";
+import PrerequisitesField from "./PrerequisitesField";
 
 const WORD_LIMITS = { title: 100, idea: 500, impact: 300, details: 300 };
 
@@ -38,7 +40,7 @@ export default function ResearchForm({ research, onClose }) {
     type: research?.type || "exploration",
     deliverable: research?.deliverable || "",
     gradeLevel: research?.gradeLevel || "",
-    prerequisites: research?.prerequisites || "",
+    prerequisites: toPrereqArray(research?.prerequisites),
     scheduleStartDate: research?.scheduleStartDate || "",
     scheduleTime: research?.scheduleTime || "",
     scheduleLocation: research?.scheduleLocation || "online",
@@ -88,7 +90,10 @@ export default function ResearchForm({ research, onClose }) {
         type: form.type,
         deliverable: form.deliverable,
         gradeLevel: form.gradeLevel,
-        prerequisites: form.prerequisites.trim() || null,
+        prerequisites: form.prerequisites
+          .map((s) => s.trim())
+          .filter(Boolean)
+          .slice(0, MAX_PREREQUISITES),
         scheduleStartDate: form.scheduleStartDate,
         scheduleTime: form.scheduleTime,
         scheduleLocation: form.scheduleLocation,
@@ -302,20 +307,10 @@ export default function ResearchForm({ research, onClose }) {
           )}
         </div>
 
-        <div className={styles.field}>
-          <label className={styles.label}>
-            Prerequisites{" "}
-            <span style={{ color: "#aaa", fontWeight: 400 }}>(optional)</span>
-          </label>
-          <input
-            className={styles.input}
-            name='prerequisites'
-            value={form.prerequisites}
-            onChange={handleChange}
-            placeholder='e.g. Basic Python, Algebra 1'
-            style={{ fontSize: "1.1rem" }}
-          />
-        </div>
+        <PrerequisitesField
+          value={form.prerequisites}
+          onChange={(next) => setForm({ ...form, prerequisites: next })}
+        />
 
         <div className={styles.field}>
           <label className={styles.label}>Schedule *</label>

@@ -10,6 +10,7 @@ import { computeLessonDates, formatLessonSlot, locationLabel } from "../utils/sc
 import InfoSlide from "./InfoSlide";
 import { SeatsRow, RegisterModal, LoginPrompt } from "./RegisterControls";
 import { useStudentAuth } from "../utils/useStudentAuth";
+import { toPrereqArray } from "../utils/prerequisites";
 
 const sectionLabel = {
   fontSize: 12,
@@ -174,7 +175,7 @@ export default function ResearchDetail() {
             )}
           </p>
 
-          {research.prerequisites && (
+          {toPrereqArray(research.prerequisites).length > 0 && (
             <p
               style={{
                 fontSize: 14,
@@ -182,7 +183,7 @@ export default function ResearchDetail() {
                 margin: "0 0 16px",
               }}
             >
-              ✅ Prerequisites: {research.prerequisites}
+              ✅ Prerequisites: {toPrereqArray(research.prerequisites).join(", ")}
             </p>
           )}
 

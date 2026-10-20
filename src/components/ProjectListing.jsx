@@ -12,6 +12,7 @@ import { GRADE_RANGE_OPTIONS } from "../utils/gradeRange";
 import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
 import { useScrollReveal } from "../utils/useScrollReveal";
 import { TopicIcon } from "../utils/topicIcons";
+import { toPrereqArray } from "../utils/prerequisites";
 
 const labelStyle = {
   fontSize: 12,
@@ -504,7 +505,7 @@ export default function ProjectListing() {
                       </p>
                     )}
 
-                    {p.prerequisites && (
+                    {toPrereqArray(p.prerequisites).length > 0 && (
                       <p
                         style={{
                           fontSize: 12,
@@ -512,7 +513,7 @@ export default function ProjectListing() {
                           margin: "0 0 8px",
                         }}
                       >
-                        ✅ Prerequisites: {p.prerequisites}
+                        ✅ Prerequisites: {toPrereqArray(p.prerequisites).join(", ")}
                       </p>
                     )}
 

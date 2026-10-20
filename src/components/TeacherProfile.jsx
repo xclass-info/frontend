@@ -18,6 +18,7 @@ import { SeatsRow, RegisterModal, LoginPrompt } from "./RegisterControls";
 import { useStudentAuth } from "../utils/useStudentAuth";
 import InitialsAvatar from "./InitialsAvatar";
 import { formatMentorName } from "../utils/mentorName";
+import { toPrereqArray } from "../utils/prerequisites";
 
 const cardStyle = {
   background: "white",
@@ -233,9 +234,9 @@ function ResearchItem({ r, onRegister, expertiseTags }) {
       >
         {r.idea}
       </p>
-      {r.prerequisites && (
+      {toPrereqArray(r.prerequisites).length > 0 && (
         <p style={{ fontSize: 12, color: "var(--muted)", margin: "0 0 4px" }}>
-          ✅ Prerequisites: {r.prerequisites}
+          ✅ Prerequisites: {toPrereqArray(r.prerequisites).join(", ")}
         </p>
       )}
       <p style={{ fontSize: 12, color: "var(--muted)", fontWeight: 600, margin: "0 0 4px" }}>
@@ -791,9 +792,9 @@ export default function TeacherProfile() {
                       }}
                     />
                   )}
-                  {project.prerequisites && (
+                  {toPrereqArray(project.prerequisites).length > 0 && (
                     <p style={{ fontSize: 12, color: "var(--muted)", margin: "6px 0 0" }}>
-                      ✅ Prerequisites: {project.prerequisites}
+                      ✅ Prerequisites: {toPrereqArray(project.prerequisites).join(", ")}
                     </p>
                   )}
                   <p style={{ fontSize: 12, color: "var(--muted)", fontWeight: 600, margin: "6px 0 0" }}>
