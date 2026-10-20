@@ -152,6 +152,23 @@ export default function ProjectDetail() {
             {project.title}
           </h1>
 
+          {project.difficulty && (
+            <span
+              style={{
+                display: "inline-block",
+                fontSize: 12,
+                fontWeight: 700,
+                color: "#8a6a25",
+                background: "rgba(154, 119, 43, 0.1)",
+                padding: "4px 12px",
+                borderRadius: 20,
+                marginBottom: 10,
+              }}
+            >
+              {project.difficulty}
+            </span>
+          )}
+
           <p style={{ fontSize: 15, color: "#888", margin: "0 0 8px" }}>
             👩‍🏫 Mentored by:{" "}
             {mentor ? (
@@ -210,6 +227,15 @@ export default function ProjectDetail() {
               {project.learning}
             </p>
           </div>
+
+          {project.details && (
+            <div style={{ marginBottom: 8 }}>
+              <p style={sectionLabel}>Additional Details</p>
+              <p style={{ ...sectionBody, background: "#f9fafb" }}>
+                {project.details}
+              </p>
+            </div>
+          )}
 
           {project.scheduleStartDate && project.scheduleTime && (
             <div style={{ marginBottom: 8 }}>

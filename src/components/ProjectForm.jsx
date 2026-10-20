@@ -14,8 +14,9 @@ import { GRADE_RANGE_OPTIONS } from "../utils/gradeRange";
 import { LOCATION_OPTIONS } from "../utils/schedule";
 import { toPrereqArray, MAX_PREREQUISITES } from "../utils/prerequisites";
 import PrerequisitesField from "./PrerequisitesField";
+import { DIFFICULTY_OPTIONS } from "../utils/difficulty";
 
-const WORD_LIMITS = { title: 100, description: 500, learning: 300 };
+const WORD_LIMITS = { title: 100, description: 500, learning: 300, details: 300 };
 
 function countWords(str) {
   const trimmed = str.trim();
@@ -36,9 +37,11 @@ export default function ProjectForm({ project, onClose }) {
     title: project?.title || "",
     description: project?.description || "",
     learning: project?.learning || "",
+    details: project?.details || "",
     seats: project?.seats ?? "",
     deliverable: project?.deliverable || "",
     gradeLevel: project?.gradeLevel || "",
+    difficulty: project?.difficulty || "",
     prerequisites: toPrereqArray(project?.prerequisites),
     scheduleStartDate: project?.scheduleStartDate || "",
     scheduleTime: project?.scheduleTime || "",
@@ -63,6 +66,7 @@ export default function ProjectForm({ project, onClose }) {
     if (!form.learning.trim()) newErrors.learning = "Required";
     if (!form.deliverable) newErrors.deliverable = "Required";
     if (!form.gradeLevel) newErrors.gradeLevel = "Required";
+    if (!form.difficulty) newErrors.difficulty = "Required";
     if (!form.scheduleStartDate) newErrors.scheduleStartDate = "Required";
     if (!form.scheduleTime) newErrors.scheduleTime = "Required";
     if (form.seats === "") newErrors.seats = "Required";
@@ -87,9 +91,11 @@ export default function ProjectForm({ project, onClose }) {
         title: form.title.trim(),
         description: form.description.trim(),
         learning: form.learning.trim(),
+        details: form.details.trim() || null,
         seats: Number(form.seats),
         deliverable: form.deliverable,
         gradeLevel: form.gradeLevel,
+        difficulty: form.difficulty,
         prerequisites: form.prerequisites
           .map((s) => s.trim())
           .filter(Boolean)
@@ -239,6 +245,36 @@ export default function ProjectForm({ project, onClose }) {
         </div>
 
         <div className={styles.field}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <label className={styles.label}>
+              Additional Details{" "}
+              <span style={{ color: "#aaa", fontWeight: 400 }}>
+                (optional)
+              </span>
+            </label>
+            <WordCount
+              count={countWords(form.details)}
+              limit={WORD_LIMITS.details}
+            />
+          </div>
+          <textarea
+            className={`${styles.input} ${styles.textarea}`}
+            name='details'
+            value={form.details}
+            onChange={handleChange}
+            placeholder='Any additional information...'
+            rows={3}
+            style={{ fontSize: "1.1rem" }}
+          />
+        </div>
+
+        <div className={styles.field}>
           <label className={styles.label}>What Students Will Produce *</label>
           <select
             className={`${styles.input} ${errors.deliverable ? styles.inputError : ""}`}
@@ -277,6 +313,27 @@ export default function ProjectForm({ project, onClose }) {
           </select>
           {errors.gradeLevel && (
             <p className={styles.errorMsg}>{errors.gradeLevel}</p>
+          )}
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label}>Difficulty *</label>
+          <select
+            className={`${styles.input} ${errors.difficulty ? styles.inputError : ""}`}
+            name='difficulty'
+            value={form.difficulty}
+            onChange={handleChange}
+            style={{ fontSize: "1.1rem" }}
+          >
+            <option value=''>Select a difficulty</option>
+            {DIFFICULTY_OPTIONS.map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
+            ))}
+          </select>
+          {errors.difficulty && (
+            <p className={styles.errorMsg}>{errors.difficulty}</p>
           )}
         </div>
 

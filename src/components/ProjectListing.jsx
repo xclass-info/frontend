@@ -13,6 +13,9 @@ import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
 import { useScrollReveal } from "../utils/useScrollReveal";
 import { TopicIcon } from "../utils/topicIcons";
 import { toPrereqArray } from "../utils/prerequisites";
+import { DIFFICULTY_OPTIONS } from "../utils/difficulty";
+import { LOCATION_OPTIONS } from "../utils/schedule";
+import styles from "./ProjectListing.module.css";
 
 const labelStyle = {
   fontSize: 12,
@@ -72,10 +75,13 @@ export default function ProjectListing() {
 
   const [search, setSearch] = useState("");
   const [selectedGrades, setSelectedGrades] = useState([]);
+  const [selectedDifficulties, setSelectedDifficulties] = useState([]);
+  const [selectedLocations, setSelectedLocations] = useState([]);
   const [selectedDeliverables, setSelectedDeliverables] = useState([]);
   const [seatsOnly, setSeatsOnly] = useState(false);
   const [selectedStages, setSelectedStages] = useState([...STAGE_OPTIONS]);
   const [sortBy, setSortBy] = useState("newest");
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const pageRef = useScrollReveal([loading, projects]);
 
   useEffect(() => {
@@ -134,6 +140,8 @@ export default function ProjectListing() {
   function clearFilters() {
     setSearch("");
     setSelectedGrades([]);
+    setSelectedDifficulties([]);
+    setSelectedLocations([]);
     setSelectedDeliverables([]);
     setSeatsOnly(false);
     setSelectedStages([...STAGE_OPTIONS]);
@@ -148,6 +156,18 @@ export default function ProjectListing() {
         if (!haystack.includes(q)) return false;
       }
       if (selectedGrades.length > 0 && !selectedGrades.includes(p.gradeLevel)) {
+        return false;
+      }
+      if (
+        selectedDifficulties.length > 0 &&
+        !selectedDifficulties.includes(p.difficulty)
+      ) {
+        return false;
+      }
+      if (
+        selectedLocations.length > 0 &&
+        !selectedLocations.includes(p.scheduleLocation)
+      ) {
         return false;
       }
       if (
@@ -177,7 +197,17 @@ export default function ProjectListing() {
     });
 
     return list;
-  }, [projects, search, selectedGrades, selectedDeliverables, seatsOnly, selectedStages, sortBy]);
+  }, [
+    projects,
+    search,
+    selectedGrades,
+    selectedDifficulties,
+    selectedLocations,
+    selectedDeliverables,
+    seatsOnly,
+    selectedStages,
+    sortBy,
+  ]);
 
   if (loading) {
     return (
@@ -216,11 +246,30 @@ export default function ProjectListing() {
           flexWrap: "wrap",
         }}
       >
+        <button
+          className={styles.filterToggle}
+          onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
+          style={{
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            background: "white",
+            border: "1px solid var(--border)",
+            borderRadius: 12,
+            padding: "12px 16px",
+            fontSize: 14,
+            fontWeight: 700,
+            color: "var(--text)",
+            cursor: "pointer",
+          }}
+        >
+          🔍 Filters {mobileFiltersOpen ? "▴" : "▾"}
+        </button>
+
         {/* Filters sidebar */}
         <aside
+          className={`${styles.sidebar} ${mobileFiltersOpen ? styles.sidebarOpen : ""}`}
           style={{
-            width: 240,
-            flexShrink: 0,
             background: "white",
             borderRadius: 16,
             padding: 20,
@@ -261,6 +310,34 @@ export default function ProjectListing() {
                 onChange={() => toggleValue(selectedGrades, setSelectedGrades, g)}
               />
               {g}
+            </label>
+          ))}
+
+          <p style={filterLabel}>Experience Level</p>
+          {DIFFICULTY_OPTIONS.map((d) => (
+            <label key={d} style={checkboxRow}>
+              <input
+                type='checkbox'
+                checked={selectedDifficulties.includes(d)}
+                onChange={() =>
+                  toggleValue(selectedDifficulties, setSelectedDifficulties, d)
+                }
+              />
+              {d}
+            </label>
+          ))}
+
+          <p style={filterLabel}>Location</p>
+          {LOCATION_OPTIONS.map((o) => (
+            <label key={o.value} style={checkboxRow}>
+              <input
+                type='checkbox'
+                checked={selectedLocations.includes(o.value)}
+                onChange={() =>
+                  toggleValue(selectedLocations, setSelectedLocations, o.value)
+                }
+              />
+              {o.label}
             </label>
           ))}
 
@@ -453,22 +530,40 @@ export default function ProjectListing() {
                       </span>
                     </div>
 
-                    {p.gradeLevel && (
-                      <span
-                        style={{
-                          display: "inline-block",
-                          fontSize: 11,
-                          fontWeight: 700,
-                          color: "var(--primary-hover)",
-                          background: "var(--surface)",
-                          border: "1px solid var(--accent)",
-                          padding: "2px 10px",
-                          borderRadius: 20,
-                          marginBottom: 12,
-                        }}
-                      >
-                        🎓 {p.gradeLevel}
-                      </span>
+                    {(p.gradeLevel || p.difficulty) && (
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+                        {p.gradeLevel && (
+                          <span
+                            style={{
+                              display: "inline-block",
+                              fontSize: 11,
+                              fontWeight: 700,
+                              color: "var(--primary-hover)",
+                              background: "var(--surface)",
+                              border: "1px solid var(--accent)",
+                              padding: "2px 10px",
+                              borderRadius: 20,
+                            }}
+                          >
+                            🎓 {p.gradeLevel}
+                          </span>
+                        )}
+                        {p.difficulty && (
+                          <span
+                            style={{
+                              display: "inline-block",
+                              fontSize: 11,
+                              fontWeight: 700,
+                              color: "#8a6a25",
+                              background: "rgba(154, 119, 43, 0.1)",
+                              padding: "2px 10px",
+                              borderRadius: 20,
+                            }}
+                          >
+                            {p.difficulty}
+                          </span>
+                        )}
+                      </div>
                     )}
 
                     <p
