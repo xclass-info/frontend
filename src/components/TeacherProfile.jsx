@@ -18,6 +18,13 @@ import { SeatsRow, RegisterModal, LoginPrompt } from "./RegisterControls";
 import { useStudentAuth } from "../utils/useStudentAuth";
 import InitialsAvatar from "./InitialsAvatar";
 import { formatMentorName } from "../utils/mentorName";
+import { mentorTypeLabel } from "../utils/mentorVerification";
+
+const VERIFIED_VIA = {
+  phd_student: "via transcript",
+  phd_graduate: "via degree certificate",
+  faculty: "via verified work email",
+};
 import { toPrereqArray } from "../utils/prerequisites";
 
 const cardStyle = {
@@ -582,6 +589,32 @@ export default function TeacherProfile() {
               <p style={{ margin: "0 0 10px", fontSize: 13, color: "#9a772b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em" }}>
                 Research Mentor
               </p>
+
+              {teacher.mentorType && (
+                <div style={{ marginBottom: 14 }}>
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                      background: "rgba(22,101,52,0.08)",
+                      color: "#14532d",
+                      border: "1px solid rgba(22,101,52,0.25)",
+                      borderRadius: 20,
+                      padding: "4px 12px",
+                      fontSize: 12,
+                      fontWeight: 700,
+                    }}
+                  >
+                    ✓ Verified {mentorTypeLabel(teacher.mentorType)}
+                  </span>
+                  {VERIFIED_VIA[teacher.mentorType] && (
+                    <p style={{ margin: "4px 0 0", fontSize: 11, color: "var(--muted)" }}>
+                      {VERIFIED_VIA[teacher.mentorType]}
+                    </p>
+                  )}
+                </div>
+              )}
 
               {(teacher.degree || teacher.university) && (
                 <p style={{ margin: "0 0 18px", fontSize: 13.5, color: "var(--muted)" }}>
