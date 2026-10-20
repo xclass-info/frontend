@@ -3,26 +3,26 @@ import styles from "./HowItWorks.module.css";
 const STEPS = [
   {
     icon: "🔍",
-    title: "Choose a research area",
-    desc: "Pick from neuroscience, AI, public health, bioinformatics, and more.",
+    title: "Pick your path",
+    desc: "Browse Research, Projects, or 1-on-1 Learning — or tell us what you need and we'll help you find the right fit.",
     color: "#427e94",
   },
   {
     icon: "🧑‍🔬",
     title: "Get matched with a mentor",
-    desc: "Connect with a PhD mentor from a top university who guides your project.",
+    desc: "Connect with a PhD mentor from a top university who reviews your request and confirms your spot.",
     color: "#9a772b",
   },
   {
     icon: "🎥",
-    title: "Do the research",
-    desc: "Work 1-on-1 with your mentor via live video sessions, chat, and shared docs.",
+    title: "Work together",
+    desc: "Meet with your mentor via live video sessions, chat, and shared docs — guided every step of the way.",
     color: "#427e94",
   },
   {
     icon: "📄",
-    title: "Present & publish",
-    desc: "Turn your project into a paper, presentation, or portfolio piece.",
+    title: "Walk away with something real",
+    desc: "A finished paper, a project you built, or a skill you finally understand — your call.",
     color: "#9a772b",
   },
 ];
@@ -33,10 +33,10 @@ export default function HowItWorks() {
       <div className={styles.inner}>
         <div className={`${styles.top} reveal`}>
           <div className='section-label'>✨ How it works</div>
-          <h2>From curiosity to research 🎯</h2>
-          <p className='section-sub'>
-            From choosing a research area to your first mentor session — it
-            takes less than 5 minutes to get started.
+          <h2>From interest to real work 🎯</h2>
+          <p className='section-sub' style={{ margin: "0 auto" }}>
+            Whether it's a research paper, a hands-on project, or 1-on-1
+            help — here's what to expect, start to finish.
           </p>
         </div>
 

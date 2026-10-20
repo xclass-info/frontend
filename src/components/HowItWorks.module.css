@@ -14,10 +14,6 @@
   margin-bottom: 64px;
 }
 
-.top .section-sub {
-  margin: 0 auto;
-}
-
 .grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
