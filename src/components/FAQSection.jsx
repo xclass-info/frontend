@@ -50,13 +50,13 @@ function FAQItem({ item, open, onToggle }) {
           cursor: "pointer",
           padding: 0,
           textAlign: "left",
-          fontSize: 16,
+          fontSize: 19,
           fontWeight: 700,
           color: "var(--text)",
         }}
       >
         {item.q}
-        <span style={{ color: "#9a772b", fontSize: 20, flexShrink: 0, marginLeft: 16 }}>
+        <span style={{ color: "#9a772b", fontSize: 22, flexShrink: 0, marginLeft: 16 }}>
           {open ? "−" : "+"}
         </span>
       </button>
@@ -64,7 +64,7 @@ function FAQItem({ item, open, onToggle }) {
         <p
           style={{
             marginTop: 12,
-            fontSize: 14,
+            fontSize: 16,
             color: "#555",
             lineHeight: 1.7,
           }}
@@ -86,7 +86,9 @@ export default function FAQSection() {
           <h2 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: 8 }}>
             ❓ Frequently Asked Questions
           </h2>
-          <p style={{ color: "#666" }}>Common questions from parents and students.</p>
+          <p style={{ color: "#666", fontSize: 17 }}>
+            Common questions from parents and students.
+          </p>
         </div>
 
         <div>
