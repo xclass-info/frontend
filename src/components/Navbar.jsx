@@ -106,6 +106,7 @@ export default function Navbar() {
             <div className={styles.dropdownMenuInner}>
               <Link to='/projects'>💡 Projects</Link>
               <Link to='/research'>🔬 Research</Link>
+              <Link to='/tutors'>🧑‍🏫 1-on-1 Learning</Link>
               <Link to='/tell-us-what-you-need'>💬 On-demand Learning</Link>
             </div>
           </div>
@@ -173,6 +174,9 @@ export default function Navbar() {
           </li>
           <li>
             <Link to='/research'>🔬 Research</Link>
+          </li>
+          <li>
+            <Link to='/tutors'>🧑‍🏫 1-on-1 Learning</Link>
           </li>
           <li>
             <Link to='/tell-us-what-you-need'>💬 On-demand Learning</Link>
