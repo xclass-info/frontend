@@ -15,6 +15,7 @@ import { LESSON_STRUCTURE_LABEL } from "../utils/format";
 import { toPrereqArray } from "../utils/prerequisites";
 import { DIFFICULTY_OPTIONS } from "../utils/difficulty";
 import { LOCATION_OPTIONS } from "../utils/schedule";
+import styles from "./ResearchListing.module.css";
 
 const labelStyle = {
   fontSize: 12,
@@ -80,6 +81,7 @@ export default function ResearchListing() {
   const [seatsOnly, setSeatsOnly] = useState(false);
   const [selectedStages, setSelectedStages] = useState([...STAGE_OPTIONS]);
   const [sortBy, setSortBy] = useState("newest");
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const pageRef = useScrollReveal([loading, research]);
 
   useEffect(() => {
@@ -256,11 +258,30 @@ export default function ResearchListing() {
           flexWrap: "wrap",
         }}
       >
+        <button
+          className={styles.filterToggle}
+          onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
+          style={{
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            background: "white",
+            border: "1px solid var(--border)",
+            borderRadius: 12,
+            padding: "12px 16px",
+            fontSize: 14,
+            fontWeight: 700,
+            color: "var(--text)",
+            cursor: "pointer",
+          }}
+        >
+          🔍 Filters {mobileFiltersOpen ? "▴" : "▾"}
+        </button>
+
         {/* Filters sidebar */}
         <aside
+          className={`${styles.sidebar} ${mobileFiltersOpen ? styles.sidebarOpen : ""}`}
           style={{
-            width: 240,
-            flexShrink: 0,
             background: "white",
             borderRadius: 16,
             padding: 20,
