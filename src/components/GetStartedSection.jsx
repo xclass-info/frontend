@@ -7,7 +7,7 @@ import styles from "./GetStartedSection.module.css";
 
 export default function GetStartedSection() {
   return (
-    <section className={styles.section}>
+    <section id='get-started' className={styles.section}>
       <div className={styles.blob1} />
       <div className={styles.blob2} />
       <div className={styles.inner}>

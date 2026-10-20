@@ -77,14 +77,14 @@ function HomePage() {
     <>
       <Navbar />
       <Hero />
+      <HowItWorks />
+      <Testimonials />
       <GetStartedSection />
       <ActiveEnrolling />
-      <HowItWorks />
       <ResearchSection />
       <ProjectSection />
       <OneOnOneSection />
       <Tutors />
-      <Testimonials />
       <Footer />
     </>
   );

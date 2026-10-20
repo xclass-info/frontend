@@ -21,22 +21,22 @@ export default function Hero() {
           </div>
           <h1 className={styles.h1}>Turn curiosity into real research 🔬</h1>
           <p className={styles.sub}>
-            Get matched 1-on-1 with a PhD research mentor in neuroscience, AI,
-            bioinformatics, and more — and work on real research, not just
-            homework.
+            Get matched 1-on-1 with a PhD mentor for real research, hands-on
+            projects, or focused tutoring — in neuroscience, AI,
+            bioinformatics, and more.
           </p>
           <div className={styles.actions}>
             <a
-              href='#tutors'
+              href='#get-started'
               className='btn-primary'
               onClick={(e) => {
                 e.preventDefault();
-                const el = document.getElementById("tutors");
+                const el = document.getElementById("get-started");
                 if (el) el.scrollIntoView({ behavior: "smooth" });
               }}
               style={{ cursor: "pointer" }}
             >
-              Find a Mentor {"→"}
+              Get Started {"→"}
             </a>
             <a
               href='#how'
