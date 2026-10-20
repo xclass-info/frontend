@@ -14,6 +14,7 @@ import { GRADE_RANGE_OPTIONS } from "../utils/gradeRange";
 import { LOCATION_OPTIONS } from "../utils/schedule";
 import { toPrereqArray, MAX_PREREQUISITES } from "../utils/prerequisites";
 import PrerequisitesField from "./PrerequisitesField";
+import { DIFFICULTY_OPTIONS } from "../utils/difficulty";
 
 const WORD_LIMITS = { title: 100, idea: 500, impact: 300, details: 300 };
 
@@ -40,6 +41,7 @@ export default function ResearchForm({ research, onClose }) {
     type: research?.type || "exploration",
     deliverable: research?.deliverable || "",
     gradeLevel: research?.gradeLevel || "",
+    difficulty: research?.difficulty || "",
     prerequisites: toPrereqArray(research?.prerequisites),
     scheduleStartDate: research?.scheduleStartDate || "",
     scheduleTime: research?.scheduleTime || "",
@@ -64,6 +66,7 @@ export default function ResearchForm({ research, onClose }) {
     if (!form.impact.trim()) newErrors.impact = "Required";
     if (!form.deliverable) newErrors.deliverable = "Required";
     if (!form.gradeLevel) newErrors.gradeLevel = "Required";
+    if (!form.difficulty) newErrors.difficulty = "Required";
     if (!form.scheduleStartDate) newErrors.scheduleStartDate = "Required";
     if (!form.scheduleTime) newErrors.scheduleTime = "Required";
     return newErrors;
@@ -89,6 +92,7 @@ export default function ResearchForm({ research, onClose }) {
         seats: 1,
         type: form.type,
         deliverable: form.deliverable,
+        difficulty: form.difficulty,
         gradeLevel: form.gradeLevel,
         prerequisites: form.prerequisites
           .map((s) => s.trim())
@@ -304,6 +308,27 @@ export default function ResearchForm({ research, onClose }) {
           </select>
           {errors.gradeLevel && (
             <p className={styles.errorMsg}>{errors.gradeLevel}</p>
+          )}
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label}>Difficulty *</label>
+          <select
+            className={`${styles.input} ${errors.difficulty ? styles.inputError : ""}`}
+            name='difficulty'
+            value={form.difficulty}
+            onChange={handleChange}
+            style={{ fontSize: "1.1rem" }}
+          >
+            <option value=''>Select a difficulty</option>
+            {DIFFICULTY_OPTIONS.map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
+            ))}
+          </select>
+          {errors.difficulty && (
+            <p className={styles.errorMsg}>{errors.difficulty}</p>
           )}
         </div>
 

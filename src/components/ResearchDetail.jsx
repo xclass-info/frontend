@@ -161,6 +161,23 @@ export default function ResearchDetail() {
             {research.title}
           </h1>
 
+          {research.difficulty && (
+            <span
+              style={{
+                display: "inline-block",
+                fontSize: 12,
+                fontWeight: 700,
+                color: "#8a6a25",
+                background: "rgba(154, 119, 43, 0.1)",
+                padding: "4px 12px",
+                borderRadius: 20,
+                marginBottom: 10,
+              }}
+            >
+              {research.difficulty}
+            </span>
+          )}
+
           <p style={{ fontSize: 15, color: "#888", margin: "0 0 8px" }}>
             👩‍🏫 Mentored by:{" "}
             {mentor ? (

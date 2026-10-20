@@ -465,22 +465,40 @@ export default function ResearchListing() {
                       </span>
                     </div>
 
-                    {r.gradeLevel && (
-                      <span
-                        style={{
-                          display: "inline-block",
-                          fontSize: 11,
-                          fontWeight: 700,
-                          color: "var(--primary-hover)",
-                          background: "var(--surface)",
-                          border: "1px solid var(--accent)",
-                          padding: "2px 10px",
-                          borderRadius: 20,
-                          marginBottom: 12,
-                        }}
-                      >
-                        🎓 {r.gradeLevel}
-                      </span>
+                    {(r.gradeLevel || r.difficulty) && (
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+                        {r.gradeLevel && (
+                          <span
+                            style={{
+                              display: "inline-block",
+                              fontSize: 11,
+                              fontWeight: 700,
+                              color: "var(--primary-hover)",
+                              background: "var(--surface)",
+                              border: "1px solid var(--accent)",
+                              padding: "2px 10px",
+                              borderRadius: 20,
+                            }}
+                          >
+                            🎓 {r.gradeLevel}
+                          </span>
+                        )}
+                        {r.difficulty && (
+                          <span
+                            style={{
+                              display: "inline-block",
+                              fontSize: 11,
+                              fontWeight: 700,
+                              color: "#8a6a25",
+                              background: "rgba(154, 119, 43, 0.1)",
+                              padding: "2px 10px",
+                              borderRadius: 20,
+                            }}
+                          >
+                            {r.difficulty}
+                          </span>
+                        )}
+                      </div>
                     )}
 
                     <p
