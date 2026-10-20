@@ -13,6 +13,8 @@ import { useScrollReveal } from "../utils/useScrollReveal";
 import { TopicIcon } from "../utils/topicIcons";
 import { LESSON_STRUCTURE_LABEL } from "../utils/format";
 import { toPrereqArray } from "../utils/prerequisites";
+import { DIFFICULTY_OPTIONS } from "../utils/difficulty";
+import { LOCATION_OPTIONS } from "../utils/schedule";
 
 const labelStyle = {
   fontSize: 12,
@@ -72,6 +74,8 @@ export default function ResearchListing() {
 
   const [search, setSearch] = useState("");
   const [selectedGrades, setSelectedGrades] = useState([]);
+  const [selectedDifficulties, setSelectedDifficulties] = useState([]);
+  const [selectedLocations, setSelectedLocations] = useState([]);
   const [selectedDeliverables, setSelectedDeliverables] = useState([]);
   const [seatsOnly, setSeatsOnly] = useState(false);
   const [selectedStages, setSelectedStages] = useState([...STAGE_OPTIONS]);
@@ -142,6 +146,8 @@ export default function ResearchListing() {
   function clearFilters() {
     setSearch("");
     setSelectedGrades([]);
+    setSelectedDifficulties([]);
+    setSelectedLocations([]);
     setSelectedDeliverables([]);
     setSeatsOnly(false);
     setSelectedStages([...STAGE_OPTIONS]);
@@ -156,6 +162,18 @@ export default function ResearchListing() {
         if (!haystack.includes(q)) return false;
       }
       if (selectedGrades.length > 0 && !selectedGrades.includes(r.gradeLevel)) {
+        return false;
+      }
+      if (
+        selectedDifficulties.length > 0 &&
+        !selectedDifficulties.includes(r.difficulty)
+      ) {
+        return false;
+      }
+      if (
+        selectedLocations.length > 0 &&
+        !selectedLocations.includes(r.scheduleLocation)
+      ) {
         return false;
       }
       if (
@@ -185,7 +203,17 @@ export default function ResearchListing() {
     });
 
     return list;
-  }, [research, search, selectedGrades, selectedDeliverables, seatsOnly, selectedStages, sortBy]);
+  }, [
+    research,
+    search,
+    selectedGrades,
+    selectedDifficulties,
+    selectedLocations,
+    selectedDeliverables,
+    seatsOnly,
+    selectedStages,
+    sortBy,
+  ]);
 
   if (loading) {
     return (
@@ -273,6 +301,34 @@ export default function ResearchListing() {
                 onChange={() => toggleValue(selectedGrades, setSelectedGrades, g)}
               />
               {g}
+            </label>
+          ))}
+
+          <p style={filterLabel}>Experience Level</p>
+          {DIFFICULTY_OPTIONS.map((d) => (
+            <label key={d} style={checkboxRow}>
+              <input
+                type='checkbox'
+                checked={selectedDifficulties.includes(d)}
+                onChange={() =>
+                  toggleValue(selectedDifficulties, setSelectedDifficulties, d)
+                }
+              />
+              {d}
+            </label>
+          ))}
+
+          <p style={filterLabel}>Location</p>
+          {LOCATION_OPTIONS.map((o) => (
+            <label key={o.value} style={checkboxRow}>
+              <input
+                type='checkbox'
+                checked={selectedLocations.includes(o.value)}
+                onChange={() =>
+                  toggleValue(selectedLocations, setSelectedLocations, o.value)
+                }
+              />
+              {o.label}
             </label>
           ))}
 
