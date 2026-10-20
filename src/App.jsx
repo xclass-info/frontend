@@ -28,6 +28,9 @@ import ResearchSection from "./components/ResearchSection";
 import ProjectSection from "./components/ProjectSection";
 import OneOnOneSection from "./components/OneOnOneSection";
 import ActiveEnrolling from "./components/ActiveEnrolling";
+import WhyHappyResearch from "./components/WhyHappyResearch";
+import StudentResearchSection from "./components/StudentResearchSection";
+import FAQSection from "./components/FAQSection";
 
 import ContactUs from "./components/ContactUs";
 import AboutUs from "./components/AboutUs";
@@ -79,12 +82,15 @@ function HomePage() {
       <Hero />
       <HowItWorks />
       <Testimonials />
+      <WhyHappyResearch />
       <GetStartedSection />
       <ActiveEnrolling />
       <ResearchSection />
       <ProjectSection />
       <OneOnOneSection />
+      <StudentResearchSection />
       <Tutors />
+      <FAQSection />
       <Footer />
     </>
   );
