@@ -26,7 +26,11 @@ export default function GetStartedSection() {
             className={styles.bigButton}
             style={{ "--btn-accent": "#6d3f6b" }}
           >
-            🔬 Research
+            <span className={styles.btnTitle}>🔬 Research</span>
+            <span className={styles.btnDesc}>
+              Real research topics led by PhD mentors, from idea to a
+              finished paper or presentation.
+            </span>
           </Link>
 
           <Link
@@ -34,7 +38,11 @@ export default function GetStartedSection() {
             className={styles.bigButton}
             style={{ "--btn-accent": "#8a6a25" }}
           >
-            💡 Project
+            <span className={styles.btnTitle}>💡 Project</span>
+            <span className={styles.btnDesc}>
+              Hands-on projects you build alongside a mentor, ending in
+              something real you made.
+            </span>
           </Link>
 
           <Link
@@ -42,7 +50,11 @@ export default function GetStartedSection() {
             className={styles.bigButton}
             style={{ "--btn-accent": "#a0527a" }}
           >
-            🧑‍🏫 1-on-1 Learning
+            <span className={styles.btnTitle}>🧑‍🏫 1-on-1 Learning</span>
+            <span className={styles.btnDesc}>
+              Book a 1-on-1 session with a mentor for general help -
+              homework, a specific question, anything.
+            </span>
           </Link>
 
           <Link
@@ -50,7 +62,11 @@ export default function GetStartedSection() {
             className={styles.bigButton}
             style={{ "--btn-accent": "#9a772b" }}
           >
-            💬 On-demand Learning
+            <span className={styles.btnTitle}>💬 On-demand Learning</span>
+            <span className={styles.btnDesc}>
+              Not sure what fits? Tell us what you need and we'll help you
+              find the right mentor.
+            </span>
           </Link>
         </div>
       </div>
