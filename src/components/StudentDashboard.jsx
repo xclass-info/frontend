@@ -61,6 +61,12 @@ function RegistrationCard({ row }) {
         <span className={`${styles.badge} ${badgeClass}`}>{badgeLabel}</span>
       </div>
 
+      {reg.status === "pending" && (
+        <p className={styles.cardDesc} style={{ color: "#8a6a25" }}>
+          We typically review applications within 48 hours.
+        </p>
+      )}
+
       {reg.status === "rejected" && reg.rejectionReason && (
         <p className={styles.cardDesc} style={{ color: "#a01f13" }}>
           {reg.rejectionReason}

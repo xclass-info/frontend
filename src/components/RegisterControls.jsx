@@ -169,7 +169,8 @@ export function RegisterModal({ kind, item, student, onClose, onRegistered }) {
             <p style={{ fontSize: 48 }}>⏳</p>
             <h3>Application submitted!</h3>
             <p style={{ color: "#888", marginBottom: 20 }}>
-              Your application is pending review. We'll let you know at{" "}
+              Your application is pending review — we typically review
+              applications within 48 hours. We'll let you know at{" "}
               {student.email} once it's approved.
             </p>
             <button
