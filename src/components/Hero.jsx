@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styles from "./Hero.module.css";
 
 export default function Hero() {
@@ -15,37 +16,19 @@ export default function Hero() {
       <div className={styles.videoOverlay} />
       <div className={styles.inner}>
         <div className={styles.content}>
-          <h1 className={styles.h1}>Turn curiosity into real research 🔬</h1>
+          <h1 className={styles.h1}>Your Research Journey Starts Here.</h1>
           <p className={styles.sub}>
-            Work with a PhD mentor on real research, a hands-on project, or
-            focused 1-on-1 tutoring — in any subject you're curious about.
-            Don't see your topic? Just tell us what you need.
+            Connect with PhD mentors, explore exciting research
+            opportunities, and turn your curiosity into meaningful
+            discoveries.
           </p>
           <div className={styles.actions}>
-            <a
-              href='#get-started'
-              className='btn-primary'
-              onClick={(e) => {
-                e.preventDefault();
-                const el = document.getElementById("get-started");
-                if (el) el.scrollIntoView({ behavior: "smooth" });
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              Get Started {"→"}
-            </a>
-            <a
-              href='#how'
-              className='btn-ghost'
-              onClick={(e) => {
-                e.preventDefault();
-                const el = document.getElementById("how");
-                if (el) el.scrollIntoView({ behavior: "smooth" });
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              How it works
-            </a>
+            <Link to='/research' className='btn-primary'>
+              Explore Research Projects {"→"}
+            </Link>
+            <Link to='/tutors' className='btn-ghost'>
+              Find Your Mentor {"→"}
+            </Link>
           </div>
         </div>
       </div>
