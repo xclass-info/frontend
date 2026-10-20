@@ -26,6 +26,7 @@ import StudentRegister from "./components/StudentRegister";
 import StudentDashboard from "./components/StudentDashboard";
 import ResearchSection from "./components/ResearchSection";
 import ProjectSection from "./components/ProjectSection";
+import OneOnOneSection from "./components/OneOnOneSection";
 import ActiveEnrolling from "./components/ActiveEnrolling";
 
 import InternshipListing from "./components/InternshipListing";
@@ -85,6 +86,7 @@ function HomePage() {
       <ResearchPrograms />
       <ResearchSection />
       <ProjectSection />
+      <OneOnOneSection />
       <Tutors />
       <Testimonials />
       <Footer />
