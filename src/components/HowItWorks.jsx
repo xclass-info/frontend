@@ -40,6 +40,14 @@ export default function HowItWorks() {
           </p>
         </div>
 
+        <div className={`${styles.banner} reveal`}>
+          <img
+            src='/photos/howitworks-banner.jpg'
+            alt='Students working together in a research lab'
+            className={styles.bannerImg}
+          />
+        </div>
+
         <div className={styles.grid}>
           {STEPS.map((step, i) => (
             <div key={i} className={`${styles.card} reveal`}>

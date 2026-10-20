@@ -33,6 +33,25 @@ export default function AboutUs() {
       </div>
 
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "64px 24px" }}>
+        <div
+          style={{
+            borderRadius: 16,
+            overflow: "hidden",
+            marginBottom: 24,
+          }}
+        >
+          <img
+            src='/photos/aboutus-banner.jpg'
+            alt='A mentor and student working together'
+            style={{
+              display: "block",
+              width: "100%",
+              maxHeight: 320,
+              objectFit: "cover",
+            }}
+          />
+        </div>
+
         {/* From the Founder */}
         <div
           style={{
