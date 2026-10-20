@@ -236,9 +236,9 @@ export default function AboutUs() {
                 desc: "Personalized guidance from world-class researchers who are passionate about teaching and mentoring.",
               },
               {
-                emoji: "🚀",
-                title: "Career Preparation",
-                desc: "Build a real research portfolio that stands out in college applications and future career opportunities.",
+                emoji: "💬",
+                title: "On-Demand Learning",
+                desc: "Not sure what fits? Tell us what you need and we'll help you find the right mentor.",
               },
             ].map((item) => (
               <div
