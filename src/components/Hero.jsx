@@ -1,33 +1,6 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { db } from "../firebase";
-import { collection, onSnapshot } from "firebase/firestore";
 import styles from "./Hero.module.css";
-import InitialsAvatar from "./InitialsAvatar";
-import { mentorTags, mentorBadge, mentorStats } from "../utils/mentorCard";
 
 export default function Hero() {
-  const navigate = useNavigate();
-  const [mentor, setMentor] = useState(null);
-
-  useEffect(() => {
-    const unsub = onSnapshot(collection(db, "teachers"), (snapshot) => {
-      const data = snapshot.docs
-        .map((d) => ({ id: d.id, ...d.data() }))
-        .filter(
-          (t) => !t.disabled && t.name && t.verificationStatus === "approved",
-        );
-      data.sort((a, b) => {
-        const ratingA = typeof a.rating === "number" ? a.rating : -1;
-        const ratingB = typeof b.rating === "number" ? b.rating : -1;
-        if (ratingB !== ratingA) return ratingB - ratingA;
-        return (b.photoURL ? 1 : 0) - (a.photoURL ? 1 : 0);
-      });
-      setMentor(data[0] || null);
-    });
-    return () => unsub();
-  }, []);
-
   return (
     <>
     <section className={styles.hero}>
@@ -66,7 +39,7 @@ export default function Hero() {
               }}
               style={{ cursor: "pointer" }}
             >
-              Find a Mentor {"\u2192"}
+              Find a Mentor {"→"}
             </a>
             <a
               href='#how'
@@ -97,70 +70,6 @@ export default function Hero() {
         </div>
       </div>
     </section>
-
-    {mentor && (
-      <section className={styles.mentorShowcase}>
-        <div className={styles.visual}>
-          {/* Mentor card */}
-          <div className={styles.terminal}>
-            <div className={styles.termBar}>
-              {mentor.photoURL ? (
-                <img
-                  src={mentor.photoURL}
-                  alt={mentor.name}
-                  className={styles.tutorAvatar}
-                  style={{ objectFit: "cover" }}
-                />
-              ) : (
-                <InitialsAvatar
-                  name={mentor.name}
-                  seed={mentor.id}
-                  className={styles.tutorAvatar}
-                  fontSize='1.1rem'
-                />
-              )}
-              <div style={{ minWidth: 0, flex: 1 }}>
-                <div className={styles.tutorName}>{mentor.name}</div>
-                <div
-                  className={styles.tutorSubject}
-                  style={{
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {(mentor.expertise || mentor.researchArea || "Research Mentor").trim()}
-                </div>
-              </div>
-              <div className={styles.tutorBadge}>{mentorBadge(mentor)}</div>
-            </div>
-            <div className={styles.termBody}>
-              <div className={styles.tutorStats}>
-                {mentorStats(mentor).map(([num, label]) => (
-                  <div className={styles.tutorStat} key={label}>
-                    <span className={styles.tutorStatNum}>{num}</span>
-                    <span className={styles.tutorStatLabel}>{label}</span>
-                  </div>
-                ))}
-              </div>
-              <div className={styles.tutorTags}>
-                {mentorTags(mentor).map((t) => (
-                  <span key={t} className={styles.tutorTag}>
-                    {t}
-                  </span>
-                ))}
-              </div>
-              <button
-                className={styles.bookBtn}
-                onClick={() => navigate(`/teacher/${mentor.id}`)}
-              >
-                View Profile →
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-      )}
     </>
   );
 }
