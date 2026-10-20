@@ -63,7 +63,7 @@ export function LoginPrompt({ from }) {
 // Seat count plus an Apply now button while seats remain. Research posts
 // only ever have a single seat, so the count is redundant there - just the
 // button shows.
-export function SeatsRow({ kind, item, onRegister, extra }) {
+export function SeatsRow({ kind, item, onRegister }) {
   const left = seatsLeft(kind, item);
   if (left === null) return null;
   const showCount = kind !== "research";
@@ -81,7 +81,6 @@ export function SeatsRow({ kind, item, onRegister, extra }) {
       {showCount && (
         <span style={{ fontSize: 14, color: "var(--muted)", fontWeight: 600 }}>
           👥 {seatsStatus(totalSeats(kind, item), item.enrolledCount)}
-          {extra}
         </span>
       )}
       {left > 0 && (
@@ -114,7 +113,7 @@ const REGISTER_ERRORS = {
 // `student` is the logged-in student's account ({ uid, name, email }) -
 // registering requires login, so there's no name/email form anymore, just a
 // confirmation using the account's details.
-export function RegisterModal({ kind, item, student, onClose, onRegistered }) {
+export function RegisterModal({ kind, item, student, onClose }) {
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
@@ -128,7 +127,6 @@ export function RegisterModal({ kind, item, student, onClose, onRegistered }) {
         email: student.email,
         studentUid: student.uid,
       });
-      onRegistered(kind, item.id);
       setDone(true);
     } catch (err) {
       console.error(err);

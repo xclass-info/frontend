@@ -35,11 +35,6 @@
   font-weight: 700;
 }
 
-.logoInfo {
-  color: var(--muted, #555f66);
-  font-size: 1rem;
-}
-
 .links {
   display: flex;
   gap: 20px;

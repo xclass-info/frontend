@@ -5,7 +5,6 @@ import { auth, db } from "../firebase";
 import { signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 
-// Replace with this:
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
@@ -89,7 +88,6 @@ export default function Navbar() {
           <circle cx='50' cy='71' r='2' fill='#9a772b' />
         </svg>
         happy<span className={styles.logoClass}>Research</span>
-        {/* <span className={styles.logoInfo}>.org</span> */}
       </Link>
 
       <ul className={styles.links}>

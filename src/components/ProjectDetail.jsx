@@ -40,10 +40,6 @@ export default function ProjectDetail() {
   const [registering, setRegistering] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
-  // Applying no longer consumes a seat immediately - the seat is only taken
-  // once an admin approves the application - so there's nothing to bump here.
-  function markRegistered() {}
-
   function openRegister() {
     if (!student) {
       setShowLoginPrompt(true);
@@ -256,7 +252,6 @@ export default function ProjectDetail() {
           item={project}
           student={student}
           onClose={() => setRegistering(false)}
-          onRegistered={markRegistered}
         />
       )}
       <Footer />

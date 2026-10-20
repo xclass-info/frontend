@@ -36,8 +36,6 @@ import ContactUs from "./components/ContactUs";
 import AboutUs from "./components/AboutUs";
 import Gallery from "./components/Gallery";
 
-import ProgramDetail from "./components/ProgramDetail";
-
 function HomePage() {
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -126,7 +124,6 @@ export default function App() {
         <Route path='/about' element={<AboutUs />} />
         <Route path='/contact' element={<ContactUs />} />
         <Route path='/gallery' element={<Gallery />} />
-        <Route path='/programs/:programId' element={<ProgramDetail />} />
       </Routes>
     </BrowserRouter>
   );

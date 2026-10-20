@@ -3,13 +3,10 @@ import { useEffect, useState } from "react";
 import { db, auth, storage } from "../firebase";
 import {
   collection,
-  query,
-  where,
   onSnapshot,
   doc,
   updateDoc,
   deleteDoc,
-  addDoc,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {
@@ -59,10 +56,6 @@ export default function AdminDashboard() {
 
   const [editItem, setEditItem] = useState(null);
   const [editType, setEditType] = useState(null);
-
-  const [addType, setAddType] = useState(null);
-  const [addForm, setAddForm] = useState({});
-  const [addLoading, setAddLoading] = useState(false);
 
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -341,28 +334,6 @@ export default function AdminDashboard() {
     }
   }
 
-  async function handleAdd() {
-    if (!addType) return;
-    setAddLoading(true);
-    try {
-      await addDoc(collection(db, addType), {
-        ...addForm,
-        teacherId: "admin",
-        teacherName: "HappyResearch Team",
-        createdAt: new Date(),
-        status: "open",
-        applicants: 0,
-      });
-      setAddType(null);
-      setAddForm({});
-    } catch (err) {
-      console.error(err);
-      alert("Failed to add. Please try again.");
-    } finally {
-      setAddLoading(false);
-    }
-  }
-
   const btnStyle = (color) => ({
     padding: "6px 14px",
     borderRadius: 6,
@@ -558,7 +529,7 @@ export default function AdminDashboard() {
     if (mentorStatusFilter === "disabled" && !m.disabled) return false;
     if (
       mentorVerificationFilter !== "all" &&
-      (m.verificationStatus || "not_started") !== mentorVerificationFilter
+      (m.verificationStatus || "incomplete") !== mentorVerificationFilter
     )
       return false;
     const q = mentorSearch.trim().toLowerCase();
@@ -1359,7 +1330,6 @@ export default function AdminDashboard() {
               <option value='pending_review'>Pending Review</option>
               <option value='rejected'>Rejected</option>
               <option value='incomplete'>Incomplete</option>
-              <option value='not_started'>Not Started</option>
             </select>
             <select
               value={mentorSort}
@@ -1408,14 +1378,6 @@ export default function AdminDashboard() {
                       Disabled
                     </span>
                   )}
-                  {/* <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 12,
-                      marginBottom: 12,
-                    }}
-                  > */}
                   <div
                     style={{
                       display: "flex",
@@ -1462,42 +1424,6 @@ export default function AdminDashboard() {
                           .toUpperCase() || "T"}
                       </div>
                     )}
-                    {/* {mentor.photoURL ? (
-                      <img
-                        src={mentor.photoURL}
-                        alt={mentor.name}
-                        style={{
-                          width: 48,
-                          height: 48,
-                          borderRadius: "50%",
-                          objectFit: "cover",
-                          flexShrink: 0,
-                        }}
-                      />
-                    ) : (
-                      <div
-                        style={{
-                          width: 48,
-                          height: 48,
-                          borderRadius: "50%",
-                          background:
-                            "linear-gradient(135deg, #2f6175, #427e94)",
-                          color: "white",
-                          fontSize: 18,
-                          fontWeight: 700,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          flexShrink: 0,
-                        }}
-                      >
-                        {mentor.name
-                          ?.split(" ")
-                          .slice(-1)[0]
-                          ?.charAt(0)
-                          .toUpperCase() || "T"}
-                      </div>
-                    )} */}
                     <div>
                       <h3 style={{ margin: 0, fontSize: 15 }}>{mentor.name}</h3>
                       <p style={{ margin: 0, fontSize: 12, color: "#2f6175" }}>
@@ -2246,191 +2172,6 @@ export default function AdminDashboard() {
                 onClick={() => {
                   setEditItem(null);
                   setEditType(null);
-                  setImageFile(null);
-                  setImagePreview(null);
-                }}
-                style={{ ...btnStyle("#888"), flex: 1, padding: 12 }}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── Add Modal ── */}
-      {addType && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 200,
-            padding: 16,
-          }}
-        >
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              padding: 32,
-              width: "100%",
-              maxWidth: 560,
-              maxHeight: "90vh",
-              overflowY: "auto",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 20,
-              }}
-            >
-              <h3 style={{ margin: 0 }}>➕ Add Research</h3>
-              <button
-                onClick={() => {
-                  setAddType(null);
-                  setAddForm({});
-                  setImageFile(null);
-                  setImagePreview(null);
-                }}
-                style={{
-                  background: "none",
-                  border: "none",
-                  fontSize: 20,
-                  cursor: "pointer",
-                }}
-              >
-                ✕
-              </button>
-            </div>
-
-            {Object.entries(addForm)
-              .filter(([key]) => key !== "projects")
-              .map(([key, value]) => (
-                <div key={key} style={{ marginBottom: 12 }}>
-                  <label
-                    style={{
-                      fontSize: 12,
-                      color: "#888",
-                      fontWeight: 600,
-                      textTransform: "capitalize",
-                      display: "block",
-                      marginBottom: 4,
-                    }}
-                  >
-                    {key.replace(/([A-Z])/g, " $1")}
-                  </label>
-                  {key === "mode" ? (
-                    <select
-                      value={value}
-                      onChange={(e) =>
-                        setAddForm({ ...addForm, [key]: e.target.value })
-                      }
-                      style={{
-                        width: "100%",
-                        padding: 8,
-                        borderRadius: 6,
-                        border: "1px solid #ddd",
-                        fontSize: 13,
-                        boxSizing: "border-box",
-                      }}
-                    >
-                      <option value='Remote'>Remote</option>
-                      <option value='In-Person'>In-Person</option>
-                      <option value='Hybrid'>Hybrid</option>
-                    </select>
-                  ) : key === "stipend" ? (
-                    <select
-                      value={value}
-                      onChange={(e) =>
-                        setAddForm({ ...addForm, [key]: e.target.value })
-                      }
-                      style={{
-                        width: "100%",
-                        padding: 8,
-                        borderRadius: 6,
-                        border: "1px solid #ddd",
-                        fontSize: 13,
-                        boxSizing: "border-box",
-                      }}
-                    >
-                      <option value='Unpaid'>Unpaid</option>
-                      <option value='Paid'>Paid</option>
-                      <option value='Academic Credit'>Academic Credit</option>
-                    </select>
-                  ) : key === "deadline" ? (
-                    <input
-                      type='date'
-                      value={value}
-                      onChange={(e) =>
-                        setAddForm({ ...addForm, [key]: e.target.value })
-                      }
-                      style={{
-                        width: "100%",
-                        padding: 8,
-                        borderRadius: 6,
-                        border: "1px solid #ddd",
-                        fontSize: 13,
-                        boxSizing: "border-box",
-                      }}
-                    />
-                  ) : typeof value === "string" &&
-                    (key === "description" ||
-                      key === "requirements" ||
-                      key === "outcomes") ? (
-                    <textarea
-                      value={value}
-                      onChange={(e) =>
-                        setAddForm({ ...addForm, [key]: e.target.value })
-                      }
-                      rows={3}
-                      style={{
-                        width: "100%",
-                        padding: 8,
-                        borderRadius: 6,
-                        border: "1px solid #ddd",
-                        fontSize: 13,
-                        boxSizing: "border-box",
-                        resize: "vertical",
-                      }}
-                    />
-                  ) : (
-                    <input
-                      value={value}
-                      onChange={(e) =>
-                        setAddForm({ ...addForm, [key]: e.target.value })
-                      }
-                      style={{
-                        width: "100%",
-                        padding: 8,
-                        borderRadius: 6,
-                        border: "1px solid #ddd",
-                        fontSize: 13,
-                        boxSizing: "border-box",
-                      }}
-                    />
-                  )}
-                </div>
-              ))}
-
-            <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
-              <button
-                onClick={handleAdd}
-                disabled={addLoading}
-                style={{ ...btnStyle("#1f6f4a"), flex: 1, padding: 12 }}
-              >
-                {addLoading ? "Adding..." : "Add ✓"}
-              </button>
-              <button
-                onClick={() => {
-                  setAddType(null);
-                  setAddForm({});
                   setImageFile(null);
                   setImagePreview(null);
                 }}

@@ -383,10 +383,6 @@ export default function TeacherProfile() {
     setRegistering({ kind, item });
   }
 
-  // Applying no longer consumes a seat immediately - the seat is only taken
-  // once an admin approves the application - so there's nothing to bump here.
-  function markRegistered() {}
-
   function validate() {
     const newErrors = {};
     if (!form.name.trim()) newErrors.name = "Required";
@@ -1074,7 +1070,6 @@ export default function TeacherProfile() {
           item={registering.item}
           student={student}
           onClose={() => setRegistering(null)}
-          onRegistered={markRegistered}
         />
       )}
       {showLoginPrompt && (
