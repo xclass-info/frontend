@@ -14,25 +14,6 @@
   z-index: 0;
 }
 
-.posterMobile {
-  display: none;
-  position: absolute;
-  inset: 0;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  z-index: 0;
-}
-
-@media (max-width: 900px) {
-  .videoBg {
-    display: none;
-  }
-  .posterMobile {
-    display: block;
-  }
-}
-
 .heroText {
   background: var(--bg);
   padding: 64px 6% 16px;

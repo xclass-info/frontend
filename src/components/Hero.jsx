@@ -75,10 +75,6 @@ export default function Hero() {
         loop
         playsInline
       />
-      <div
-        className={styles.posterMobile}
-        style={{ backgroundImage: "url(/hero-poster.jpg)" }}
-      />
     </section>
 
     <section className={styles.heroText}>
