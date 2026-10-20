@@ -227,8 +227,8 @@ export default function AboutUs() {
               },
               {
                 emoji: "📄",
-                title: "Publication Track Research",
-                desc: "Advanced students collaborate with mentors to produce academic-quality research papers and publications.",
+                title: "Academic Research",
+                desc: "Advanced students collaborate with mentors to produce academic-quality research papers, and are encouraged (though not guaranteed) to pursue publication.",
               },
               {
                 emoji: "👩‍🏫",
