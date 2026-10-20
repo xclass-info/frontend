@@ -13,11 +13,134 @@ import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
 import { useScrollReveal } from "../utils/useScrollReveal";
 import { TopicIcon } from "../utils/topicIcons";
 
+function ShowcaseDetailModal({ entry, mentorLabel, onClose }) {
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.5)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 200,
+        padding: 16,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "white",
+          borderRadius: 16,
+          padding: 32,
+          width: "100%",
+          maxWidth: 560,
+          maxHeight: "90vh",
+          overflowY: "auto",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            gap: 12,
+            marginBottom: 16,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: "var(--mint)",
+              background: "rgba(31,111,74,0.08)",
+              padding: "3px 10px",
+              borderRadius: 20,
+            }}
+          >
+            📦 {entry.outputType}
+          </span>
+          <button
+            onClick={onClose}
+            style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer" }}
+          >
+            ✕
+          </button>
+        </div>
+
+        {entry.fileType === "image" ? (
+          <img
+            src={entry.fileUrl}
+            alt={`${entry.title} poster`}
+            style={{
+              width: "100%",
+              maxHeight: 320,
+              objectFit: "cover",
+              borderRadius: 10,
+              marginBottom: 16,
+            }}
+          />
+        ) : (
+          <div style={{ marginBottom: 16 }}>
+            <TopicIcon seed={entry.id} />
+          </div>
+        )}
+
+        <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8, color: "#1a1a2e" }}>
+          {entry.title}
+        </h2>
+
+        <p style={{ fontSize: 13, color: "#888", margin: "0 0 4px" }}>
+          👤 {entry.studentName}
+        </p>
+        <p style={{ fontSize: 13, color: "#888", margin: "0 0 16px" }}>
+          👩‍🏫 Mentored by: {mentorLabel(entry)}
+        </p>
+
+        <p style={{ fontSize: 14, color: "#444", lineHeight: 1.7, marginBottom: 20 }}>
+          {entry.summary}
+        </p>
+
+        {entry.createdAt?.toDate && (
+          <p style={{ fontSize: 12, color: "#aaa", marginBottom: 20 }}>
+            Published {entry.createdAt.toDate().toLocaleDateString()}
+          </p>
+        )}
+
+        <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+          {entry.fileType === "pdf" && (
+            <a
+              href={entry.fileUrl}
+              target='_blank'
+              rel='noreferrer'
+              style={{ fontSize: 13, color: "#2f6175", fontWeight: 600, textDecoration: "none" }}
+            >
+              📄 View Paper (PDF) →
+            </a>
+          )}
+          {entry.outputUrl && (
+            <a
+              href={entry.outputUrl}
+              target='_blank'
+              rel='noreferrer'
+              style={{ fontSize: 13, color: "#2f6175", fontWeight: 600, textDecoration: "none" }}
+            >
+              View work →
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ShowcaseListing() {
   const [entries, setEntries] = useState([]);
   const [teachers, setTeachers] = useState({});
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const [selectedEntry, setSelectedEntry] = useState(null);
   const pageRef = useScrollReveal([loading, entries]);
 
   useEffect(() => {
@@ -303,11 +426,41 @@ export default function ShowcaseListing() {
                     )}
                   </span>
                 </div>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedEntry(s);
+                  }}
+                  style={{
+                    width: "100%",
+                    marginTop: 16,
+                    padding: 10,
+                    borderRadius: 8,
+                    border: "1px solid var(--border)",
+                    background: "var(--bg)",
+                    color: "var(--text)",
+                    fontWeight: 700,
+                    fontSize: 13,
+                    cursor: "pointer",
+                  }}
+                >
+                  See More →
+                </button>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {selectedEntry && (
+        <ShowcaseDetailModal
+          entry={selectedEntry}
+          mentorLabel={mentorLabel}
+          onClose={() => setSelectedEntry(null)}
+        />
+      )}
+
       <Footer />
     </div>
   );
