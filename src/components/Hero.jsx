@@ -22,8 +22,8 @@ export default function Hero() {
           <h1 className={styles.h1}>Turn curiosity into real research 🔬</h1>
           <p className={styles.sub}>
             Work with a PhD mentor on real research, a hands-on project, or
-            focused tutoring — in any subject you're curious about. Don't
-            see your topic? Just tell us what you need.
+            focused 1-on-1 tutoring — in any subject you're curious about.
+            Don't see your topic? Just tell us what you need.
           </p>
           <div className={styles.actions}>
             <a
