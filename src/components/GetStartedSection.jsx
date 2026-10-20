@@ -14,7 +14,7 @@ export default function GetStartedSection() {
         <div className={styles.top}>
           <div className='section-label'>🚀 Get Started</div>
           <h2>However you'd like to begin</h2>
-          <p className='section-sub'>
+          <p className='section-sub' style={{ margin: "0 auto" }}>
             Browse what's available, or just tell us what you need - either
             way, we'll help you find the right fit.
           </p>

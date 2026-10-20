@@ -53,11 +53,6 @@
   animation: fadeInUp 0.7s ease both;
 }
 
-.top .section-sub {
-  margin: 0 auto;
-  max-width: 560px;
-}
-
 .grid {
   max-width: 1200px;
   margin: 0 auto;
