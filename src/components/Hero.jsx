@@ -21,9 +21,9 @@ export default function Hero() {
           </div>
           <h1 className={styles.h1}>Turn curiosity into real research 🔬</h1>
           <p className={styles.sub}>
-            Get matched 1-on-1 with a PhD mentor for real research, hands-on
-            projects, or focused tutoring — in neuroscience, AI,
-            bioinformatics, and more.
+            Work directly with a PhD mentor on real research, build a
+            hands-on project, or get focused 1-on-1 tutoring — in
+            neuroscience, AI, bioinformatics, and more.
           </p>
           <div className={styles.actions}>
             <a
