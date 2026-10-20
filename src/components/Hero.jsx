@@ -161,22 +161,6 @@ export default function Hero() {
         </div>
       </section>
       )}
-
-      {mentor && (
-      <section className={styles.liveSession}>
-        <div className={styles.aiPill}>
-          <div className={styles.aiIcon}>🔬</div>
-          <div>
-            <strong>Live Session in Progress</strong>
-            <p>
-              {mentorTags(mentor)[0] || "Research"} Journal Club · 8
-              students joined
-            </p>
-          </div>
-          <div className={styles.liveDot} />
-        </div>
-      </section>
-      )}
     </>
   );
 }
