@@ -2,7 +2,7 @@
 // Lets a mentor publish a finished student project to the public Showcase
 // page - the "here's proof, not just a claim" feature.
 import { useState } from "react";
-import { db, auth } from "../firebase";
+import { db, auth, storage } from "../firebase";
 import {
   collection,
   addDoc,
@@ -10,11 +10,13 @@ import {
   getDoc,
   updateDoc,
 } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import styles from "./TeacherAuth.module.css";
 import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
 import { safeUrl } from "../utils/format";
 
 const WORD_LIMITS = { title: 100, summary: 400 };
+const MAX_FILE_MB = 10;
 
 function countWords(str) {
   const trimmed = str.trim();
@@ -41,6 +43,8 @@ export default function ShowcaseForm({ entry, onClose }) {
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
   const [errors, setErrors] = useState({});
+  const [file, setFile] = useState(null);
+  const [fileError, setFileError] = useState("");
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -48,6 +52,22 @@ export default function ShowcaseForm({ entry, onClose }) {
     if (limit && countWords(value) > limit) return;
     setForm({ ...form, [name]: value });
     setErrors({ ...errors, [name]: "" });
+  }
+
+  function handleFileChange(e) {
+    const f = e.target.files[0];
+    if (!f) return;
+    const okType = f.type === "application/pdf" || f.type.startsWith("image/");
+    if (!okType) {
+      setFileError("Please upload a PDF or image file.");
+      return;
+    }
+    if (f.size > MAX_FILE_MB * 1024 * 1024) {
+      setFileError(`File must be under ${MAX_FILE_MB}MB.`);
+      return;
+    }
+    setFileError("");
+    setFile(f);
   }
 
   function validate() {
@@ -73,12 +93,25 @@ export default function ShowcaseForm({ entry, onClose }) {
     try {
       const user = auth.currentUser;
       const teacherSnap = await getDoc(doc(db, "teachers", user.uid));
+
+      let fileUrl = entry?.fileUrl || null;
+      let fileType = entry?.fileType || null;
+      if (file) {
+        const path = `showcase-files/${user.uid}/${Date.now()}_${file.name}`;
+        const fileRef = ref(storage, path);
+        await uploadBytes(fileRef, file);
+        fileUrl = await getDownloadURL(fileRef);
+        fileType = file.type.startsWith("image/") ? "image" : "pdf";
+      }
+
       const payload = {
         title: form.title.trim(),
         studentName: form.studentName.trim(),
         outputType: form.outputType,
         summary: form.summary.trim(),
         outputUrl: form.outputUrl.trim() || null,
+        fileUrl,
+        fileType,
       };
       if (isEditing) {
         await updateDoc(doc(db, "showcase", entry.id), {
@@ -243,6 +276,36 @@ export default function ShowcaseForm({ entry, onClose }) {
           {errors.outputUrl && (
             <p className={styles.errorMsg}>{errors.outputUrl}</p>
           )}
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label}>
+            Upload Paper or Poster{" "}
+            <span style={{ color: "#aaa", fontWeight: 400 }}>
+              (optional, PDF or image, up to {MAX_FILE_MB}MB)
+            </span>
+          </label>
+          {entry?.fileUrl && !file && (
+            <p style={{ fontSize: 13, color: "var(--muted)", margin: "0 0 8px" }}>
+              Current file:{" "}
+              <a href={entry.fileUrl} target='_blank' rel='noopener noreferrer'>
+                View {entry.fileType === "image" ? "poster" : "paper"}
+              </a>{" "}
+              — choose a new file below to replace it.
+            </p>
+          )}
+          <input
+            type='file'
+            accept='application/pdf,image/*'
+            onChange={handleFileChange}
+            style={{ fontSize: "0.95rem" }}
+          />
+          {file && (
+            <p style={{ fontSize: 13, color: "var(--muted)", margin: "6px 0 0" }}>
+              Selected: {file.name}
+            </p>
+          )}
+          {fileError && <p className={styles.errorMsg}>{fileError}</p>}
         </div>
 
         <div style={{ display: "flex", gap: 12 }}>

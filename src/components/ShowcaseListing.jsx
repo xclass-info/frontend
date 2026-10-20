@@ -193,7 +193,25 @@ export default function ShowcaseListing() {
                 }}
               >
                 <div style={{ marginBottom: 14 }}>
-                  <TopicIcon seed={s.id} />
+                  {s.fileType === "image" ? (
+                    <img
+                      src={s.fileUrl}
+                      alt={`${s.title} poster`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.open(s.fileUrl, "_blank", "noopener,noreferrer");
+                      }}
+                      style={{
+                        width: "100%",
+                        height: 140,
+                        objectFit: "cover",
+                        borderRadius: 10,
+                        cursor: "pointer",
+                      }}
+                    />
+                  ) : (
+                    <TopicIcon seed={s.id} />
+                  )}
                 </div>
                 <span
                   style={{
@@ -245,26 +263,45 @@ export default function ShowcaseListing() {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: 8,
                   }}
                 >
                   <span style={{ fontSize: 12, color: "#888" }}>
                     👩‍🏫 Mentored by: {mentorLabel(s)}
                   </span>
-                  {s.outputUrl && (
-                    <a
-                      href={s.outputUrl}
-                      target='_blank'
-                      rel='noreferrer'
-                      style={{
-                        fontSize: 12,
-                        color: "#2f6175",
-                        fontWeight: 600,
-                        textDecoration: "none",
-                      }}
-                    >
-                      View work →
-                    </a>
-                  )}
+                  <span style={{ display: "flex", gap: 12 }}>
+                    {s.fileType === "pdf" && (
+                      <a
+                        href={s.fileUrl}
+                        target='_blank'
+                        rel='noreferrer'
+                        style={{
+                          fontSize: 12,
+                          color: "#2f6175",
+                          fontWeight: 600,
+                          textDecoration: "none",
+                        }}
+                      >
+                        📄 View Paper (PDF) →
+                      </a>
+                    )}
+                    {s.outputUrl && (
+                      <a
+                        href={s.outputUrl}
+                        target='_blank'
+                        rel='noreferrer'
+                        style={{
+                          fontSize: 12,
+                          color: "#2f6175",
+                          fontWeight: 600,
+                          textDecoration: "none",
+                        }}
+                      >
+                        View work →
+                      </a>
+                    )}
+                  </span>
                 </div>
               </div>
             ))}
