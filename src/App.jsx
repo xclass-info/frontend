@@ -35,7 +35,6 @@ import ContactUs from "./components/ContactUs";
 import AboutUs from "./components/AboutUs";
 import Gallery from "./components/Gallery";
 
-import ResearchPrograms from "./components/ResearchPrograms";
 import ProgramDetail from "./components/ProgramDetail";
 
 function HomePage() {
@@ -83,7 +82,6 @@ function HomePage() {
       <GetStartedSection />
       <ActiveEnrolling />
       <HowItWorks />
-      <ResearchPrograms />
       <ResearchSection />
       <ProjectSection />
       <OneOnOneSection />
