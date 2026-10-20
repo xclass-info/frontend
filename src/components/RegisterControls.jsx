@@ -107,7 +107,7 @@ export function SeatsRow({ kind, item, onRegister, extra }) {
 
 const REGISTER_ERRORS = {
   FULL: "Sorry, the last seat was just taken.",
-  DUPLICATE: "This email is already registered for this.",
+  DUPLICATE: "You've already applied to this.",
   NOT_FOUND: "This is no longer available.",
 };
 
@@ -166,10 +166,11 @@ export function RegisterModal({ kind, item, student, onClose, onRegistered }) {
       >
         {done ? (
           <div style={{ textAlign: "center", padding: 20 }}>
-            <p style={{ fontSize: 48 }}>✅</p>
-            <h3>You're registered!</h3>
+            <p style={{ fontSize: 48 }}>⏳</p>
+            <h3>Application submitted!</h3>
             <p style={{ color: "#888", marginBottom: 20 }}>
-              The mentor will be in touch at {student.email}.
+              Your application is pending review. We'll let you know at{" "}
+              {student.email} once it's approved.
             </p>
             <button
               onClick={onClose}
@@ -196,7 +197,7 @@ export function RegisterModal({ kind, item, student, onClose, onRegistered }) {
                 marginBottom: 16,
               }}
             >
-              <h3 style={{ margin: 0 }}>Register: {item.title}</h3>
+              <h3 style={{ margin: 0 }}>Apply: {item.title}</h3>
               <button
                 onClick={onClose}
                 style={{
@@ -229,7 +230,7 @@ export function RegisterModal({ kind, item, student, onClose, onRegistered }) {
                   margin: "0 0 4px",
                 }}
               >
-                Registering as
+                Applying as
               </p>
               <p style={{ margin: 0, fontWeight: 700, color: "var(--text)" }}>
                 {student.name}
@@ -259,7 +260,7 @@ export function RegisterModal({ kind, item, student, onClose, onRegistered }) {
                 opacity: submitting ? 0.6 : 1,
               }}
             >
-              {submitting ? "Registering..." : "Confirm Registration"}
+              {submitting ? "Submitting..." : "Submit Application"}
             </button>
           </>
         )}

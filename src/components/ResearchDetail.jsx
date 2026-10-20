@@ -40,9 +40,9 @@ export default function ResearchDetail() {
   const [registering, setRegistering] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
-  function markRegistered() {
-    setResearch((r) => ({ ...r, enrolledCount: (r.enrolledCount || 0) + 1 }));
-  }
+  // Applying no longer consumes a seat immediately - the seat is only taken
+  // once an admin approves the application - so there's nothing to bump here.
+  function markRegistered() {}
 
   // Registering requires a logged-in student account, so it can be tied to
   // the student's record and reliably show up on their dashboard. Rather

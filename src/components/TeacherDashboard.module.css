@@ -298,6 +298,18 @@
   background: transparent;
 }
 
+.pending {
+  color: #8a6a25;
+  border-color: rgba(154, 119, 43, 0.3);
+  background: rgba(154, 119, 43, 0.08);
+}
+
+.rejected {
+  color: #a01f13;
+  border-color: rgba(160, 31, 19, 0.3);
+  background: rgba(160, 31, 19, 0.08);
+}
+
 .cardDesc {
   font-size: 1rem;
   color: #64748b;

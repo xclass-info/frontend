@@ -20,6 +20,10 @@ import {
 import { Link } from "react-router-dom";
 import { mentorTypeLabel } from "../utils/mentorVerification";
 import { loadStudentRegistrations } from "../utils/studentData";
+import {
+  approveStudentApplication,
+  rejectStudentApplication,
+} from "../utils/registration";
 
 const ADMIN_EMAIL = "zhenhepan@gmail.com";
 
@@ -36,10 +40,16 @@ export default function AdminDashboard() {
   const [students, setStudents] = useState([]);
   const [research, setResearch] = useState([]);
   const [mentors, setMentors] = useState([]);
+  const [registrations, setRegistrations] = useState([]);
   const pendingApplications = mentors.filter(
     (m) => m.verificationStatus === "pending_review",
   );
-  const [rejectTarget, setRejectTarget] = useState(null); // mentor being rejected, or null
+  const pendingStudentApplications = registrations.filter(
+    (r) => r.status === "pending",
+  );
+  // rejectTarget is { type: "mentor" | "student", id } or null - shared by
+  // both the mentor-verification and student-application reject flows below.
+  const [rejectTarget, setRejectTarget] = useState(null);
   const [rejectReason, setRejectReason] = useState("");
   const [rejectError, setRejectError] = useState("");
 
@@ -76,6 +86,10 @@ export default function AdminDashboard() {
   const [applicationTypeFilter, setApplicationTypeFilter] = useState("all");
   const [applicationSort, setApplicationSort] = useState("oldest");
 
+  const [studentAppSearch, setStudentAppSearch] = useState("");
+  const [studentAppKindFilter, setStudentAppKindFilter] = useState("all");
+  const [studentAppSort, setStudentAppSort] = useState("oldest");
+
   useEffect(() => {
     const unsub = auth.onAuthStateChanged((u) => {
       if (u && u.email === ADMIN_EMAIL) setUser(u);
@@ -104,6 +118,14 @@ export default function AdminDashboard() {
     if (!user) return;
     const unsub = onSnapshot(collection(db, "teachers"), (snap) => {
       setMentors(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    });
+    return () => unsub();
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    const unsub = onSnapshot(collection(db, "registrations"), (snap) => {
+      setRegistrations(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     });
     return () => unsub();
   }, [user]);
@@ -191,7 +213,26 @@ export default function AdminDashboard() {
   }
 
   function openRejectModal(mentorId) {
-    setRejectTarget(mentorId);
+    setRejectTarget({ type: "mentor", id: mentorId });
+    setRejectReason("");
+    setRejectError("");
+  }
+
+  async function approveStudentApp(regId) {
+    try {
+      await approveStudentApplication(regId);
+    } catch (err) {
+      console.error(err);
+      alert(
+        err.message === "FULL"
+          ? "No seats left - can't approve this application."
+          : "Something went wrong. Please try again.",
+      );
+    }
+  }
+
+  function openStudentRejectModal(regId) {
+    setRejectTarget({ type: "student", id: regId });
     setRejectReason("");
     setRejectError("");
   }
@@ -204,7 +245,11 @@ export default function AdminDashboard() {
       );
       return;
     }
-    await rejectApplication(rejectTarget, trimmed);
+    if (rejectTarget.type === "student") {
+      await rejectStudentApplication(rejectTarget.id, trimmed);
+    } else {
+      await rejectApplication(rejectTarget.id, trimmed);
+    }
     setRejectTarget(null);
   }
 
@@ -509,13 +554,38 @@ export default function AdminDashboard() {
           return applicationSort === "oldest" ? ta - tb : tb - ta;
         });
 
+  let visibleStudentApplications = pendingStudentApplications.filter((r) => {
+    if (studentAppKindFilter !== "all" && r.kind !== studentAppKindFilter)
+      return false;
+    const q = studentAppSearch.trim().toLowerCase();
+    if (!q) return true;
+    return [r.studentName, r.studentEmail, r.itemTitle]
+      .filter(Boolean)
+      .some((s) => s.toLowerCase().includes(q));
+  });
+  visibleStudentApplications =
+    studentAppSort === "name"
+      ? [...visibleStudentApplications].sort((a, b) =>
+          (a.studentName || "").localeCompare(b.studentName || ""),
+        )
+      : [...visibleStudentApplications].sort((a, b) => {
+          const ta = a.createdAt?.toMillis?.() ?? 0;
+          const tb = b.createdAt?.toMillis?.() ?? 0;
+          return studentAppSort === "oldest" ? ta - tb : tb - ta;
+        });
+
   const navItemsRaw = [
     { id: "overview", label: "🏠 Overview" },
     { id: "students", label: "🎓 Students", group: "People" },
     { id: "mentors", label: "👩‍🏫 Mentors", group: "People" },
     {
       id: "applications",
-      label: `✅ Applications${pendingApplications.length > 0 ? ` (${pendingApplications.length})` : ""}`,
+      label: `✅ Mentor Applications${pendingApplications.length > 0 ? ` (${pendingApplications.length})` : ""}`,
+      group: "People",
+    },
+    {
+      id: "student-applications",
+      label: `📋 Student Applications${pendingStudentApplications.length > 0 ? ` (${pendingStudentApplications.length})` : ""}`,
       group: "People",
     },
     { id: "research", label: "🔬 Research", group: "Content" },
@@ -623,9 +693,14 @@ export default function AdminDashboard() {
                   { label: "Students", count: students.length, go: "students" },
                   { label: "Mentors", count: mentors.length, go: "mentors" },
                   {
-                    label: "Pending Applications",
+                    label: "Pending Mentor Applications",
                     count: pendingApplications.length,
                     go: "applications",
+                  },
+                  {
+                    label: "Pending Student Applications",
+                    count: pendingStudentApplications.length,
+                    go: "student-applications",
                   },
                   { label: "Research", count: research.length, go: "research" },
                 ].map((stat) => (
@@ -1070,6 +1145,126 @@ export default function AdminDashboard() {
         </div>
       )}
 
+      {tab === "student-applications" && (
+        <div>
+          <p style={{ color: "#888", marginBottom: 16 }}>
+            {visibleStudentApplications.length} of{" "}
+            {pendingStudentApplications.length} pending application
+            {pendingStudentApplications.length === 1 ? "" : "s"}
+          </p>
+          <div
+            style={{
+              display: "flex",
+              gap: 10,
+              marginBottom: 16,
+              flexWrap: "wrap",
+            }}
+          >
+            <input
+              type='text'
+              placeholder='Search student, email, or title...'
+              value={studentAppSearch}
+              onChange={(e) => setStudentAppSearch(e.target.value)}
+              style={{ ...filterInputStyle, flex: "1 1 220px" }}
+            />
+            <select
+              value={studentAppKindFilter}
+              onChange={(e) => setStudentAppKindFilter(e.target.value)}
+              style={filterInputStyle}
+            >
+              <option value='all'>All types</option>
+              <option value='research'>Research</option>
+              <option value='project'>Project</option>
+            </select>
+            <select
+              value={studentAppSort}
+              onChange={(e) => setStudentAppSort(e.target.value)}
+              style={filterInputStyle}
+            >
+              <option value='oldest'>Oldest first</option>
+              <option value='newest'>Newest first</option>
+              <option value='name'>Name (A-Z)</option>
+            </select>
+          </div>
+          {visibleStudentApplications.length === 0 ? (
+            <p style={{ color: "#aaa" }}>
+              {pendingStudentApplications.length === 0
+                ? "No student applications waiting on review."
+                : "No applications match these filters."}
+            </p>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
+                gap: 16,
+              }}
+            >
+              {visibleStudentApplications.map((reg) => {
+                const mentor = mentors.find((m) => m.id === reg.teacherId);
+                return (
+                  <div
+                    key={reg.id}
+                    style={{
+                      background: "white",
+                      borderRadius: 12,
+                      padding: 20,
+                      border: "1px solid #eee",
+                    }}
+                  >
+                    <div style={{ fontWeight: 700, fontSize: 16 }}>
+                      {reg.studentName || "(no name)"}
+                    </div>
+                    <div style={{ color: "#888", fontSize: 13, marginBottom: 8 }}>
+                      {reg.studentEmail}
+                    </div>
+                    <span
+                      style={{
+                        fontSize: 11,
+                        background: "#e3eff3",
+                        color: "#2f6175",
+                        padding: "2px 8px",
+                        borderRadius: 20,
+                        display: "inline-block",
+                        marginBottom: 12,
+                      }}
+                    >
+                      {reg.kind === "research" ? "🔬 Research" : "💡 Project"}
+                    </span>
+
+                    <div style={{ fontSize: 13, color: "#333", marginBottom: 14 }}>
+                      <div>Applying to: {reg.itemTitle}</div>
+                      {mentor && <div>Mentor: {mentor.name}</div>}
+                      <div style={{ color: "#aaa" }}>
+                        Applied{" "}
+                        {reg.createdAt?.toDate
+                          ? reg.createdAt.toDate().toLocaleDateString()
+                          : ""}
+                      </div>
+                    </div>
+
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button
+                        style={btnStyle("#14532d")}
+                        onClick={() => approveStudentApp(reg.id)}
+                      >
+                        Approve
+                      </button>
+                      <button
+                        style={btnStyle("#a01f13")}
+                        onClick={() => openStudentRejectModal(reg.id)}
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
       {tab === "mentors" && (
         <div>
           <div
@@ -1353,8 +1548,9 @@ export default function AdminDashboard() {
               </button>
             </div>
             <p style={{ color: "#888", fontSize: 13, marginBottom: 12 }}>
-              Explain what needs to change before this can be approved. This
-              is shown to the mentor.
+              {rejectTarget?.type === "student"
+                ? "Explain why this application was rejected. This is shown to the student."
+                : "Explain what needs to change before this can be approved. This is shown to the mentor."}
             </p>
             <textarea
               autoFocus

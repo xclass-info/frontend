@@ -38,8 +38,13 @@ const clamp = (lines) => ({
   overflow: "hidden",
 });
 
-function badgeFor(kind, item) {
-  return item.stage === "completed"
+// Registrations made before the review step have no status field - they
+// were confirmed under the old instant-accept flow, so treat missing status
+// as approved rather than pending.
+function badgeFor(reg, item) {
+  if (reg.status === "pending") return [styles.pending, "Pending review"];
+  if (reg.status === "rejected") return [styles.rejected, "Not accepted"];
+  return item?.stage === "completed"
     ? [styles.draft, "Completed"]
     : [styles.active, "Active"];
 }
@@ -47,16 +52,20 @@ function badgeFor(kind, item) {
 function RegistrationCard({ row }) {
   const { reg, item, mentorName, mentorType, mentorDegree } = row;
   const description = item ? item.idea || item.description : null;
-  const [badgeClass, badgeLabel] = item ? badgeFor(reg.kind, item) : [];
+  const [badgeClass, badgeLabel] = badgeFor(reg, item);
 
   return (
     <div className={styles.card}>
       <div className={styles.cardTop}>
         <h3 className={styles.cardTitle}>{reg.itemTitle}</h3>
-        {item && (
-          <span className={`${styles.badge} ${badgeClass}`}>{badgeLabel}</span>
-        )}
+        <span className={`${styles.badge} ${badgeClass}`}>{badgeLabel}</span>
       </div>
+
+      {reg.status === "rejected" && reg.rejectionReason && (
+        <p className={styles.cardDesc} style={{ color: "#a01f13" }}>
+          {reg.rejectionReason}
+        </p>
+      )}
 
       {item ? (
         description && (
@@ -70,7 +79,7 @@ function RegistrationCard({ row }) {
 
       <div className={styles.cardMeta}>
         <span>
-          ✅ Registered{" "}
+          📝 Applied{" "}
           {reg.createdAt?.toDate ? reg.createdAt.toDate().toLocaleDateString() : ""}
         </span>
         {mentorName && reg.teacherId && (

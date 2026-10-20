@@ -376,15 +376,9 @@ export default function TeacherProfile() {
     setRegistering({ kind, item });
   }
 
-  // Keep the on-screen seat counts in step after someone registers.
-  function markRegistered(kind, id) {
-    const bump = (list) =>
-      list.map((x) =>
-        x.id === id ? { ...x, enrolledCount: (x.enrolledCount || 0) + 1 } : x,
-      );
-    if (kind === "research") setResearch(bump);
-    else if (kind === "project") setProjects(bump);
-  }
+  // Applying no longer consumes a seat immediately - the seat is only taken
+  // once an admin approves the application - so there's nothing to bump here.
+  function markRegistered() {}
 
   function validate() {
     const newErrors = {};
