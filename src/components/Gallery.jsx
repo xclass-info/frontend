@@ -495,7 +495,7 @@ export default function Gallery() {
             🖼️ Gallery
           </h1>
           <p style={{ color: "#666" }}>
-            Moments from our research programs, internships and student
+            Moments from our research programs, projects and student
             journeys.
           </p>
         </div>

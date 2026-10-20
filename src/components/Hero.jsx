@@ -54,19 +54,6 @@ export default function Hero() {
               How it works
             </a>
           </div>
-          <div className={styles.stats}>
-            {[
-              ["5", "Research areas"],
-              ["PhD", "Led mentors"],
-              ["1:1", "Mentor sessions"],
-              ["100%", "Online"],
-            ].map(([num, label]) => (
-              <div key={label}>
-                <div className={styles.statNum}>{num}</div>
-                <div className={styles.statLabel}>{label}</div>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </section>

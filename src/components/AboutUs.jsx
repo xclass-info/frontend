@@ -202,9 +202,9 @@ export default function AboutUs() {
           >
             {[
               {
-                emoji: "🧪",
-                title: "Internships",
-                desc: "Students work on real research projects alongside PhD mentors in fields ranging from AI to environmental science.",
+                emoji: "💡",
+                title: "Hands-On Projects",
+                desc: "Students build real projects alongside PhD mentors, ending in something they made in fields ranging from AI to environmental science.",
               },
               {
                 emoji: "📄",
@@ -403,7 +403,7 @@ export default function AboutUs() {
           }}
         >
           <a
-            href='/internship'
+            href='/projects'
             style={{
               padding: "12px 32px",
               borderRadius: 32,
@@ -414,7 +414,7 @@ export default function AboutUs() {
               fontSize: 15,
             }}
           >
-            🧪 Browse Internships
+            💡 Browse Projects
           </a>
           <a
             href='/research'

@@ -82,23 +82,6 @@
   margin-bottom: 48px;
 }
 
-.stats {
-  display: flex;
-  gap: 32px;
-}
-
-.statNum {
-  font-family: "Source Serif 4", Georgia, serif;
-  font-size: 1.6rem;
-  color: var(--coral);
-}
-
-.statLabel {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--muted);
-}
-
 @keyframes heroFadeUp {
   from {
     opacity: 0;
@@ -126,18 +109,11 @@
   .h1 {
     font-size: 2.4rem;
   }
-  .stats {
-    gap: 20px;
-  }
 }
 
 @media (max-width: 560px) {
   .hero {
     padding: 60px 4% 40px;
-  }
-  .stats {
-    gap: 16px;
-    flex-wrap: wrap;
   }
   .actions {
     flex-direction: column;

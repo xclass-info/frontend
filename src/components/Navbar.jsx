@@ -98,10 +98,6 @@ export default function Navbar() {
             Home
           </a>
         </li>
-        {/* <li>
-          <Link to='/internship'>Internship</Link>
-        </li> */}
-
         <li className={styles.dropdown}>
           <span className={styles.dropdownTrigger}>
             Programs <span className={styles.dropdownCaret}>▾</span>
@@ -169,10 +165,6 @@ export default function Navbar() {
               Home
             </a>
           </li>
-          {/* <li>
-            <Link to='/internship'>🧪 Internship</Link>
-          </li> */}
-
           <li>
             <p className={styles.mobileGroupLabel}>Programs</p>
           </li>

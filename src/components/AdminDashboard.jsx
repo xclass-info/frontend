@@ -35,7 +35,6 @@ export default function AdminDashboard() {
 
   const [students, setStudents] = useState([]);
   const [research, setResearch] = useState([]);
-  const [internships, setInternships] = useState([]);
   const [mentors, setMentors] = useState([]);
   const pendingApplications = mentors.filter(
     (m) => m.verificationStatus === "pending_review",
@@ -67,10 +66,6 @@ export default function AdminDashboard() {
   const [researchStatusFilter, setResearchStatusFilter] = useState("all");
   const [researchSort, setResearchSort] = useState("newest");
 
-  const [internshipSearch, setInternshipSearch] = useState("");
-  const [internshipStatusFilter, setInternshipStatusFilter] = useState("all");
-  const [internshipSort, setInternshipSort] = useState("newest");
-
   const [mentorSearch, setMentorSearch] = useState("");
   const [mentorStatusFilter, setMentorStatusFilter] = useState("all");
   const [mentorVerificationFilter, setMentorVerificationFilter] =
@@ -101,14 +96,6 @@ export default function AdminDashboard() {
     if (!user) return;
     const unsub = onSnapshot(collection(db, "research"), (snap) => {
       setResearch(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    });
-    return () => unsub();
-  }, [user]);
-
-  useEffect(() => {
-    if (!user) return;
-    const unsub = onSnapshot(collection(db, "internships"), (snap) => {
-      setInternships(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     });
     return () => unsub();
   }, [user]);
@@ -479,28 +466,6 @@ export default function AdminDashboard() {
         )
       : sortByDate(visibleResearch, "createdAt", researchSort);
 
-  let visibleInternships = internships.filter((i) => {
-    if (internshipStatusFilter === "active" && i.status === "disabled")
-      return false;
-    if (internshipStatusFilter === "disabled" && i.status !== "disabled")
-      return false;
-    const q = internshipSearch.trim().toLowerCase();
-    if (!q) return true;
-    return [i.title, i.field, i.teacherName]
-      .filter(Boolean)
-      .some((s) => s.toLowerCase().includes(q));
-  });
-  visibleInternships =
-    internshipSort === "title"
-      ? [...visibleInternships].sort((a, b) =>
-          (a.title || "").localeCompare(b.title || ""),
-        )
-      : internshipSort === "deadline"
-        ? [...visibleInternships].sort((a, b) =>
-            (a.deadline || "").localeCompare(b.deadline || ""),
-          )
-        : sortByDate(visibleInternships, "createdAt", internshipSort);
-
   let visibleMentors = mentors.filter((m) => {
     if (mentorStatusFilter === "active" && m.disabled) return false;
     if (mentorStatusFilter === "disabled" && !m.disabled) return false;
@@ -554,7 +519,6 @@ export default function AdminDashboard() {
       group: "People",
     },
     { id: "research", label: "🔬 Research", group: "Content" },
-    { id: "internships", label: "🧪 Internships", group: "Content" },
   ];
   let lastNavGroup = null;
   const navItems = navItemsRaw.map((item) => {
@@ -664,11 +628,6 @@ export default function AdminDashboard() {
                     go: "applications",
                   },
                   { label: "Research", count: research.length, go: "research" },
-                  {
-                    label: "Internships",
-                    count: internships.length,
-                    go: "internships",
-                  },
                 ].map((stat) => (
                   <button
                     key={stat.label}
@@ -928,177 +887,6 @@ export default function AdminDashboard() {
                     </button>
                     <button
                       onClick={() => handleDelete("research", r.id)}
-                      style={btnStyle("#a01f13")}
-                    >
-                      🗑 Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ── Internships Tab ── */}
-      {tab === "internships" && (
-        <div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 16,
-            }}
-          >
-            <p style={{ color: "#888", margin: 0 }}>
-              {visibleInternships.length} of {internships.length} internships
-            </p>
-            <button
-              onClick={() => {
-                setAddType("internships");
-                setAddForm({
-                  title: "",
-                  field: "",
-                  description: "",
-                  requirements: "",
-                  outcomes: "",
-                  duration: "",
-                  mode: "Remote",
-                  stipend: "Unpaid",
-                  spots: "",
-                  deadline: "",
-                });
-              }}
-              style={btnStyle("#2f6175")}
-            >
-              + Add Internship
-            </button>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              gap: 10,
-              marginBottom: 16,
-              flexWrap: "wrap",
-            }}
-          >
-            <input
-              type='text'
-              placeholder='Search title, field, mentor...'
-              value={internshipSearch}
-              onChange={(e) => setInternshipSearch(e.target.value)}
-              style={{ ...filterInputStyle, flex: "1 1 220px" }}
-            />
-            <select
-              value={internshipStatusFilter}
-              onChange={(e) => setInternshipStatusFilter(e.target.value)}
-              style={filterInputStyle}
-            >
-              <option value='all'>All statuses</option>
-              <option value='active'>Active</option>
-              <option value='disabled'>Disabled</option>
-            </select>
-            <select
-              value={internshipSort}
-              onChange={(e) => setInternshipSort(e.target.value)}
-              style={filterInputStyle}
-            >
-              <option value='newest'>Newest first</option>
-              <option value='oldest'>Oldest first</option>
-              <option value='deadline'>Deadline (soonest)</option>
-              <option value='title'>Title (A-Z)</option>
-            </select>
-          </div>
-          {visibleInternships.length === 0 ? (
-            <p style={{ color: "#aaa" }}>
-              No internships match these filters.
-            </p>
-          ) : (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-                gap: 16,
-              }}
-            >
-              {visibleInternships.map((intern) => (
-                <div
-                  key={intern.id}
-                  style={{
-                    background: "white",
-                    borderRadius: 12,
-                    padding: 20,
-                    border: `1px solid ${intern.status === "disabled" ? "#fca5a5" : "#eee"}`,
-                    opacity: intern.status === "disabled" ? 0.7 : 1,
-                  }}
-                >
-                  {intern.status === "disabled" && (
-                    <span
-                      style={{
-                        fontSize: 11,
-                        background: "#fee2e2",
-                        color: "#a01f13",
-                        padding: "2px 8px",
-                        borderRadius: 20,
-                        marginBottom: 8,
-                        display: "inline-block",
-                      }}
-                    >
-                      Disabled
-                    </span>
-                  )}
-                  <h3 style={{ margin: "0 0 4px", fontSize: 15 }}>
-                    {intern.title}
-                  </h3>
-                  <p
-                    style={{
-                      fontSize: 12,
-                      color: "#2f6175",
-                      fontWeight: 600,
-                      marginBottom: 6,
-                    }}
-                  >
-                    🔬 {intern.field}
-                  </p>
-                  <p
-                    style={{
-                      fontSize: 13,
-                      color: "#555",
-                      marginBottom: 8,
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                    }}
-                  >
-                    {intern.description}
-                  </p>
-                  <p style={{ fontSize: 12, color: "#888", marginBottom: 12 }}>
-                    👩‍🏫 {intern.teacherName} · 📅 {intern.deadline}
-                  </p>
-                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                    <button
-                      onClick={() => {
-                        setEditItem({ ...intern });
-                        setEditType("internships");
-                      }}
-                      style={btnStyle("#2f6175")}
-                    >
-                      ✏️ Edit
-                    </button>
-                    <button
-                      onClick={() =>
-                        handleDisable("internships", intern.id, intern.status)
-                      }
-                      style={btnStyle(
-                        intern.status === "disabled" ? "#1f6f4a" : "#f59e0b",
-                      )}
-                    >
-                      {intern.status === "disabled" ? "✅ Enable" : "⏸ Disable"}
-                    </button>
-                    <button
-                      onClick={() => handleDelete("internships", intern.id)}
                       style={btnStyle("#a01f13")}
                     >
                       🗑 Delete
@@ -1826,11 +1614,7 @@ export default function AdminDashboard() {
             >
               <h3 style={{ margin: 0 }}>
                 ✏️ Edit{" "}
-                {editType === "research"
-                  ? "Research"
-                  : editType === "internships"
-                    ? "Internship"
-                    : "Mentor"}
+                {editType === "research" ? "Research" : "Mentor"}
               </h3>
               <button
                 onClick={() => {
@@ -2261,9 +2045,7 @@ export default function AdminDashboard() {
                 marginBottom: 20,
               }}
             >
-              <h3 style={{ margin: 0 }}>
-                ➕ Add Internship
-              </h3>
+              <h3 style={{ margin: 0 }}>➕ Add Research</h3>
               <button
                 onClick={() => {
                   setAddType(null);

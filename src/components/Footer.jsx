@@ -122,16 +122,6 @@ export default function Footer() {
                 Research
               </Link>
               <Link
-                to='/internship'
-                style={{
-                  color: "#555f66",
-                  fontSize: 14,
-                  textDecoration: "none",
-                }}
-              >
-                Internships
-              </Link>
-              <Link
                 to='/tutors'
                 style={{
                   color: "#555f66",

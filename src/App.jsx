@@ -29,8 +29,6 @@ import ProjectSection from "./components/ProjectSection";
 import OneOnOneSection from "./components/OneOnOneSection";
 import ActiveEnrolling from "./components/ActiveEnrolling";
 
-import InternshipListing from "./components/InternshipListing";
-
 import ContactUs from "./components/ContactUs";
 import AboutUs from "./components/AboutUs";
 import Gallery from "./components/Gallery";
@@ -119,7 +117,6 @@ export default function App() {
         <Route path='/explore' element={<ExploreResources />} />
         <Route path='/tell-us-what-you-need' element={<TellUsWhatYouNeed />} />
         <Route path='/verify-mentor-email' element={<VerifyMentorEmail />} />
-        <Route path='/internship' element={<InternshipListing />} />
         <Route path='/about' element={<AboutUs />} />
         <Route path='/contact' element={<ContactUs />} />
         <Route path='/gallery' element={<Gallery />} />
