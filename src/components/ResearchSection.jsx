@@ -116,7 +116,7 @@ export default function ResearchSection() {
                     margin: "0 0 6px",
                   }}
                 >
-                  Project {String(idx + 1).padStart(2, "0")}
+                  Research {String(idx + 1).padStart(2, "0")}
                 </p>
 
                 <h3

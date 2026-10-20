@@ -40,11 +40,18 @@ const filterLabel = {
   margin: "20px 0 10px",
 };
 
+// Matches only the exact surname, not a substring anywhere in the full name
+// (a plain .includes("wu")/.includes("pan") would also match names like
+// "Pandey" or "Shuwen").
+function lastName(name) {
+  return name?.trim().split(/\s+/).pop()?.toLowerCase();
+}
+
 function featuredSort(a, b) {
-  if (a.name?.toLowerCase().includes("wu")) return -1;
-  if (b.name?.toLowerCase().includes("wu")) return 1;
-  if (a.name?.toLowerCase().includes("pan")) return 1;
-  if (b.name?.toLowerCase().includes("pan")) return -1;
+  if (lastName(a.name) === "wu") return -1;
+  if (lastName(b.name) === "wu") return 1;
+  if (lastName(a.name) === "pan") return 1;
+  if (lastName(b.name) === "pan") return -1;
   return 0;
 }
 

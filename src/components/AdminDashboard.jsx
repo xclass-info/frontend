@@ -52,6 +52,10 @@ export default function AdminDashboard() {
   const [rejectTarget, setRejectTarget] = useState(null);
   const [rejectReason, setRejectReason] = useState("");
   const [rejectError, setRejectError] = useState("");
+  // Guards against double-submitting an approve/reject action (e.g. a fast
+  // double-click), which would otherwise hit Firestore twice and surface a
+  // false "something went wrong" on the second, already-too-late call.
+  const [actionBusy, setActionBusy] = useState(false);
 
   const [editItem, setEditItem] = useState(null);
   const [editType, setEditType] = useState(null);
@@ -199,10 +203,19 @@ export default function AdminDashboard() {
   }
 
   async function approveApplication(mentorId) {
-    await updateDoc(doc(db, "teachers", mentorId), {
-      verificationStatus: "approved",
-      rejectionReason: null,
-    });
+    if (actionBusy) return;
+    setActionBusy(true);
+    try {
+      await updateDoc(doc(db, "teachers", mentorId), {
+        verificationStatus: "approved",
+        rejectionReason: null,
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setActionBusy(false);
+    }
   }
 
   async function rejectApplication(mentorId, reason) {
@@ -219,6 +232,8 @@ export default function AdminDashboard() {
   }
 
   async function approveStudentApp(regId) {
+    if (actionBusy) return;
+    setActionBusy(true);
     try {
       await approveStudentApplication(regId);
     } catch (err) {
@@ -228,6 +243,8 @@ export default function AdminDashboard() {
           ? "No seats left - can't approve this application."
           : "Something went wrong. Please try again.",
       );
+    } finally {
+      setActionBusy(false);
     }
   }
 
@@ -245,26 +262,46 @@ export default function AdminDashboard() {
       );
       return;
     }
-    if (rejectTarget.type === "student") {
-      await rejectStudentApplication(rejectTarget.id, trimmed);
-    } else {
-      await rejectApplication(rejectTarget.id, trimmed);
+    if (actionBusy) return;
+    setActionBusy(true);
+    try {
+      if (rejectTarget.type === "student") {
+        await rejectStudentApplication(rejectTarget.id, trimmed);
+      } else {
+        await rejectApplication(rejectTarget.id, trimmed);
+      }
+      setRejectTarget(null);
+    } catch (err) {
+      console.error(err);
+      setRejectError("Something went wrong. Please try again.");
+    } finally {
+      setActionBusy(false);
     }
-    setRejectTarget(null);
   }
 
   async function openStudentDetail(student) {
     setStudentDetail(student);
     setStudentRegsLoading(true);
-    const rows = await loadStudentRegistrations(student.email, student.id);
-    setStudentRegistrations(rows);
-    setStudentRegsLoading(false);
+    try {
+      const rows = await loadStudentRegistrations(student.email, student.id);
+      setStudentRegistrations(rows);
+    } catch (err) {
+      console.error(err);
+      alert("Couldn't load this student's activity. Please try again.");
+    } finally {
+      setStudentRegsLoading(false);
+    }
   }
 
   async function handleDisable(collection_, id, currentStatus) {
-    await updateDoc(doc(db, collection_, id), {
-      status: currentStatus === "disabled" ? "published" : "disabled",
-    });
+    try {
+      await updateDoc(doc(db, collection_, id), {
+        status: currentStatus === "disabled" ? "published" : "disabled",
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong. Please try again.");
+    }
   }
 
   async function handleDelete(collection_, id) {
@@ -274,7 +311,12 @@ export default function AdminDashboard() {
       )
     )
       return;
-    await deleteDoc(doc(db, collection_, id));
+    try {
+      await deleteDoc(doc(db, collection_, id));
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong. Please try again.");
+    }
   }
 
   async function handleSaveEdit() {
@@ -1127,12 +1169,14 @@ export default function AdminDashboard() {
                   <div style={{ display: "flex", gap: 8 }}>
                     <button
                       style={btnStyle("#14532d")}
+                      disabled={actionBusy}
                       onClick={() => approveApplication(mentor.id)}
                     >
                       Approve
                     </button>
                     <button
                       style={btnStyle("#a01f13")}
+                      disabled={actionBusy}
                       onClick={() => openRejectModal(mentor.id)}
                     >
                       Reject
@@ -1246,12 +1290,14 @@ export default function AdminDashboard() {
                     <div style={{ display: "flex", gap: 8 }}>
                       <button
                         style={btnStyle("#14532d")}
+                        disabled={actionBusy}
                         onClick={() => approveStudentApp(reg.id)}
                       >
                         Approve
                       </button>
                       <button
                         style={btnStyle("#a01f13")}
+                        disabled={actionBusy}
                         onClick={() => openStudentRejectModal(reg.id)}
                       >
                         Reject
@@ -1594,8 +1640,12 @@ export default function AdminDashboard() {
               >
                 Cancel
               </button>
-              <button onClick={submitRejectModal} style={btnStyle("#a01f13")}>
-                Reject Application
+              <button
+                onClick={submitRejectModal}
+                disabled={actionBusy}
+                style={btnStyle("#a01f13")}
+              >
+                {actionBusy ? "Submitting..." : "Reject Application"}
               </button>
             </div>
           </div>

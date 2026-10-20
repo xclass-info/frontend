@@ -88,7 +88,7 @@ const photos = [
   { url: "/gallery/76.jpg", caption: "Lab session" },
   { url: "/gallery/78.jpg", caption: "Lab session" },
   { url: "/gallery/79.jpg", caption: "Lab session" },
-  { url: "/gallery/70.jpg", caption: "Lab session" },
+  { url: "/gallery/80.jpg", caption: "Lab session" },
   { url: "/gallery/85.jpg", caption: "Lab session" },
   { url: "/gallery/86.png", caption: "Lab session" },
   { url: "/gallery/88.png", caption: "Lab session" },

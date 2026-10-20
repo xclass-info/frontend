@@ -22,10 +22,12 @@ export function totalSeats(kind, item) {
 // Submits one person's application for one item. The seat check and the
 // application record happen in a single transaction so two people can't both
 // take the last seat once approved. The registration id is derived from item
-// + email, so the same email can't apply to the same item twice. The seat
-// isn't actually taken yet - applying only reserves a review slot; an admin
-// must approve it (see approveStudentApplication below) before it counts
-// against enrolledCount.
+// + email, so the same email can't have two live applications for the same
+// item - but a previously REJECTED application doesn't block reapplying;
+// tx.set below overwrites it with a fresh pending submission. The seat isn't
+// actually taken yet - applying only reserves a review slot; an admin must
+// approve it (see approveStudentApplication below) before it counts against
+// enrolledCount.
 export async function registerForItem(kind, itemId, { name, email, studentUid }) {
   const { collection: coll, seatsField } = KINDS[kind];
   const itemRef = doc(db, coll, itemId);
@@ -39,7 +41,9 @@ export async function registerForItem(kind, itemId, { name, email, studentUid })
     const itemSnap = await tx.get(itemRef);
     if (!itemSnap.exists()) throw new Error("NOT_FOUND");
     const regSnap = await tx.get(regRef);
-    if (regSnap.exists()) throw new Error("DUPLICATE");
+    if (regSnap.exists() && regSnap.data().status !== "rejected") {
+      throw new Error("DUPLICATE");
+    }
 
     const item = itemSnap.data();
     const taken = item.enrolledCount || 0;

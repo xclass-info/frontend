@@ -87,6 +87,9 @@ export default function TeacherDashboard() {
   useEffect(() => {
     let profileLoaded = false;
     let unsubscribeTeacher = () => {};
+    let unsubscribeResearch = () => {};
+    let unsubscribeProjects = () => {};
+    let unsubscribeShowcase = () => {};
     const unsubscribeAuth = auth.onAuthStateChanged((user) => {
       if (!user) {
         navigate("/teacher/login");
@@ -115,7 +118,7 @@ export default function TeacherDashboard() {
         collection(db, "research"),
         where("teacherId", "==", user.uid),
       );
-      const unsubscribeResearch = onSnapshot(researchQuery, (snapshot) => {
+      unsubscribeResearch = onSnapshot(researchQuery, (snapshot) => {
         setResearch(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
         setLoading(false);
       });
@@ -124,7 +127,7 @@ export default function TeacherDashboard() {
         collection(db, "projects"),
         where("teacherId", "==", user.uid),
       );
-      const unsubscribeProjects = onSnapshot(projectsQuery, (snapshot) => {
+      unsubscribeProjects = onSnapshot(projectsQuery, (snapshot) => {
         setProjects(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
       });
 
@@ -132,20 +135,17 @@ export default function TeacherDashboard() {
         collection(db, "showcase"),
         where("teacherId", "==", user.uid),
       );
-      const unsubscribeShowcase = onSnapshot(showcaseQuery, (snapshot) => {
+      unsubscribeShowcase = onSnapshot(showcaseQuery, (snapshot) => {
         setShowcase(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
       });
-
-      return () => {
-        unsubscribeResearch();
-        unsubscribeProjects();
-        unsubscribeShowcase();
-      };
     });
 
     return () => {
       unsubscribeAuth();
       unsubscribeTeacher();
+      unsubscribeResearch();
+      unsubscribeProjects();
+      unsubscribeShowcase();
     };
   }, []);
 
