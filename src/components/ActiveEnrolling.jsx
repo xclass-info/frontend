@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef, useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebase";
 import { collection, onSnapshot } from "firebase/firestore";
@@ -47,11 +47,18 @@ function Card({ mentor, openKind, onClick }) {
   );
 }
 
+// Matches Testimonials.module.css's marquee speed (its track covers 2160px
+// of one copy in 48s) so both carousels feel equally paced regardless of
+// how many cards either one actually has.
+const MARQUEE_PX_PER_SEC = 45;
+
 export default function ActiveEnrolling() {
   const navigate = useNavigate();
   const [teachers, setTeachers] = useState([]);
   const [research, setResearch] = useState([]);
   const [projects, setProjects] = useState([]);
+  const trackRef = useRef(null);
+  const [duration, setDuration] = useState(120);
 
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "teachers"), (snapshot) => {
@@ -105,6 +112,12 @@ export default function ActiveEnrolling() {
       });
   }, [teachers, research, projects]);
 
+  useLayoutEffect(() => {
+    if (!trackRef.current || enrolling.length === 0) return;
+    const oneCopyWidth = trackRef.current.scrollWidth / 2;
+    setDuration(oneCopyWidth / MARQUEE_PX_PER_SEC);
+  }, [enrolling]);
+
   if (enrolling.length === 0) return null;
 
   return (
@@ -120,7 +133,11 @@ export default function ActiveEnrolling() {
       </div>
 
       <div className={`${styles.marqueeWrap} reveal`}>
-        <div className={styles.track}>
+        <div
+          ref={trackRef}
+          className={styles.track}
+          style={{ animationDuration: `${duration}s` }}
+        >
           {enrolling.map(({ mentor, openKind }) => (
             <Card
               key={`a-${mentor.id}`}
