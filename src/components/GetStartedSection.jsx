@@ -22,11 +22,27 @@ export default function GetStartedSection() {
 
         <div className={styles.grid}>
           <Link
-            to='/explore'
+            to='/research'
             className={styles.bigButton}
-            style={{ "--btn-accent": "#427e94" }}
+            style={{ "--btn-accent": "#6d3f6b" }}
           >
-            🔎 Explore Learning Resources
+            🔬 Research
+          </Link>
+
+          <Link
+            to='/projects'
+            className={styles.bigButton}
+            style={{ "--btn-accent": "#8a6a25" }}
+          >
+            💡 Project
+          </Link>
+
+          <Link
+            to='/tutors'
+            className={styles.bigButton}
+            style={{ "--btn-accent": "#a0527a" }}
+          >
+            🧑‍🏫 1-on-1 Learning
           </Link>
 
           <Link
