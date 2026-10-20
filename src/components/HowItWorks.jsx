@@ -43,7 +43,7 @@ export default function HowItWorks() {
         <div className={`${styles.banner} reveal`}>
           <img
             src='/photos/howitworks-banner.jpg'
-            alt='Students working together in a research lab'
+            alt='A mentor and student on a live video session'
             className={styles.bannerImg}
           />
         </div>
