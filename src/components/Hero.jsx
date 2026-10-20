@@ -16,14 +16,11 @@ export default function Hero() {
       <div className={styles.videoOverlay} />
       <div className={styles.inner}>
         <div className={styles.content}>
-          <h1 className={styles.h1}>
-            Your Mentor for Research, Projects &amp; 1-on-1 Learning.
-          </h1>
+          <h1 className={styles.h1}>Your Research Journey Starts Here.</h1>
           <p className={styles.sub}>
-            For high school students: work with a PhD mentor on real
-            research, a hands-on project, or focused 1-on-1 tutoring — in any
-            subject you're curious about. Don't see your topic? Just tell us
-            what you need.
+            Connect with PhD mentors, explore exciting research
+            opportunities, and turn your curiosity into meaningful
+            discoveries.
           </p>
           <div className={styles.actions}>
             <Link to='/research' className='btn-primary'>
