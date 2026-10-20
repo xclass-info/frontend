@@ -137,15 +137,25 @@
   padding: 20px;
 }
 
+.liveSession {
+  background: var(--surface);
+  padding: 32px 6% 56px;
+  display: flex;
+  justify-content: center;
+}
+
 .aiPill {
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
+  max-width: 420px;
   background: var(--card);
   border: 2.5px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 16px 20px;
   box-shadow: 6px 6px 0 var(--border);
+  animation: heroFadeUp 0.7s ease both;
 }
 
 .aiPill strong {

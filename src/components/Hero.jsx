@@ -4,42 +4,7 @@ import { db } from "../firebase";
 import { collection, onSnapshot } from "firebase/firestore";
 import styles from "./Hero.module.css";
 import InitialsAvatar from "./InitialsAvatar";
-
-function mentorTags(teacher) {
-  const raw = [teacher.expertise, teacher.researchArea]
-    .filter(Boolean)
-    .flatMap((s) => s.split(/&|,|\//))
-    .map((s) => s.trim())
-    .filter(Boolean);
-  return [...new Set(raw)].slice(0, 4);
-}
-
-function mentorBadge(teacher) {
-  if (typeof teacher.rating === "number" && teacher.rating >= 4.5) {
-    return "Top Rated";
-  }
-  if (/phd|doctor/i.test(teacher.degree || "")) return "PhD Mentor";
-  return "Featured Mentor";
-}
-
-function mentorStats(teacher) {
-  const stats = [];
-  if (typeof teacher.rating === "number") {
-    stats.push([`${teacher.rating.toFixed(1)}★`, "Rating"]);
-  }
-  if (teacher.yearsOfExperience) {
-    stats.push([teacher.yearsOfExperience, "Years exp."]);
-  }
-  if (/phd|doctor/i.test(teacher.degree || "")) {
-    stats.push(["PhD", "Degree"]);
-  } else if (teacher.degree) {
-    stats.push([teacher.degree.split(" ")[0], "Degree"]);
-  }
-  if (teacher.projects?.length) {
-    stats.push([`${teacher.projects.length}`, "Project ideas"]);
-  }
-  return stats.slice(0, 3);
-}
+import { mentorTags, mentorBadge, mentorStats } from "../utils/mentorCard";
 
 export default function Hero() {
   const navigate = useNavigate();
@@ -193,19 +158,22 @@ export default function Hero() {
               </button>
             </div>
           </div>
+        </div>
+      </section>
+      )}
 
-          {/* Live session pill */}
-          <div className={styles.aiPill}>
-            <div className={styles.aiIcon}>🔬</div>
-            <div>
-              <strong>Live Session in Progress</strong>
-              <p>
-                {mentorTags(mentor)[0] || "Research"} Journal Club · 8
-                students joined
-              </p>
-            </div>
-            <div className={styles.liveDot} />
+      {mentor && (
+      <section className={styles.liveSession}>
+        <div className={styles.aiPill}>
+          <div className={styles.aiIcon}>🔬</div>
+          <div>
+            <strong>Live Session in Progress</strong>
+            <p>
+              {mentorTags(mentor)[0] || "Research"} Journal Club · 8
+              students joined
+            </p>
           </div>
+          <div className={styles.liveDot} />
         </div>
       </section>
       )}
