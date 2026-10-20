@@ -15,10 +15,6 @@ export default function Hero() {
       <div className={styles.videoOverlay} />
       <div className={styles.inner}>
         <div className={styles.content}>
-          <div className={styles.tag}>
-            <span className={styles.tagDot} />
-            🔬 Online · All ages · Real research
-          </div>
           <h1 className={styles.h1}>Turn curiosity into real research 🔬</h1>
           <p className={styles.sub}>
             Work with a PhD mentor on real research, a hands-on project, or
