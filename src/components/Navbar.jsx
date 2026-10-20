@@ -149,6 +149,9 @@ export default function Navbar() {
             <Link to='/teacher/login' className={styles.teacherBtn}>
               Mentor Login
             </Link>
+            <Link to='/student/register' className={styles.cta}>
+              Apply Now
+            </Link>
           </>
         )}
       </div>
@@ -218,6 +221,11 @@ export default function Navbar() {
               </li>
               <li>
                 <Link to='/teacher/login'>Mentor Login</Link>
+              </li>
+              <li>
+                <Link to='/student/register' className={styles.cta}>
+                  Apply Now
+                </Link>
               </li>
             </>
           )}

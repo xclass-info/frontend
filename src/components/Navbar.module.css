@@ -221,6 +221,11 @@
   color: var(--primary-hover, #2f6175);
 }
 
+.mobileMenu .cta {
+  display: inline-block;
+  text-align: center;
+}
+
 @media (max-width: 1260px) {
   .links {
     display: none;
