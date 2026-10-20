@@ -78,8 +78,8 @@ function HomePage() {
     <>
       <Navbar />
       <Hero />
-      <ActiveEnrolling />
       <GetStartedSection />
+      <ActiveEnrolling />
       <HowItWorks />
       <ResearchPrograms />
       <ResearchSection />
