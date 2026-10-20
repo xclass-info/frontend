@@ -16,7 +16,7 @@ export default function Hero() {
       <div className={styles.videoOverlay} />
       <div className={styles.inner}>
         <div className={styles.content}>
-          <h1 className={styles.h1}>Your Research Journey Starts Here.</h1>
+          <h1 className={styles.h1}>Your Curiosity, Our Mentors.</h1>
           <p className={styles.sub}>
             Connect with PhD mentors, explore exciting research
             opportunities, and turn your curiosity into meaningful
