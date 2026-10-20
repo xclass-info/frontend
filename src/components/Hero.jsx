@@ -2,7 +2,6 @@ import styles from "./Hero.module.css";
 
 export default function Hero() {
   return (
-    <>
     <section className={styles.hero}>
       <video
         className={styles.videoBg}
@@ -13,9 +12,7 @@ export default function Hero() {
         loop
         playsInline
       />
-    </section>
-
-    <section className={styles.heroText}>
+      <div className={styles.videoOverlay} />
       <div className={styles.inner}>
         <div className={styles.content}>
           <div className={styles.tag}>
@@ -57,6 +54,5 @@ export default function Hero() {
         </div>
       </div>
     </section>
-    </>
   );
 }
