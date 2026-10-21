@@ -11,6 +11,7 @@ import Footer from "./Footer";
 import { formatMentorName } from "../utils/mentorName";
 import { GRADE_OPTIONS } from "../utils/grades";
 import { loadStudentRegistrations } from "../utils/studentData";
+import { isAccountVerified } from "../utils/accountVerification";
 
 const TABS = [
   { id: "profile", label: "👤 Profile" },
@@ -425,14 +426,14 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     const unsub = auth.onAuthStateChanged(async (user) => {
-      // Only verified student accounts belong here.
-      if (!user || !user.emailVerified) {
+      if (!user) {
         navigate("/student/login");
         return;
       }
       try {
         const snap = await getDoc(doc(db, "students", user.uid));
-        if (!snap.exists()) {
+        // Only verified student accounts belong here.
+        if (!snap.exists() || !isAccountVerified(snap.data())) {
           navigate("/student/login");
           return;
         }

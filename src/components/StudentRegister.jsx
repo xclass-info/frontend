@@ -1,17 +1,15 @@
 import { useState } from "react";
 import { auth, db } from "../firebase";
-import {
-  createUserWithEmailAndPassword,
-  sendEmailVerification,
-  signOut,
-} from "firebase/auth";
+import { createUserWithEmailAndPassword, signOut } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import styles from "./TeacherAuth.module.css";
 import Footer from "./Footer";
 import { GRADE_OPTIONS } from "../utils/grades";
-
-const CONTINUE_URL = "https://happyresearch.org/student/login";
+import {
+  generateVerificationToken,
+  sendVerificationEmail,
+} from "../utils/accountVerification";
 
 export default function StudentRegister() {
   const navigate = useNavigate();
@@ -52,21 +50,24 @@ export default function StudentRegister() {
         form.password,
       );
 
+      const name = form.name.trim();
+      const email = form.email.trim().toLowerCase();
+      const token = generateVerificationToken();
+
       // The students record marks this as a student account (mentors share
       // the same login system), so create it before anything else can fail.
       await setDoc(doc(db, "students", user.uid), {
-        name: form.name.trim(),
-        email: form.email.trim().toLowerCase(),
+        name,
+        email,
         grade: form.grade.trim(),
         phone: form.phone.trim(),
         createdAt: new Date(),
+        accountEmailToken: token,
+        accountEmailVerified: false,
       });
 
       try {
-        await sendEmailVerification(user, {
-          url: CONTINUE_URL,
-          handleCodeInApp: false,
-        });
+        await sendVerificationEmail({ kind: "student", uid: user.uid, name, email, token });
       } catch (err) {
         console.error(err);
         setEmailFailed(true);

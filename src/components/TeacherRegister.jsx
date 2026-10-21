@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { auth, db } from "../firebase";
-import {
-  createUserWithEmailAndPassword,
-  sendEmailVerification,
-} from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate, Link } from "react-router-dom";
 import styles from "./TeacherAuth.module.css";
 import Footer from "./Footer";
+import {
+  generateVerificationToken,
+  sendVerificationEmail,
+} from "../utils/accountVerification";
 
 export default function TeacherRegister() {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ export default function TeacherRegister() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [verificationSent, setVerificationSent] = useState(false);
+  const [emailFailed, setEmailFailed] = useState(false);
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -44,11 +46,7 @@ export default function TeacherRegister() {
         form.password,
       );
 
-      // Send verification email
-      await sendEmailVerification(user, {
-        url: "https://happyresearch.org/teacher/login",
-        handleCodeInApp: false,
-      });
+      const token = generateVerificationToken();
 
       // Save teacher to Firestore
       await setDoc(doc(db, "teachers", user.uid), {
@@ -56,7 +54,22 @@ export default function TeacherRegister() {
         email: form.email,
         verificationStatus: "incomplete",
         createdAt: new Date(),
+        accountEmailToken: token,
+        accountEmailVerified: false,
       });
+
+      try {
+        await sendVerificationEmail({
+          kind: "teacher",
+          uid: user.uid,
+          name: form.name,
+          email: form.email,
+          token,
+        });
+      } catch (err) {
+        console.error(err);
+        setEmailFailed(true);
+      }
 
       setVerificationSent(true);
     } catch (err) {
@@ -86,7 +99,7 @@ export default function TeacherRegister() {
             <div style={{ textAlign: "center", padding: 20 }}>
               <p style={{ fontSize: 48, marginBottom: 12 }}>📧</p>
               <h3 style={{ color: "#2f6175", marginBottom: 8 }}>
-                Check your email!
+                {emailFailed ? "Account created" : "Check your email!"}
               </h3>
               <p
                 style={{
@@ -96,8 +109,19 @@ export default function TeacherRegister() {
                   marginBottom: 20,
                 }}
               >
-                We sent a verification link to <strong>{form.email}</strong>.
-                Please click the link to verify your account before logging in.
+                {emailFailed ? (
+                  <>
+                    We couldn't send the verification email to{" "}
+                    <strong>{form.email}</strong>. Go to Login and choose
+                    "Resend Verification Email".
+                  </>
+                ) : (
+                  <>
+                    We sent a verification link to <strong>{form.email}</strong>
+                    . Please click the link to verify your account before
+                    logging in.
+                  </>
+                )}
               </p>
               <button
                 onClick={() => navigate("/teacher/login")}

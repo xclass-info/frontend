@@ -1,14 +1,18 @@
 import { useState } from "react";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
-  sendEmailVerification,
   signOut,
 } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 import { useNavigate, Link } from "react-router-dom";
 import styles from "./TeacherAuth.module.css";
 import Footer from "./Footer";
+import {
+  isAccountVerified,
+  resendVerificationEmail,
+} from "../utils/accountVerification";
 
 export default function TeacherLogin() {
   const navigate = useNavigate();
@@ -37,8 +41,10 @@ export default function TeacherLogin() {
         form.password,
       );
 
-      // Check if email is verified
-      if (!user.emailVerified) {
+      // Check if email is verified (accounts predating this field are
+      // treated as verified - see isAccountVerified)
+      const teacherSnap = await getDoc(doc(db, "teachers", user.uid));
+      if (teacherSnap.exists() && !isAccountVerified(teacherSnap.data())) {
         await signOut(auth);
         setError(
           "Please verify your email before logging in. Check your inbox for the verification link.",
@@ -99,9 +105,11 @@ export default function TeacherLogin() {
         form.email,
         form.password,
       );
-      await sendEmailVerification(user, {
-        url: "https://happyresearch.org/teacher/login",
-        handleCodeInApp: false,
+      await resendVerificationEmail({
+        kind: "teacher",
+        uid: user.uid,
+        name: "",
+        email: user.email,
       });
       await signOut(auth);
       setResendSent(true);

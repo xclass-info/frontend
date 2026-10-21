@@ -3,13 +3,16 @@ import { auth, db } from "../firebase";
 import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
-  sendEmailVerification,
   signOut,
 } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import styles from "./TeacherAuth.module.css";
 import Footer from "./Footer";
+import {
+  isAccountVerified,
+  resendVerificationEmail,
+} from "../utils/accountVerification";
 
 const CONTINUE_URL = "https://happyresearch.org/student/login";
 
@@ -41,15 +44,6 @@ export default function StudentLogin() {
         form.password,
       );
 
-      if (!user.emailVerified) {
-        await signOut(auth);
-        setError(
-          "Please verify your email before logging in. Check your inbox (and spam folder) for the verification link.",
-        );
-        setShowResend(true);
-        return;
-      }
-
       // Mentors have accounts too - only student accounts belong here.
       const student = await getDoc(doc(db, "students", user.uid));
       if (!student.exists()) {
@@ -57,6 +51,15 @@ export default function StudentLogin() {
         setError(
           "No student account found for this email. If you're a mentor, use Mentor Login.",
         );
+        return;
+      }
+
+      if (!isAccountVerified(student.data())) {
+        await signOut(auth);
+        setError(
+          "Please verify your email before logging in. Check your inbox (and spam folder) for the verification link.",
+        );
+        setShowResend(true);
         return;
       }
 
@@ -112,9 +115,11 @@ export default function StudentLogin() {
         form.email,
         form.password,
       );
-      await sendEmailVerification(user, {
-        url: CONTINUE_URL,
-        handleCodeInApp: false,
+      await resendVerificationEmail({
+        kind: "student",
+        uid: user.uid,
+        name: "",
+        email: user.email,
       });
       await signOut(auth);
       setResendSent(true);
