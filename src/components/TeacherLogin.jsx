@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { login, logout, sendPasswordReset } from "../auth";
+import {
+  login,
+  logout,
+  resendVerificationEmail,
+  sendPasswordReset,
+} from "../auth";
 import { useNavigate, Link } from "react-router-dom";
 import styles from "./TeacherAuth.module.css";
 import Footer from "./Footer";
-import {
-  isAccountVerified,
-  resendVerificationEmail,
-} from "../utils/accountVerification";
+import { isAccountVerified } from "../utils/accountVerification";
 
 export default function TeacherLogin() {
   const navigate = useNavigate();
@@ -33,7 +35,7 @@ export default function TeacherLogin() {
 
       // Check if email is verified (accounts predating this field are
       // treated as verified - see isAccountVerified)
-      if (user.teacher && !isAccountVerified(user.teacher)) {
+      if (user?.teacher && !isAccountVerified(user.teacher)) {
         logout();
         setError(
           "Please verify your email before logging in. Check your inbox for the verification link.",
@@ -46,10 +48,6 @@ export default function TeacherLogin() {
     } catch (err) {
       if (err.code === "INVALID_CREDENTIALS") {
         setError("Invalid email or password.");
-      } else if (err.code === "PASSWORD_RESET_REQUIRED") {
-        setError(
-          'We\'ve moved to a new login system - please click "Forgot password?" below to set your password.',
-        );
       } else if (err.code === "RATE_LIMITED") {
         setError("Too many failed attempts. Please try again later.");
       } else {
@@ -67,7 +65,7 @@ export default function TeacherLogin() {
     }
     setResetLoading(true);
     try {
-      await sendPasswordReset(form.email);
+      await sendPasswordReset(form.email, "https://happyresearch.org/teacher/login");
       setResetSent(true);
       setError("");
     } catch (err) {

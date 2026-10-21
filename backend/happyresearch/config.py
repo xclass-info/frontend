@@ -33,8 +33,6 @@ class Config:
     # Inbox that receives Contact Us / On-demand Learning messages.
     TEAM_INBOX = os.environ.get("TEAM_INBOX", "happyprogramming.us@gmail.com")
 
-    AUTH_TOKEN_DAYS = int(os.environ.get("AUTH_TOKEN_DAYS", "30"))
-
     MAIL_SERVER = "smtp.gmail.com"
     MAIL_PORT = 587
     MAIL_USE_TLS = True
@@ -54,11 +52,7 @@ class Config:
     S3_REGION = os.environ.get("S3_REGION", "auto")
     MAX_UPLOAD_MB = 10
 
-    # Firebase Auth scrypt parameters, for verifying imported password hashes.
-    # From Firebase Console > Authentication > Users > ⋮ > Password hash parameters.
-    FIREBASE_HASH_SIGNER_KEY = os.environ.get("FIREBASE_HASH_SIGNER_KEY")
-    FIREBASE_HASH_SALT_SEPARATOR = os.environ.get("FIREBASE_HASH_SALT_SEPARATOR", "Bw==")
-    FIREBASE_HASH_ROUNDS = int(os.environ.get("FIREBASE_HASH_ROUNDS", "8"))
-    FIREBASE_HASH_MEM_COST = int(os.environ.get("FIREBASE_HASH_MEM_COST", "14"))
+    # Logins are Firebase Authentication accounts in this project.
+    FIREBASE_PROJECT_ID = os.environ.get("FIREBASE_PROJECT_ID", "xclass-3e2f3")
 
     RATELIMIT_STORAGE_URI = "memory://"

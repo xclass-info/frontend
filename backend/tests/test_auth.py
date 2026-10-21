@@ -1,41 +1,33 @@
+import time
+
+import jwt
+from cryptography.hazmat.primitives.asymmetric import rsa
+
 from happyresearch.extensions import db
 from happyresearch.models import Student, Teacher, User
 
-from .conftest import login, make_user
-
-# Example parameters + hash from Firebase's published scrypt docs
-# (github.com/firebase/scrypt), password "user1password".
-FIREBASE_PARAMS = {
-    "FIREBASE_HASH_SIGNER_KEY": "jxspr8Ki0RYycVU8zykbdLGjFQ3McFUH0uiiTvC8pVMXAn210wjLNmdZJzxUECKbm0QsEmYUSDzZvpjeJ9WmXA==",
-    "FIREBASE_HASH_SALT_SEPARATOR": "Bw==",
-    "FIREBASE_HASH_ROUNDS": 8,
-    "FIREBASE_HASH_MEM_COST": 14,
-}
-FIREBASE_SALT = "42xEC+ixf3L2lw=="
-FIREBASE_HASH = "lSrfV15cpx95/sZS2W9c9Kp6i/LVgQNDNC/qzrCnh1SAyZvqmZqAjTdn3aoItz+VHjoZilo78198JAdRuid5lQ=="
+from .conftest import auth, firebase_token, make_user
 
 
-def test_student_signup_verify_login(client, outbox):
+def test_student_signup_verify(client, outbox):
+    # Firebase account already created in the browser; now the profile.
+    headers = auth("fb-ann", "Ann@Example.com")
     res = client.post(
-        "/api/auth/register",
-        json={"kind": "student", "name": "Ann", "email": "Ann@Example.com", "password": "secret123", "grade": "10th"},
+        "/api/auth/profile", json={"kind": "student", "name": "Ann", "grade": "10th"}, headers=headers
     )
     assert res.status_code == 201 and res.json["emailSent"]
-    uid = res.json["uid"]
     assert len(outbox) == 1 and outbox[0].recipients == ["ann@example.com"]
 
-    student = db.session.get(Student, uid)
-    assert student.accountEmailVerified is False
+    student = db.session.get(Student, "fb-ann")
+    assert student.accountEmailVerified is False and student.email == "ann@example.com"
     token = student.accountEmailToken
     assert token in outbox[0].html
 
-    # Logging in works, but the account isn't usable as a student yet.
-    headers = login(client, "ann@example.com")
+    # Not usable as a student until verified.
     assert client.get("/api/students/me/registrations", headers=headers).json["code"] == "EMAIL_NOT_VERIFIED"
-
-    bad = client.post("/api/auth/verify-email", json={"kind": "student", "uid": uid, "token": "nope"})
+    bad = client.post("/api/auth/verify-email", json={"kind": "student", "uid": "fb-ann", "token": "nope"})
     assert bad.json["status"] == "invalid"
-    ok = client.post("/api/auth/verify-email", json={"kind": "student", "uid": uid, "token": token})
+    ok = client.post("/api/auth/verify-email", json={"kind": "student", "uid": "fb-ann", "token": token})
     assert ok.json["status"] == "success"
     assert client.get("/api/students/me/registrations", headers=headers).status_code == 200
 
@@ -43,74 +35,66 @@ def test_student_signup_verify_login(client, outbox):
     assert me["student"]["name"] == "Ann" and me["teacher"] is None
     assert "accountEmailToken" not in me["student"]
 
-
-def test_duplicate_email_and_bad_password(client):
-    make_user("a@example.com")
-    res = client.post(
-        "/api/auth/register",
-        json={"kind": "teacher", "name": "A", "email": "A@example.com", "password": "secret123"},
-    )
-    assert res.json["code"] == "EMAIL_IN_USE"
-    res = client.post("/api/auth/login", json={"email": "a@example.com", "password": "wrong"})
-    assert res.status_code == 401 and res.json["code"] == "INVALID_CREDENTIALS"
+    dup = client.post("/api/auth/profile", json={"kind": "student", "name": "Ann"}, headers=headers)
+    assert dup.json["code"] == "PROFILE_EXISTS"
 
 
-def test_password_reset_invalidates_old_tokens(client, outbox):
-    make_user("r@example.com")
-    old = login(client, "r@example.com")
-    assert client.post("/api/auth/forgot-password", json={"email": "r@example.com"}).status_code == 200
-    # Unknown emails get the same answer (no account enumeration).
-    assert client.post("/api/auth/forgot-password", json={"email": "x@example.com"}).status_code == 200
-    assert len(outbox) == 1
-    token = outbox[0].html.split("reset-password?token=")[1].split('"')[0]
-
-    res = client.post("/api/auth/reset-password", json={"token": token, "password": "newpass1"})
-    assert res.status_code == 200
-    assert client.get("/api/auth/me", headers=old).status_code == 401
-    login(client, "r@example.com", "newpass1")
-    # Single use.
-    res = client.post("/api/auth/reset-password", json={"token": token, "password": "another1"})
-    assert res.json["code"] == "INVALID_TOKEN"
+def test_resend_verification_issues_new_link(client, outbox):
+    headers = auth("fb-t", "t@example.com")
+    client.post("/api/auth/profile", json={"kind": "teacher", "name": "Dr. T"}, headers=headers)
+    first = db.session.get(Teacher, "fb-t").accountEmailToken
+    assert client.post("/api/auth/resend-verification", json={"kind": "teacher"}, headers=headers).status_code == 200
+    teacher = db.session.get(Teacher, "fb-t")
+    assert teacher.accountEmailToken != first and teacher.verificationStatus == "incomplete"
+    assert len(outbox) == 2
 
 
-def test_migrated_account_without_password_must_reset(client):
-    db.session.add(User(id="olduid", email="old@example.com", passwordAlgo=None))
+def test_bad_tokens_are_rejected(client):
+    other_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    for token in (
+        "garbage",
+        firebase_token("u1", "a@example.com", project="someone-else"),
+        firebase_token("u1", "a@example.com", key=other_key),
+        firebase_token("u1", "a@example.com", expires_in=-3600),
+    ):
+        res = client.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
+        assert res.status_code == 401
+    assert client.get("/api/auth/me").status_code == 401
+
+
+def test_first_request_creates_user_and_replaces_stale_row(client):
+    # A placeholder login holding the email under another id (from the import).
+    db.session.add(User(id="placeholder", email="admin@example.com"))
     db.session.commit()
-    res = client.post("/api/auth/login", json={"email": "old@example.com", "password": "whatever"})
-    assert res.status_code == 409 and res.json["code"] == "PASSWORD_RESET_REQUIRED"
+    me = client.get("/api/auth/me", headers=auth("real-uid", "Admin@example.com")).json
+    assert me["uid"] == "real-uid" and me["isAdmin"] is True
+    assert db.session.get(User, "placeholder") is None
 
 
-def test_firebase_scrypt_hash_is_accepted_and_upgraded(app, client):
-    app.config.update(FIREBASE_PARAMS)
-    db.session.add(
-        User(
-            id="fbuid",
-            email="fb@example.com",
-            passwordAlgo="firebase_scrypt",
-            passwordHash=FIREBASE_HASH,
-            passwordSalt=FIREBASE_SALT,
-        )
-    )
-    db.session.commit()
-    assert client.post("/api/auth/login", json={"email": "fb@example.com", "password": "wrong"}).status_code == 401
-    login(client, "fb@example.com", "user1password")
-    assert db.session.get(User, "fbuid").passwordAlgo == "werkzeug"
-    login(client, "fb@example.com", "user1password")
+def test_admin_role_follows_admin_emails(client):
+    make_user("s@example.com", student=True)
+    assert client.get("/api/auth/me", headers=auth(User.query.one().id, "s@example.com")).json["isAdmin"] is False
 
 
-def test_teacher_signup_gives_incomplete_mentor(client):
-    res = client.post(
-        "/api/auth/register",
-        json={"kind": "teacher", "name": "Dr. Who", "email": "who@example.com", "password": "secret123"},
-    )
-    teacher = db.session.get(Teacher, res.json["uid"])
-    assert teacher.verificationStatus == "incomplete"
-    assert teacher.accountEmailVerified is False
+def test_token_email_change_is_synced(client):
+    user = make_user("old@example.com")
+    client.get("/api/auth/me", headers=auth(user.id, "new@example.com"))
+    assert db.session.get(User, user.id).email == "new@example.com"
 
 
-def test_admin_email_gets_admin_role(client):
-    client.post(
-        "/api/auth/register",
-        json={"kind": "student", "name": "Boss", "email": "admin@example.com", "password": "secret123"},
-    )
-    assert User.query.filter_by(email="admin@example.com").one().isAdmin
+def test_parallel_first_requests_share_one_user(client, monkeypatch):
+    # Simulate the other request winning the race to create the row.
+    real_get = db.session.get
+    calls = {"n": 0}
+
+    def get(model, ident, *a, **kw):
+        if model is User and ident == "racer" and calls["n"] == 0:
+            calls["n"] += 1
+            with db.engine.begin() as conn:
+                conn.execute(User.__table__.insert().values(id="racer", email="racer@example.com", is_admin=False))
+            return None
+        return real_get(model, ident, *a, **kw)
+
+    monkeypatch.setattr(db.session, "get", get)
+    res = client.get("/api/auth/me", headers=auth("racer", "racer@example.com"))
+    assert res.status_code == 200 and res.json["uid"] == "racer"

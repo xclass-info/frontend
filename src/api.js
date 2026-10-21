@@ -23,7 +23,7 @@ const CHANGED = "hr:data-changed";
 
 async function request(method, path, body) {
   const headers = {};
-  const token = getToken();
+  const token = await getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
   let payload;
   if (body instanceof FormData) {

@@ -22,7 +22,6 @@ import ExploreResources from "./components/ExploreResources";
 import TellUsWhatYouNeed from "./components/TellUsWhatYouNeed";
 import VerifyMentorEmail from "./components/VerifyMentorEmail";
 import VerifyAccountEmail from "./components/VerifyAccountEmail";
-import ResetPassword from "./components/ResetPassword";
 import StudentLogin from "./components/StudentLogin";
 import StudentRegister from "./components/StudentRegister";
 import StudentDashboard from "./components/StudentDashboard";
@@ -124,7 +123,6 @@ export default function App() {
         <Route path='/tell-us-what-you-need' element={<TellUsWhatYouNeed />} />
         <Route path='/verify-mentor-email' element={<VerifyMentorEmail />} />
         <Route path='/verify-account-email' element={<VerifyAccountEmail />} />
-        <Route path='/reset-password' element={<ResetPassword />} />
         <Route path='/about' element={<AboutUs />} />
         <Route path='/contact' element={<ContactUs />} />
         <Route path='/gallery' element={<Gallery />} />

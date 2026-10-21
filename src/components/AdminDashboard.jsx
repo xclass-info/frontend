@@ -124,7 +124,7 @@ export default function AdminDashboard() {
     setResetSent(false);
     try {
       const result = await login(email, password);
-      if (!result.isAdmin) {
+      if (!result?.isAdmin) {
         logout();
         setError("You are not authorized as admin.");
       }
@@ -133,10 +133,10 @@ export default function AdminDashboard() {
         setError(
           "Too many failed attempts. Wait a few minutes, or reset your password below.",
         );
-      } else if (err.code === "PASSWORD_RESET_REQUIRED") {
-        setError(
-          'We\'ve moved to a new login system - click "Forgot password?" below to set your password.',
-        );
+      } else if (err.code === "INVALID_EMAIL") {
+        setError("That doesn't look like a valid email address.");
+      } else if (err.code === "USER_DISABLED") {
+        setError("This account has been disabled.");
       } else {
         setError("Invalid email or password.");
       }

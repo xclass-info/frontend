@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { login, logout, sendPasswordReset } from "../auth";
+import {
+  login,
+  logout,
+  resendVerificationEmail,
+  sendPasswordReset,
+} from "../auth";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import styles from "./TeacherAuth.module.css";
 import Footer from "./Footer";
-import {
-  isAccountVerified,
-  resendVerificationEmail,
-} from "../utils/accountVerification";
+import { isAccountVerified } from "../utils/accountVerification";
 
 export default function StudentLogin() {
   const navigate = useNavigate();
@@ -33,7 +35,7 @@ export default function StudentLogin() {
       const user = await login(form.email, form.password);
 
       // Mentors have accounts too - only student accounts belong here.
-      if (!user.student) {
+      if (!user?.student) {
         logout();
         setError(
           "No student account found for this email. If you're a mentor, use Mentor Login.",
@@ -55,10 +57,6 @@ export default function StudentLogin() {
     } catch (err) {
       if (err.code === "INVALID_CREDENTIALS") {
         setError("Invalid email or password.");
-      } else if (err.code === "PASSWORD_RESET_REQUIRED") {
-        setError(
-          'We\'ve moved to a new login system - please click "Forgot password?" below to set your password.',
-        );
       } else if (err.code === "RATE_LIMITED") {
         setError("Too many failed attempts. Please try again later.");
       } else {
@@ -76,7 +74,7 @@ export default function StudentLogin() {
     }
     setResetLoading(true);
     try {
-      await sendPasswordReset(form.email);
+      await sendPasswordReset(form.email, "https://happyresearch.org/student/login");
       setResetSent(true);
       setError("");
     } catch (err) {
