@@ -1,5 +1,5 @@
 {
-  "name": "happy-ai-academy",
+  "name": "happyresearch",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -8,13 +8,10 @@
     "build": "vite build",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "npm run build && gh-pages -d dist -b gh-pages -f"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
-    "@stripe/react-stripe-js": "^6.3.0",
-    "@stripe/stripe-js": "^9.4.0",
-    "country-state-city": "^3.2.1",
     "firebase": "^12.11.0",
     "moment": "^2.30.1",
     "react": "^18.2.0",

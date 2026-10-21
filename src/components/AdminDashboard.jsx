@@ -1,52 +1,150 @@
 // src/components/AdminDashboard.jsx
 import { useEffect, useState } from "react";
-import { db, auth } from "../firebase";
+import { db, auth, storage } from "../firebase";
 import {
   collection,
-  query,
-  where,
   onSnapshot,
   doc,
   updateDoc,
+  deleteDoc,
 } from "firebase/firestore";
-import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import {
+  signInWithEmailAndPassword,
+  signOut,
+  sendPasswordResetEmail,
+} from "firebase/auth";
+import { Link } from "react-router-dom";
+import { mentorTypeLabel } from "../utils/mentorVerification";
+import { loadStudentRegistrations } from "../utils/studentData";
+import {
+  approveStudentApplication,
+  rejectStudentApplication,
+} from "../utils/registration";
 
-const ADMIN_EMAIL = "xclassinfo@gmail.com";
+const ADMIN_EMAIL = "zhenhepan@gmail.com";
 
 export default function AdminDashboard() {
   const [user, setUser] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [ads, setAds] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [tab, setTab] = useState("pending");
-  const [selectedAd, setSelectedAd] = useState(null);
+  const [resetSent, setResetSent] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
+  const [tab, setTab] = useState("overview");
+
+  const [students, setStudents] = useState([]);
+  const [research, setResearch] = useState([]);
+  const [mentors, setMentors] = useState([]);
+  const [registrations, setRegistrations] = useState([]);
+  const pendingApplications = mentors.filter(
+    (m) => m.verificationStatus === "pending_review",
+  );
+  const pendingStudentApplications = registrations.filter(
+    (r) => r.status === "pending",
+  );
+  // rejectTarget is { type: "mentor" | "student", id } or null - shared by
+  // both the mentor-verification and student-application reject flows below.
+  const [rejectTarget, setRejectTarget] = useState(null);
+  const [rejectReason, setRejectReason] = useState("");
+  const [rejectError, setRejectError] = useState("");
+  // Guards against double-submitting an approve/reject action (e.g. a fast
+  // double-click), which would otherwise hit Firestore twice and surface a
+  // false "something went wrong" on the second, already-too-late call.
+  const [actionBusy, setActionBusy] = useState(false);
+
+  const [editItem, setEditItem] = useState(null);
+  const [editType, setEditType] = useState(null);
+
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [imageUploading, setImageUploading] = useState(false);
+
+  // Filters & sorting for each tab (client-side, data is already loaded)
+  const [studentSearch, setStudentSearch] = useState("");
+  const [studentSort, setStudentSort] = useState("name");
+
+  const [studentDetail, setStudentDetail] = useState(null); // selected student or null
+  const [studentRegistrations, setStudentRegistrations] = useState([]);
+  const [studentRegsLoading, setStudentRegsLoading] = useState(false);
+
+  const [researchSearch, setResearchSearch] = useState("");
+  const [researchStatusFilter, setResearchStatusFilter] = useState("all");
+  const [researchSort, setResearchSort] = useState("newest");
+
+  const [mentorSearch, setMentorSearch] = useState("");
+  const [mentorStatusFilter, setMentorStatusFilter] = useState("all");
+  const [mentorVerificationFilter, setMentorVerificationFilter] =
+    useState("all");
+  const [mentorSort, setMentorSort] = useState("name");
+
+  const [applicationSearch, setApplicationSearch] = useState("");
+  const [applicationTypeFilter, setApplicationTypeFilter] = useState("all");
+  const [applicationSort, setApplicationSort] = useState("oldest");
+
+  const [studentAppSearch, setStudentAppSearch] = useState("");
+  const [studentAppKindFilter, setStudentAppKindFilter] = useState("all");
+  const [studentAppSort, setStudentAppSort] = useState("oldest");
 
   useEffect(() => {
     const unsub = auth.onAuthStateChanged((u) => {
-      if (u && u.email === ADMIN_EMAIL) {
-        setUser(u);
-      } else {
-        setUser(null);
-      }
+      if (u && u.email === ADMIN_EMAIL) setUser(u);
+      else setUser(null);
     });
     return () => unsub();
   }, []);
 
   useEffect(() => {
     if (!user) return;
-    const q = query(collection(db, "adposts"), where("status", "==", tab));
-    const unsub = onSnapshot(q, (snap) => {
-      setAds(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    const unsub = onSnapshot(collection(db, "students"), (snap) => {
+      setStudents(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     });
     return () => unsub();
-  }, [user, tab]);
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    const unsub = onSnapshot(collection(db, "research"), (snap) => {
+      setResearch(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    });
+    return () => unsub();
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    const unsub = onSnapshot(collection(db, "teachers"), (snap) => {
+      setMentors(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    });
+    return () => unsub();
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    const unsub = onSnapshot(collection(db, "registrations"), (snap) => {
+      setRegistrations(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    });
+    return () => unsub();
+  }, [user]);
+
+  async function uploadMentorImage(file, mentorId) {
+    const imageRef = ref(storage, `mentors/${mentorId}_${Date.now()}`);
+    await uploadBytes(imageRef, file);
+    return await getDownloadURL(imageRef);
+  }
+
+  function handleImageChange(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  }
 
   async function handleLogin(e) {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setResetSent(false);
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
       if (result.user.email !== ADMIN_EMAIL) {
@@ -54,18 +152,42 @@ export default function AdminDashboard() {
         setError("You are not authorized as admin.");
       }
     } catch (err) {
-      setError("Invalid email or password.");
+      if (err.code === "auth/too-many-requests") {
+        setError(
+          "Too many failed attempts. Wait a few minutes, or reset your password below.",
+        );
+      } else if (err.code === "auth/invalid-email") {
+        setError("That doesn't look like a valid email address.");
+      } else if (err.code === "auth/user-disabled") {
+        setError("This account has been disabled.");
+      } else {
+        setError("Invalid email or password.");
+      }
     } finally {
       setLoading(false);
     }
   }
 
-  async function handleApprove(adId) {
-    await updateDoc(doc(db, "adposts", adId), { status: "approved" });
-  }
-
-  async function handleReject(adId) {
-    await updateDoc(doc(db, "adposts", adId), { status: "rejected" });
+  async function handleForgotPassword() {
+    if (!email.trim()) {
+      setError("Enter your admin email above first, then click Forgot password.");
+      return;
+    }
+    setResetLoading(true);
+    setError("");
+    setResetSent(false);
+    try {
+      await sendPasswordResetEmail(auth, email.trim());
+      setResetSent(true);
+    } catch (err) {
+      if (err.code === "auth/invalid-email") {
+        setError("That doesn't look like a valid email address.");
+      } else {
+        setError("Could not send reset email. Please try again.");
+      }
+    } finally {
+      setResetLoading(false);
+    }
   }
 
   async function handleLogout() {
@@ -73,7 +195,158 @@ export default function AdminDashboard() {
     setUser(null);
   }
 
+  async function approveApplication(mentorId) {
+    if (actionBusy) return;
+    setActionBusy(true);
+    try {
+      await updateDoc(doc(db, "teachers", mentorId), {
+        verificationStatus: "approved",
+        rejectionReason: null,
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setActionBusy(false);
+    }
+  }
+
+  async function rejectApplication(mentorId, reason) {
+    await updateDoc(doc(db, "teachers", mentorId), {
+      verificationStatus: "rejected",
+      rejectionReason: reason.trim(),
+    });
+  }
+
+  function openRejectModal(mentorId) {
+    setRejectTarget({ type: "mentor", id: mentorId });
+    setRejectReason("");
+    setRejectError("");
+  }
+
+  async function approveStudentApp(regId) {
+    if (actionBusy) return;
+    setActionBusy(true);
+    try {
+      await approveStudentApplication(regId);
+    } catch (err) {
+      console.error(err);
+      alert(
+        err.message === "FULL"
+          ? "No seats left - can't approve this application."
+          : "Something went wrong. Please try again.",
+      );
+    } finally {
+      setActionBusy(false);
+    }
+  }
+
+  function openStudentRejectModal(regId) {
+    setRejectTarget({ type: "student", id: regId });
+    setRejectReason("");
+    setRejectError("");
+  }
+
+  async function submitRejectModal() {
+    const trimmed = rejectReason.trim();
+    if (trimmed.length < 10 || !/[a-zA-Z]{3,}/.test(trimmed)) {
+      setRejectError(
+        "Please write at least one full sentence explaining why this is being rejected.",
+      );
+      return;
+    }
+    if (actionBusy) return;
+    setActionBusy(true);
+    try {
+      if (rejectTarget.type === "student") {
+        await rejectStudentApplication(rejectTarget.id, trimmed);
+      } else {
+        await rejectApplication(rejectTarget.id, trimmed);
+      }
+      setRejectTarget(null);
+    } catch (err) {
+      console.error(err);
+      setRejectError("Something went wrong. Please try again.");
+    } finally {
+      setActionBusy(false);
+    }
+  }
+
+  async function openStudentDetail(student) {
+    setStudentDetail(student);
+    setStudentRegsLoading(true);
+    try {
+      const rows = await loadStudentRegistrations(student.email, student.id);
+      setStudentRegistrations(rows);
+    } catch (err) {
+      console.error(err);
+      alert("Couldn't load this student's activity. Please try again.");
+    } finally {
+      setStudentRegsLoading(false);
+    }
+  }
+
+  async function handleDisable(collection_, id, currentStatus) {
+    try {
+      await updateDoc(doc(db, collection_, id), {
+        status: currentStatus === "disabled" ? "published" : "disabled",
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong. Please try again.");
+    }
+  }
+
+  async function handleDelete(collection_, id) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this? This cannot be undone.",
+      )
+    )
+      return;
+    try {
+      await deleteDoc(doc(db, collection_, id));
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong. Please try again.");
+    }
+  }
+
+  async function handleSaveEdit() {
+    if (!editItem || !editType) return;
+    setImageUploading(true);
+    try {
+      const { id, ...data } = editItem;
+      if (imageFile && editType === "teachers") {
+        const url = await uploadMentorImage(imageFile, id);
+        data.photoURL = url;
+      }
+      await updateDoc(doc(db, editType, id), data);
+      setEditItem(null);
+      setEditType(null);
+      setImageFile(null);
+      setImagePreview(null);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save. Please try again.");
+    } finally {
+      setImageUploading(false);
+    }
+  }
+
+  const btnStyle = (color) => ({
+    padding: "6px 14px",
+    borderRadius: 6,
+    border: "none",
+    background: color,
+    color: "white",
+    cursor: "pointer",
+    fontSize: 13,
+    fontWeight: 600,
+  });
+
   // ── Login screen ──
+
   if (!user) {
     return (
       <div
@@ -92,8 +365,25 @@ export default function AdminDashboard() {
             padding: 32,
             width: 360,
             boxShadow: "0 2px 12px rgba(0,0,0,0.1)",
+            position: "relative",
           }}
         >
+          {/* X button */}
+          <a
+            href='/'
+            style={{
+              position: "absolute",
+              top: 16,
+              right: 16,
+              color: "#888",
+              fontSize: 22,
+              textDecoration: "none",
+              lineHeight: 1,
+            }}
+          >
+            ✕
+          </a>
+
           <h2 style={{ marginBottom: 4 }}>🔐 Admin Login</h2>
           <p style={{ color: "#888", fontSize: 14, marginBottom: 24 }}>
             HappyResearch admin only
@@ -101,6 +391,12 @@ export default function AdminDashboard() {
           {error && (
             <p style={{ color: "red", fontSize: 13, marginBottom: 12 }}>
               {error}
+            </p>
+          )}
+          {resetSent && (
+            <p style={{ color: "#1f6f4a", fontSize: 13, marginBottom: 12 }}>
+              Password reset email sent to {email.trim()}. Check your inbox
+              (and spam folder).
             </p>
           )}
           <form onSubmit={handleLogin}>
@@ -140,7 +436,7 @@ export default function AdminDashboard() {
                 padding: 12,
                 borderRadius: 8,
                 border: "none",
-                background: "#4a90e2",
+                background: "#2f6175",
                 color: "white",
                 fontSize: 15,
                 cursor: "pointer",
@@ -150,10 +446,169 @@ export default function AdminDashboard() {
               {loading ? "Logging in..." : "Login →"}
             </button>
           </form>
+          <button
+            type='button'
+            onClick={handleForgotPassword}
+            disabled={resetLoading}
+            style={{
+              display: "block",
+              width: "100%",
+              marginTop: 14,
+              background: "none",
+              border: "none",
+              color: "#2f6175",
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: "pointer",
+              textAlign: "center",
+            }}
+          >
+            {resetLoading ? "Sending..." : "Forgot password?"}
+          </button>
         </div>
       </div>
     );
   }
+
+  // ── Filters & sorting (client-side, data is already fully loaded) ──
+  const filterInputStyle = {
+    padding: "8px 12px",
+    borderRadius: 8,
+    border: "1px solid #ddd",
+    fontSize: 13,
+    fontFamily: "inherit",
+  };
+
+  function sortByDate(list, field, direction) {
+    return [...list].sort((a, b) => {
+      const ta = a[field]?.toMillis?.() ?? 0;
+      const tb = b[field]?.toMillis?.() ?? 0;
+      return direction === "oldest" ? ta - tb : tb - ta;
+    });
+  }
+
+  let visibleStudents = students.filter((s) => {
+    const q = studentSearch.trim().toLowerCase();
+    if (!q) return true;
+    return [s.name, s.email].filter(Boolean).some((v) => v.toLowerCase().includes(q));
+  });
+  visibleStudents =
+    studentSort === "name"
+      ? [...visibleStudents].sort((a, b) =>
+          (a.name || "").localeCompare(b.name || ""),
+        )
+      : studentSort === "grade"
+        ? [...visibleStudents].sort((a, b) =>
+            (a.grade || "").localeCompare(b.grade || ""),
+          )
+        : sortByDate(visibleStudents, "createdAt", studentSort);
+
+  let visibleResearch = research.filter((r) => {
+    if (
+      researchStatusFilter === "active" &&
+      r.status === "disabled"
+    )
+      return false;
+    if (researchStatusFilter === "disabled" && r.status !== "disabled")
+      return false;
+    const q = researchSearch.trim().toLowerCase();
+    if (!q) return true;
+    return [r.title, r.idea, r.teacherName]
+      .filter(Boolean)
+      .some((s) => s.toLowerCase().includes(q));
+  });
+  visibleResearch =
+    researchSort === "title"
+      ? [...visibleResearch].sort((a, b) =>
+          (a.title || "").localeCompare(b.title || ""),
+        )
+      : sortByDate(visibleResearch, "createdAt", researchSort);
+
+  let visibleMentors = mentors.filter((m) => {
+    if (mentorStatusFilter === "active" && m.disabled) return false;
+    if (mentorStatusFilter === "disabled" && !m.disabled) return false;
+    if (
+      mentorVerificationFilter !== "all" &&
+      (m.verificationStatus || "incomplete") !== mentorVerificationFilter
+    )
+      return false;
+    const q = mentorSearch.trim().toLowerCase();
+    if (!q) return true;
+    return [m.name, m.university, m.expertise]
+      .filter(Boolean)
+      .some((s) => s.toLowerCase().includes(q));
+  });
+  visibleMentors =
+    mentorSort === "name"
+      ? [...visibleMentors].sort((a, b) =>
+          (a.name || "").localeCompare(b.name || ""),
+        )
+      : mentorSort === "university"
+        ? [...visibleMentors].sort((a, b) =>
+            (a.university || "").localeCompare(b.university || ""),
+          )
+        : sortByDate(visibleMentors, "createdAt", mentorSort);
+
+  let visibleApplications = pendingApplications.filter((m) => {
+    if (applicationTypeFilter !== "all" && m.mentorType !== applicationTypeFilter)
+      return false;
+    const q = applicationSearch.trim().toLowerCase();
+    if (!q) return true;
+    return [m.name, m.email].filter(Boolean).some((s) => s.toLowerCase().includes(q));
+  });
+  visibleApplications =
+    applicationSort === "name"
+      ? [...visibleApplications].sort((a, b) =>
+          (a.name || "").localeCompare(b.name || ""),
+        )
+      : [...visibleApplications].sort((a, b) => {
+          const ta = a.submittedAt?.toMillis?.() ?? a.createdAt?.toMillis?.() ?? 0;
+          const tb = b.submittedAt?.toMillis?.() ?? b.createdAt?.toMillis?.() ?? 0;
+          return applicationSort === "oldest" ? ta - tb : tb - ta;
+        });
+
+  let visibleStudentApplications = pendingStudentApplications.filter((r) => {
+    if (studentAppKindFilter !== "all" && r.kind !== studentAppKindFilter)
+      return false;
+    const q = studentAppSearch.trim().toLowerCase();
+    if (!q) return true;
+    return [r.studentName, r.studentEmail, r.itemTitle]
+      .filter(Boolean)
+      .some((s) => s.toLowerCase().includes(q));
+  });
+  visibleStudentApplications =
+    studentAppSort === "name"
+      ? [...visibleStudentApplications].sort((a, b) =>
+          (a.studentName || "").localeCompare(b.studentName || ""),
+        )
+      : [...visibleStudentApplications].sort((a, b) => {
+          const ta = a.createdAt?.toMillis?.() ?? 0;
+          const tb = b.createdAt?.toMillis?.() ?? 0;
+          return studentAppSort === "oldest" ? ta - tb : tb - ta;
+        });
+
+  const navItemsRaw = [
+    { id: "overview", label: "🏠 Overview" },
+    { id: "students", label: "🎓 Students", group: "People" },
+    { id: "mentors", label: "👩‍🏫 Mentors", group: "People" },
+    {
+      id: "applications",
+      label: `✅ Mentor Applications${pendingApplications.length > 0 ? ` (${pendingApplications.length})` : ""}`,
+      group: "People",
+    },
+    {
+      id: "student-applications",
+      label: `📋 Student Applications${pendingStudentApplications.length > 0 ? ` (${pendingStudentApplications.length})` : ""}`,
+      group: "People",
+    },
+    { id: "research", label: "🔬 Research", group: "Content" },
+  ];
+  let lastNavGroup = null;
+  const navItems = navItemsRaw.map((item) => {
+    const showGroupLabel = Boolean(item.group && item.group !== lastNavGroup);
+    lastNavGroup = item.group || lastNavGroup;
+    return { ...item, showGroupLabel };
+  });
 
   // ── Admin dashboard ──
   return (
@@ -173,276 +628,958 @@ export default function AdminDashboard() {
             Logged in as {user.email}
           </p>
         </div>
-        <button
-          onClick={handleLogout}
-          style={{
-            padding: "8px 20px",
-            borderRadius: 8,
-            border: "none",
-            background: "#e74c3c",
-            color: "white",
-            cursor: "pointer",
-          }}
-        >
+        <button onClick={handleLogout} style={btnStyle("#a01f13")}>
           Logout
         </button>
       </div>
 
-      {/* Tabs */}
-      <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
-        {["pending", "approved", "rejected"].map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            style={{
-              padding: "8px 20px",
-              borderRadius: 20,
-              border: "none",
-              background: tab === t ? "#4a90e2" : "#e0e0e0",
-              color: tab === t ? "white" : "#555",
-              cursor: "pointer",
-              fontWeight: 600,
-              textTransform: "capitalize",
-            }}
-          >
-            {t === "pending" ? "⏳" : t === "approved" ? "✅" : "❌"} {t}
-          </button>
-        ))}
-      </div>
-
-      {/* Ads list */}
-      {ads.length === 0 ? (
-        <p style={{ color: "#aaa" }}>No {tab} ads.</p>
-      ) : (
-        <div
+      <div style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
+        {/* Sidebar nav */}
+        <nav
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-            gap: 16,
+            width: 200,
+            flexShrink: 0,
+            background: "white",
+            borderRadius: 12,
+            border: "1px solid #eee",
+            padding: "16px 12px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            position: "sticky",
+            top: 24,
           }}
         >
-          {ads.map((ad) => (
-            <div
-              key={ad.id}
-              style={{
-                background: "white",
-                borderRadius: 12,
-                padding: 20,
-                border: "1px solid #eee",
-              }}
-            >
-              {/* Image */}
-              {ad.image && (
-                <img
-                  src={ad.image}
-                  alt={ad.title}
+          {navItems.map((item) => (
+            <div key={item.id}>
+              {item.showGroupLabel && (
+                <p
                   style={{
-                    width: "100%",
-                    height: 180,
-                    objectFit: "cover",
-                    borderRadius: 8,
-                    marginBottom: 12,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: "#aaa",
+                    textTransform: "uppercase",
+                    letterSpacing: 0.5,
+                    padding: "12px 12px 4px",
+                    margin: 0,
                   }}
-                />
+                >
+                  {item.group}
+                </p>
               )}
+              <button
+                onClick={() => setTab(item.id)}
+                style={{
+                  display: "block",
+                  width: "100%",
+                  textAlign: "left",
+                  padding: "10px 12px",
+                  borderRadius: 8,
+                  border: "none",
+                  background: tab === item.id ? "#2f6175" : "transparent",
+                  color: tab === item.id ? "white" : "#555",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  fontSize: 14,
+                }}
+              >
+                {item.label}
+              </button>
+            </div>
+          ))}
+        </nav>
 
-              {/* Title & Subject */}
+        <main style={{ flex: 1, minWidth: 0 }}>
+          {/* ── Overview Tab ── */}
+          {tab === "overview" && (
+            <div>
+              <h3 style={{ marginTop: 0 }}>Overview</h3>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 16,
+                  flexWrap: "wrap",
+                  marginBottom: 8,
+                }}
+              >
+                {[
+                  { label: "Students", count: students.length, go: "students" },
+                  { label: "Mentors", count: mentors.length, go: "mentors" },
+                  {
+                    label: "Pending Mentor Applications",
+                    count: pendingApplications.length,
+                    go: "applications",
+                  },
+                  {
+                    label: "Pending Student Applications",
+                    count: pendingStudentApplications.length,
+                    go: "student-applications",
+                  },
+                  { label: "Research", count: research.length, go: "research" },
+                ].map((stat) => (
+                  <button
+                    key={stat.label}
+                    onClick={() => setTab(stat.go)}
+                    style={{
+                      background: "white",
+                      borderRadius: 12,
+                      border: "1px solid #eee",
+                      padding: "20px 24px",
+                      minWidth: 140,
+                      textAlign: "left",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <p style={{ margin: 0, fontSize: 28, fontWeight: 700 }}>
+                      {stat.count}
+                    </p>
+                    <p style={{ margin: "4px 0 0", color: "#888", fontSize: 13 }}>
+                      {stat.label}
+                    </p>
+                  </button>
+                ))}
+              </div>
+              {pendingApplications.length > 0 && (
+                <p style={{ color: "#888", fontSize: 14 }}>
+                  {pendingApplications.length} mentor application
+                  {pendingApplications.length === 1 ? "" : "s"} waiting on
+                  review —{" "}
+                  <button
+                    onClick={() => setTab("applications")}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#2f6175",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      padding: 0,
+                      fontSize: 14,
+                    }}
+                  >
+                    Review now →
+                  </button>
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* ── Students Tab ── */}
+          {tab === "students" && (
+            <div>
               <div
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
-                  marginBottom: 8,
+                  marginBottom: 16,
                 }}
               >
-                <h3 style={{ margin: 0, fontSize: 16 }}>{ad.title}</h3>
-                {ad.subject && (
-                  <span
-                    style={{
-                      fontSize: 12,
-                      background: "#eff6ff",
-                      color: "#3b82f6",
-                      padding: "2px 10px",
-                      borderRadius: 20,
-                    }}
-                  >
-                    {ad.subject}
-                  </span>
-                )}
-              </div>
-
-              {/* Class type */}
-              {ad.classType && (
-                <span
-                  style={{
-                    fontSize: 12,
-                    background: "#f0fdf4",
-                    color: "#16a34a",
-                    padding: "2px 10px",
-                    borderRadius: 20,
-                    marginBottom: 8,
-                    display: "inline-block",
-                  }}
-                >
-                  {ad.classType}
-                </span>
-              )}
-
-              {/* Message */}
-              {ad.message && (
-                <p
-                  style={{
-                    color: "#555",
-                    fontSize: 14,
-                    marginBottom: 10,
-                    lineHeight: 1.5,
-                  }}
-                >
-                  {ad.message}
+                <p style={{ color: "#888", margin: 0 }}>
+                  {visibleStudents.length} of {students.length} students
                 </p>
-              )}
-
-              {/* URL */}
-              {ad.url && (
-                <a
-                  href={ad.url}
-                  target='_blank'
-                  rel='noreferrer'
-                  style={{
-                    fontSize: 13,
-                    color: "#4a90e2",
-                    display: "block",
-                    marginBottom: 10,
-                    wordBreak: "break-all",
-                  }}
-                >
-                  {ad.url}
-                </a>
-              )}
-
-              {/* Contact info */}
+              </div>
               <div
                 style={{
-                  borderTop: "1px solid #f0f0f0",
-                  marginBottom: 10,
-                  paddingTop: 10,
+                  display: "flex",
+                  gap: 10,
+                  marginBottom: 16,
+                  flexWrap: "wrap",
                 }}
               >
-                <div style={{ fontSize: 13, color: "#555", marginBottom: 4 }}>
-                  👤 <strong>{ad.name}</strong>
-                </div>
-                <div style={{ fontSize: 13, color: "#555", marginBottom: 4 }}>
-                  📧 {ad.email}
-                </div>
-                {ad.phone && (
-                  <div style={{ fontSize: 13, color: "#555", marginBottom: 4 }}>
-                    📞 {ad.phone}
-                  </div>
-                )}
-                {(ad.state || ad.city) && (
-                  <div style={{ fontSize: 13, color: "#555", marginBottom: 4 }}>
-                    📍 {[ad.city, ad.state].filter(Boolean).join(", ")}
-                  </div>
-                )}
-                <div style={{ fontSize: 12, color: "#aaa", marginTop: 6 }}>
-                  🕐{" "}
-                  {ad.createdAt?.toDate?.().toLocaleDateString() ||
-                    "Unknown date"}
-                </div>
+                <input
+                  type='text'
+                  placeholder='Search name or email...'
+                  value={studentSearch}
+                  onChange={(e) => setStudentSearch(e.target.value)}
+                  style={{ ...filterInputStyle, flex: "1 1 220px" }}
+                />
+                <select
+                  value={studentSort}
+                  onChange={(e) => setStudentSort(e.target.value)}
+                  style={filterInputStyle}
+                >
+                  <option value='name'>Name (A-Z)</option>
+                  <option value='grade'>Grade (A-Z)</option>
+                  <option value='newest'>Newest first</option>
+                  <option value='oldest'>Oldest first</option>
+                </select>
               </div>
-
-              {/* View details button */}
-              <button
-                onClick={() => setSelectedAd(ad)}
-                style={{
-                  width: "100%",
-                  padding: "8px",
-                  borderRadius: 8,
-                  border: "1px solid #ddd",
-                  background: "white",
-                  cursor: "pointer",
-                  marginBottom: 8,
-                  fontSize: 14,
-                  color: "#555",
-                }}
-              >
-                👁 View Full Details
-              </button>
-
-              {/* Action buttons */}
-              {tab === "pending" && (
-                <div style={{ display: "flex", gap: 8 }}>
-                  <button
-                    onClick={() => handleApprove(ad.id)}
-                    style={{
-                      flex: 1,
-                      padding: "8px",
-                      borderRadius: 8,
-                      border: "none",
-                      background: "#27ae60",
-                      color: "white",
-                      cursor: "pointer",
-                      fontWeight: 600,
-                    }}
-                  >
-                    ✅ Approve
-                  </button>
-                  <button
-                    onClick={() => handleReject(ad.id)}
-                    style={{
-                      flex: 1,
-                      padding: "8px",
-                      borderRadius: 8,
-                      border: "none",
-                      background: "#e74c3c",
-                      color: "white",
-                      cursor: "pointer",
-                      fontWeight: 600,
-                    }}
-                  >
-                    ❌ Reject
-                  </button>
+              {visibleStudents.length === 0 ? (
+                <p style={{ color: "#aaa" }}>No students match these filters.</p>
+              ) : (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                    gap: 16,
+                  }}
+                >
+                  {visibleStudents.map((s) => (
+                    <div
+                      key={s.id}
+                      style={{
+                        background: "white",
+                        borderRadius: 12,
+                        padding: 20,
+                        border: "1px solid #eee",
+                      }}
+                    >
+                      <h3 style={{ margin: "0 0 4px", fontSize: 15 }}>
+                        {s.name || "(no name)"}
+                      </h3>
+                      <p style={{ fontSize: 13, color: "#888", marginBottom: 8 }}>
+                        {s.email}
+                      </p>
+                      <p style={{ fontSize: 12, color: "#888", marginBottom: 4 }}>
+                        🎓 {s.grade || "—"}
+                      </p>
+                      {s.phone && (
+                        <p
+                          style={{ fontSize: 12, color: "#888", marginBottom: 12 }}
+                        >
+                          📞 {s.phone}
+                        </p>
+                      )}
+                      <button
+                        onClick={() => openStudentDetail(s)}
+                        style={{ ...btnStyle("#2f6175"), width: "100%" }}
+                      >
+                        View Activity
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              )}
-              {tab === "approved" && (
-                <button
-                  onClick={() => handleReject(ad.id)}
-                  style={{
-                    width: "100%",
-                    padding: "8px",
-                    borderRadius: 8,
-                    border: "none",
-                    background: "#e74c3c",
-                    color: "white",
-                    cursor: "pointer",
-                  }}
-                >
-                  ❌ Remove
-                </button>
-              )}
-              {tab === "rejected" && (
-                <button
-                  onClick={() => handleApprove(ad.id)}
-                  style={{
-                    width: "100%",
-                    padding: "8px",
-                    borderRadius: 8,
-                    border: "none",
-                    background: "#27ae60",
-                    color: "white",
-                    cursor: "pointer",
-                  }}
-                >
-                  ✅ Approve
-                </button>
               )}
             </div>
-          ))}
+          )}
+
+          {/* ── Research Tab ── */}
+      {tab === "research" && (
+        <div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 16,
+            }}
+          >
+            <p style={{ color: "#888", margin: 0 }}>
+              {visibleResearch.length} of {research.length} research entries
+            </p>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              gap: 10,
+              marginBottom: 16,
+              flexWrap: "wrap",
+            }}
+          >
+            <input
+              type='text'
+              placeholder='Search title, idea, mentor...'
+              value={researchSearch}
+              onChange={(e) => setResearchSearch(e.target.value)}
+              style={{ ...filterInputStyle, flex: "1 1 220px" }}
+            />
+            <select
+              value={researchStatusFilter}
+              onChange={(e) => setResearchStatusFilter(e.target.value)}
+              style={filterInputStyle}
+            >
+              <option value='all'>All statuses</option>
+              <option value='active'>Active</option>
+              <option value='disabled'>Disabled</option>
+            </select>
+            <select
+              value={researchSort}
+              onChange={(e) => setResearchSort(e.target.value)}
+              style={filterInputStyle}
+            >
+              <option value='newest'>Newest first</option>
+              <option value='oldest'>Oldest first</option>
+              <option value='title'>Title (A-Z)</option>
+            </select>
+          </div>
+          {visibleResearch.length === 0 ? (
+            <p style={{ color: "#aaa" }}>No research matches these filters.</p>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+                gap: 16,
+              }}
+            >
+              {visibleResearch.map((r) => (
+                <div
+                  key={r.id}
+                  style={{
+                    background: "white",
+                    borderRadius: 12,
+                    padding: 20,
+                    border: `1px solid ${r.status === "disabled" ? "#fca5a5" : "#eee"}`,
+                    opacity: r.status === "disabled" ? 0.7 : 1,
+                  }}
+                >
+                  {r.status === "disabled" && (
+                    <span
+                      style={{
+                        fontSize: 11,
+                        background: "#fee2e2",
+                        color: "#a01f13",
+                        padding: "2px 8px",
+                        borderRadius: 20,
+                        marginBottom: 8,
+                        display: "inline-block",
+                      }}
+                    >
+                      Disabled
+                    </span>
+                  )}
+                  <h3 style={{ margin: "0 0 8px", fontSize: 15 }}>{r.title}</h3>
+                  <p
+                    style={{
+                      fontSize: 13,
+                      color: "#555",
+                      marginBottom: 8,
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {r.idea}
+                  </p>
+                  <p style={{ fontSize: 12, color: "#888", marginBottom: 12 }}>
+                    👩‍🏫 {r.teacherName}
+                  </p>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    <button
+                      onClick={() => {
+                        setEditItem({ ...r });
+                        setEditType("research");
+                      }}
+                      style={btnStyle("#2f6175")}
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button
+                      onClick={() => handleDisable("research", r.id, r.status)}
+                      style={btnStyle(
+                        r.status === "disabled" ? "#1f6f4a" : "#f59e0b",
+                      )}
+                    >
+                      {r.status === "disabled" ? "✅ Enable" : "⏸ Disable"}
+                    </button>
+                    <button
+                      onClick={() => handleDelete("research", r.id)}
+                      style={btnStyle("#a01f13")}
+                    >
+                      🗑 Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
-      {/* ── Detail Modal ── */}
-      {selectedAd && (
+      {/* ── Applications Tab ── */}
+      {tab === "applications" && (
+        <div>
+          <p style={{ color: "#888", marginBottom: 16 }}>
+            {visibleApplications.length} of {pendingApplications.length}{" "}
+            pending application{pendingApplications.length === 1 ? "" : "s"}
+          </p>
+          <div
+            style={{
+              display: "flex",
+              gap: 10,
+              marginBottom: 16,
+              flexWrap: "wrap",
+            }}
+          >
+            <input
+              type='text'
+              placeholder='Search name or email...'
+              value={applicationSearch}
+              onChange={(e) => setApplicationSearch(e.target.value)}
+              style={{ ...filterInputStyle, flex: "1 1 220px" }}
+            />
+            <select
+              value={applicationTypeFilter}
+              onChange={(e) => setApplicationTypeFilter(e.target.value)}
+              style={filterInputStyle}
+            >
+              <option value='all'>All types</option>
+              <option value='phd_student'>PhD Student</option>
+              <option value='phd_graduate'>PhD Graduate</option>
+              <option value='faculty'>Faculty</option>
+            </select>
+            <select
+              value={applicationSort}
+              onChange={(e) => setApplicationSort(e.target.value)}
+              style={filterInputStyle}
+            >
+              <option value='oldest'>Oldest first</option>
+              <option value='newest'>Newest first</option>
+              <option value='name'>Name (A-Z)</option>
+            </select>
+          </div>
+          {visibleApplications.length === 0 ? (
+            <p style={{ color: "#aaa" }}>
+              {pendingApplications.length === 0
+                ? "No applications waiting on review."
+                : "No applications match these filters."}
+            </p>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
+                gap: 16,
+              }}
+            >
+              {visibleApplications.map((mentor) => (
+                <div
+                  key={mentor.id}
+                  style={{
+                    background: "white",
+                    borderRadius: 12,
+                    padding: 20,
+                    border: "1px solid #eee",
+                  }}
+                >
+                  <div style={{ fontWeight: 700, fontSize: 16 }}>
+                    {mentor.name || "(no name)"}
+                  </div>
+                  <div style={{ color: "#888", fontSize: 13, marginBottom: 8 }}>
+                    {mentor.email}
+                  </div>
+                  <span
+                    style={{
+                      fontSize: 11,
+                      background: "#e3eff3",
+                      color: "#2f6175",
+                      padding: "2px 8px",
+                      borderRadius: 20,
+                      display: "inline-block",
+                      marginBottom: 12,
+                    }}
+                  >
+                    {mentorTypeLabel(mentor.mentorType)}
+                  </span>
+
+                  <div style={{ fontSize: 13, color: "#333", marginBottom: 14 }}>
+                    {mentor.mentorType === "phd_student" && (
+                      <div>
+                        Transcript:{" "}
+                        {mentor.transcriptURL ? (
+                          <a
+                            href={mentor.transcriptURL}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            style={{ color: "#2f6175" }}
+                          >
+                            View file
+                          </a>
+                        ) : (
+                          <span style={{ color: "#a01f13" }}>Not uploaded</span>
+                        )}
+                      </div>
+                    )}
+                    {mentor.mentorType === "phd_graduate" && (
+                      <div>
+                        Degree certificate:{" "}
+                        {mentor.degreeCertificateURL ? (
+                          <a
+                            href={mentor.degreeCertificateURL}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            style={{ color: "#2f6175" }}
+                          >
+                            View file
+                          </a>
+                        ) : (
+                          <span style={{ color: "#a01f13" }}>Not uploaded</span>
+                        )}
+                      </div>
+                    )}
+                    {mentor.mentorType === "faculty" && (
+                      <>
+                        <div>
+                          Work email: {mentor.workEmail || "—"}{" "}
+                          {mentor.workEmailVerified ? (
+                            <span style={{ color: "#14532d" }}>✓ Verified</span>
+                          ) : (
+                            <span style={{ color: "#a01f13" }}>Not verified</span>
+                          )}
+                        </div>
+                        <div>
+                          University profile:{" "}
+                          {mentor.universityProfileURL ? (
+                            <a
+                              href={mentor.universityProfileURL}
+                              target='_blank'
+                              rel='noopener noreferrer'
+                              style={{ color: "#2f6175" }}
+                            >
+                              View profile
+                            </a>
+                          ) : (
+                            <span style={{ color: "#a01f13" }}>Not provided</span>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button
+                      style={btnStyle("#14532d")}
+                      disabled={actionBusy}
+                      onClick={() => approveApplication(mentor.id)}
+                    >
+                      Approve
+                    </button>
+                    <button
+                      style={btnStyle("#a01f13")}
+                      disabled={actionBusy}
+                      onClick={() => openRejectModal(mentor.id)}
+                    >
+                      Reject
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {tab === "student-applications" && (
+        <div>
+          <p style={{ color: "#888", marginBottom: 16 }}>
+            {visibleStudentApplications.length} of{" "}
+            {pendingStudentApplications.length} pending application
+            {pendingStudentApplications.length === 1 ? "" : "s"}
+          </p>
+          <div
+            style={{
+              display: "flex",
+              gap: 10,
+              marginBottom: 16,
+              flexWrap: "wrap",
+            }}
+          >
+            <input
+              type='text'
+              placeholder='Search student, email, or title...'
+              value={studentAppSearch}
+              onChange={(e) => setStudentAppSearch(e.target.value)}
+              style={{ ...filterInputStyle, flex: "1 1 220px" }}
+            />
+            <select
+              value={studentAppKindFilter}
+              onChange={(e) => setStudentAppKindFilter(e.target.value)}
+              style={filterInputStyle}
+            >
+              <option value='all'>All types</option>
+              <option value='research'>Research</option>
+              <option value='project'>Project</option>
+            </select>
+            <select
+              value={studentAppSort}
+              onChange={(e) => setStudentAppSort(e.target.value)}
+              style={filterInputStyle}
+            >
+              <option value='oldest'>Oldest first</option>
+              <option value='newest'>Newest first</option>
+              <option value='name'>Name (A-Z)</option>
+            </select>
+          </div>
+          {visibleStudentApplications.length === 0 ? (
+            <p style={{ color: "#aaa" }}>
+              {pendingStudentApplications.length === 0
+                ? "No student applications waiting on review."
+                : "No applications match these filters."}
+            </p>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
+                gap: 16,
+              }}
+            >
+              {visibleStudentApplications.map((reg) => {
+                const mentor = mentors.find((m) => m.id === reg.teacherId);
+                return (
+                  <div
+                    key={reg.id}
+                    style={{
+                      background: "white",
+                      borderRadius: 12,
+                      padding: 20,
+                      border: "1px solid #eee",
+                    }}
+                  >
+                    <div style={{ fontWeight: 700, fontSize: 16 }}>
+                      {reg.studentName || "(no name)"}
+                    </div>
+                    <div style={{ color: "#888", fontSize: 13, marginBottom: 8 }}>
+                      {reg.studentEmail}
+                    </div>
+                    <span
+                      style={{
+                        fontSize: 11,
+                        background: "#e3eff3",
+                        color: "#2f6175",
+                        padding: "2px 8px",
+                        borderRadius: 20,
+                        display: "inline-block",
+                        marginBottom: 12,
+                      }}
+                    >
+                      {reg.kind === "research" ? "🔬 Research" : "💡 Project"}
+                    </span>
+
+                    <div style={{ fontSize: 13, color: "#333", marginBottom: 14 }}>
+                      <div>Applying to: {reg.itemTitle}</div>
+                      {mentor && <div>Mentor: {mentor.name}</div>}
+                      <div style={{ color: "#aaa" }}>
+                        Applied{" "}
+                        {reg.createdAt?.toDate
+                          ? reg.createdAt.toDate().toLocaleDateString()
+                          : ""}
+                      </div>
+                    </div>
+
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button
+                        style={btnStyle("#14532d")}
+                        disabled={actionBusy}
+                        onClick={() => approveStudentApp(reg.id)}
+                      >
+                        Approve
+                      </button>
+                      <button
+                        style={btnStyle("#a01f13")}
+                        disabled={actionBusy}
+                        onClick={() => openStudentRejectModal(reg.id)}
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {tab === "mentors" && (
+        <div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 16,
+            }}
+          >
+            <p style={{ color: "#888", margin: 0 }}>
+              {visibleMentors.length} of {mentors.length} mentors
+            </p>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              gap: 10,
+              marginBottom: 16,
+              flexWrap: "wrap",
+            }}
+          >
+            <input
+              type='text'
+              placeholder='Search name, university, expertise...'
+              value={mentorSearch}
+              onChange={(e) => setMentorSearch(e.target.value)}
+              style={{ ...filterInputStyle, flex: "1 1 220px" }}
+            />
+            <select
+              value={mentorStatusFilter}
+              onChange={(e) => setMentorStatusFilter(e.target.value)}
+              style={filterInputStyle}
+            >
+              <option value='all'>All statuses</option>
+              <option value='active'>Active</option>
+              <option value='disabled'>Disabled</option>
+            </select>
+            <select
+              value={mentorVerificationFilter}
+              onChange={(e) => setMentorVerificationFilter(e.target.value)}
+              style={filterInputStyle}
+            >
+              <option value='all'>All verification</option>
+              <option value='approved'>Approved</option>
+              <option value='pending_review'>Pending Review</option>
+              <option value='rejected'>Rejected</option>
+              <option value='incomplete'>Incomplete</option>
+            </select>
+            <select
+              value={mentorSort}
+              onChange={(e) => setMentorSort(e.target.value)}
+              style={filterInputStyle}
+            >
+              <option value='name'>Name (A-Z)</option>
+              <option value='university'>University (A-Z)</option>
+              <option value='newest'>Newest first</option>
+              <option value='oldest'>Oldest first</option>
+            </select>
+          </div>
+          {visibleMentors.length === 0 ? (
+            <p style={{ color: "#aaa" }}>No mentors match these filters.</p>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+                gap: 16,
+              }}
+            >
+              {visibleMentors.map((mentor) => (
+                <div
+                  key={mentor.id}
+                  style={{
+                    background: "white",
+                    borderRadius: 12,
+                    padding: 20,
+                    border: `1px solid ${mentor.disabled ? "#fca5a5" : "#eee"}`,
+                    opacity: mentor.disabled ? 0.7 : 1,
+                  }}
+                >
+                  {mentor.disabled && (
+                    <span
+                      style={{
+                        fontSize: 11,
+                        background: "#fee2e2",
+                        color: "#a01f13",
+                        padding: "2px 8px",
+                        borderRadius: 20,
+                        marginBottom: 8,
+                        display: "inline-block",
+                      }}
+                    >
+                      Disabled
+                    </span>
+                  )}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                      marginBottom: 12,
+                      flexDirection: "column",
+                      textAlign: "center",
+                    }}
+                  >
+                    {mentor.photoURL ? (
+                      <img
+                        src={mentor.photoURL}
+                        alt={mentor.name}
+                        style={{
+                          width: 96,
+                          height: 96,
+                          borderRadius: "50%",
+                          objectFit: "cover",
+                          flexShrink: 0,
+                        }}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          width: 96,
+                          height: 96,
+                          borderRadius: "50%",
+                          background:
+                            "linear-gradient(135deg, #2f6175, #427e94)",
+                          color: "white",
+                          fontSize: 36,
+                          fontWeight: 700,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {mentor.name
+                          ?.split(" ")
+                          .slice(-1)[0]
+                          ?.charAt(0)
+                          .toUpperCase() || "T"}
+                      </div>
+                    )}
+                    <div>
+                      <h3 style={{ margin: 0, fontSize: 15 }}>{mentor.name}</h3>
+                      <p style={{ margin: 0, fontSize: 12, color: "#2f6175" }}>
+                        {mentor.expertise}
+                      </p>
+                    </div>
+                  </div>
+                  <p style={{ fontSize: 12, color: "#888", marginBottom: 4 }}>
+                    🎓 {mentor.degree}
+                  </p>
+                  <p style={{ fontSize: 12, color: "#888", marginBottom: 12 }}>
+                    🏛 {mentor.university}
+                  </p>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    <button
+                      onClick={() => {
+                        setEditItem({ major: "", ...mentor });
+                        setEditType("teachers");
+                        setImageFile(null);
+                        setImagePreview(null);
+                      }}
+                      style={btnStyle("#2f6175")}
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button
+                      onClick={async () => {
+                        await updateDoc(doc(db, "teachers", mentor.id), {
+                          disabled: !mentor.disabled,
+                        });
+                      }}
+                      style={btnStyle(mentor.disabled ? "#1f6f4a" : "#f59e0b")}
+                    >
+                      {mentor.disabled ? "✅ Enable" : "⏸ Disable"}
+                    </button>
+                    <button
+                      onClick={() => handleDelete("teachers", mentor.id)}
+                      style={btnStyle("#a01f13")}
+                    >
+                      🗑 Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+        </main>
+      </div>
+
+      {/* ── Reject Application Modal ── */}
+      {rejectTarget && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 200,
+            padding: 16,
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              borderRadius: 16,
+              padding: 32,
+              width: "100%",
+              maxWidth: 480,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 12,
+              }}
+            >
+              <h3 style={{ margin: 0 }}>Reject Application</h3>
+              <button
+                onClick={() => setRejectTarget(null)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: 20,
+                  cursor: "pointer",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <p style={{ color: "#888", fontSize: 13, marginBottom: 12 }}>
+              {rejectTarget?.type === "student"
+                ? "Explain why this application was rejected. This is shown to the student."
+                : "Explain what needs to change before this can be approved. This is shown to the mentor."}
+            </p>
+            <textarea
+              autoFocus
+              value={rejectReason}
+              onChange={(e) => {
+                setRejectReason(e.target.value);
+                setRejectError("");
+              }}
+              rows={4}
+              placeholder='e.g. "The uploaded transcript is not legible, please re-upload a clearer scan."'
+              style={{
+                width: "100%",
+                padding: 10,
+                borderRadius: 8,
+                border: "1px solid #ddd",
+                fontSize: 14,
+                fontFamily: "inherit",
+                resize: "vertical",
+                boxSizing: "border-box",
+                marginBottom: 8,
+              }}
+            />
+            {rejectError && (
+              <p style={{ color: "#a01f13", fontSize: 13, marginBottom: 12 }}>
+                {rejectError}
+              </p>
+            )}
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+              <button
+                onClick={() => setRejectTarget(null)}
+                style={{
+                  padding: "10px 20px",
+                  borderRadius: 8,
+                  border: "1px solid #ddd",
+                  background: "white",
+                  color: "#555",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={submitRejectModal}
+                disabled={actionBusy}
+                style={btnStyle("#a01f13")}
+              >
+                {actionBusy ? "Submitting..." : "Reject Application"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Student Detail Modal ── */}
+      {studentDetail && (
         <div
           style={{
             position: "fixed",
@@ -466,7 +1603,179 @@ export default function AdminDashboard() {
               overflowY: "auto",
             }}
           >
-            {/* Header */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 12,
+              }}
+            >
+              <h3 style={{ margin: 0 }}>{studentDetail.name || "(no name)"}</h3>
+              <button
+                onClick={() => {
+                  setStudentDetail(null);
+                  setStudentRegistrations([]);
+                }}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: 20,
+                  cursor: "pointer",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div
+              style={{
+                borderBottom: "1px solid #f0f0f0",
+                paddingBottom: 12,
+                marginBottom: 16,
+              }}
+            >
+              <p style={{ fontSize: 13, color: "#555", margin: "0 0 4px" }}>
+                📧 {studentDetail.email}
+              </p>
+              <p style={{ fontSize: 13, color: "#555", margin: "0 0 4px" }}>
+                🎓 {studentDetail.grade || "—"}
+              </p>
+              {studentDetail.phone && (
+                <p style={{ fontSize: 13, color: "#555", margin: "0 0 4px" }}>
+                  📞 {studentDetail.phone}
+                </p>
+              )}
+              {studentDetail.createdAt && (
+                <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
+                  Member since{" "}
+                  {studentDetail.createdAt.toDate?.().toLocaleDateString()}
+                </p>
+              )}
+            </div>
+
+            {studentRegsLoading ? (
+              <p style={{ color: "#aaa" }}>Loading activity...</p>
+            ) : (
+              <>
+                {["research", "project"].map((kind) => {
+                  const rows = studentRegistrations.filter(
+                    (r) => r.reg.kind === kind,
+                  );
+                  return (
+                    <div key={kind} style={{ marginBottom: 20 }}>
+                      <h4 style={{ margin: "0 0 10px", fontSize: 14 }}>
+                        {kind === "research" ? "🔬 Research" : "💡 Projects"}
+                      </h4>
+                      {rows.length === 0 ? (
+                        <p style={{ color: "#aaa", fontSize: 13 }}>
+                          No {kind === "research" ? "research" : "project"}{" "}
+                          registrations.
+                        </p>
+                      ) : (
+                        rows.map(({ reg, item, mentorName }) => (
+                          <div
+                            key={reg.id}
+                            style={{
+                              background: "#f9fafb",
+                              borderRadius: 8,
+                              padding: 12,
+                              marginBottom: 8,
+                              border: "1px solid #eee",
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "flex-start",
+                                gap: 8,
+                                marginBottom: 4,
+                              }}
+                            >
+                              <Link
+                                to={`/${kind === "research" ? "research" : "projects"}/${reg.itemId}`}
+                                style={{
+                                  fontSize: 13,
+                                  fontWeight: 700,
+                                  color: "#2f6175",
+                                }}
+                              >
+                                {reg.itemTitle}
+                              </Link>
+                              {item && (
+                                <span
+                                  style={{
+                                    fontSize: 11,
+                                    fontWeight: 700,
+                                    color:
+                                      item.stage === "completed"
+                                        ? "#64748b"
+                                        : "#14532d",
+                                    background:
+                                      item.stage === "completed"
+                                        ? "#f1f5f9"
+                                        : "rgba(22,101,52,0.08)",
+                                    padding: "2px 8px",
+                                    borderRadius: 20,
+                                    whiteSpace: "nowrap",
+                                  }}
+                                >
+                                  {item.stage === "completed"
+                                    ? "Completed"
+                                    : "Active"}
+                                </span>
+                              )}
+                            </div>
+                            <p
+                              style={{
+                                fontSize: 12,
+                                color: "#888",
+                                margin: "0 0 2px",
+                              }}
+                            >
+                              👩‍🏫 {mentorName || "Unknown mentor"}
+                            </p>
+                            <p style={{ fontSize: 11, color: "#aaa", margin: 0 }}>
+                              Registered{" "}
+                              {reg.createdAt?.toDate?.().toLocaleDateString()}
+                            </p>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  );
+                })}
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Edit Modal ── */}
+      {editItem && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 200,
+            padding: 16,
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              borderRadius: 16,
+              padding: 32,
+              width: "100%",
+              maxWidth: 560,
+              maxHeight: "90vh",
+              overflowY: "auto",
+            }}
+          >
             <div
               style={{
                 display: "flex",
@@ -475,9 +1784,17 @@ export default function AdminDashboard() {
                 marginBottom: 20,
               }}
             >
-              <h3 style={{ margin: 0 }}>📋 Ad Details</h3>
+              <h3 style={{ margin: 0 }}>
+                ✏️ Edit{" "}
+                {editType === "research" ? "Research" : "Mentor"}
+              </h3>
               <button
-                onClick={() => setSelectedAd(null)}
+                onClick={() => {
+                  setEditItem(null);
+                  setEditType(null);
+                  setImageFile(null);
+                  setImagePreview(null);
+                }}
                 style={{
                   background: "none",
                   border: "none",
@@ -489,275 +1806,380 @@ export default function AdminDashboard() {
               </button>
             </div>
 
-            {/* Image */}
-            {selectedAd.image && (
-              <img
-                src={selectedAd.image}
-                alt={selectedAd.title}
-                style={{
-                  width: "100%",
-                  height: 220,
-                  objectFit: "cover",
-                  borderRadius: 10,
-                  marginBottom: 16,
-                }}
-              />
-            )}
-
-            {/* Title & badges */}
-            <h2 style={{ margin: "0 0 8px", fontSize: 20 }}>
-              {selectedAd.title}
-            </h2>
-            <div
-              style={{
-                display: "flex",
-                gap: 8,
-                flexWrap: "wrap",
-                marginBottom: 16,
-              }}
-            >
-              {selectedAd.subject && (
-                <span
-                  style={{
-                    fontSize: 12,
-                    background: "#eff6ff",
-                    color: "#3b82f6",
-                    padding: "4px 12px",
-                    borderRadius: 20,
-                  }}
-                >
-                  📚 {selectedAd.subject}
-                </span>
-              )}
-              {selectedAd.classType && (
-                <span
-                  style={{
-                    fontSize: 12,
-                    background: "#f0fdf4",
-                    color: "#16a34a",
-                    padding: "4px 12px",
-                    borderRadius: 20,
-                  }}
-                >
-                  🏫 {selectedAd.classType}
-                </span>
-              )}
-              <span
-                style={{
-                  fontSize: 12,
-                  background: "#fffbeb",
-                  color: "#d97706",
-                  padding: "4px 12px",
-                  borderRadius: 20,
-                }}
-              >
-                ⏳ {selectedAd.status}
-              </span>
-            </div>
-
-            {/* Message */}
-            {selectedAd.message && (
-              <div
-                style={{
-                  background: "#f9fafb",
-                  borderRadius: 8,
-                  padding: 14,
-                  marginBottom: 16,
-                }}
-              >
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: 14,
-                    color: "#555",
-                    lineHeight: 1.6,
-                  }}
-                >
-                  {selectedAd.message}
-                </p>
-              </div>
-            )}
-
-            {/* URL */}
-            {selectedAd.url && (
-              <div style={{ marginBottom: 16 }}>
-                <p style={{ fontSize: 12, color: "#aaa", margin: "0 0 4px" }}>
-                  Link
-                </p>
-                <a
-                  href={selectedAd.url}
-                  target='_blank'
-                  rel='noreferrer'
-                  style={{
-                    fontSize: 14,
-                    color: "#4a90e2",
-                    wordBreak: "break-all",
-                  }}
-                >
-                  🔗 {selectedAd.url}
-                </a>
-              </div>
-            )}
-
-            {/* Contact info */}
-            <div
-              style={{
-                borderTop: "1px solid #f0f0f0",
-                paddingTop: 16,
-                marginBottom: 16,
-              }}
-            >
-              <p style={{ fontSize: 12, color: "#aaa", margin: "0 0 10px" }}>
-                Contact Information
-              </p>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 10,
-                }}
-              >
-                <div>
-                  <p style={{ fontSize: 12, color: "#aaa", margin: "0 0 2px" }}>
-                    Name
-                  </p>
-                  <p
+            {/* Image upload for mentors */}
+            {editType === "teachers" && (
+              <div style={{ textAlign: "center", marginBottom: 20 }}>
+                {imagePreview || editItem.photoURL ? (
+                  <img
+                    src={imagePreview || editItem.photoURL}
+                    alt='Mentor'
                     style={{
-                      fontSize: 14,
-                      color: "#333",
-                      margin: 0,
-                      fontWeight: 600,
+                      width: 90,
+                      height: 90,
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                      marginBottom: 10,
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: 90,
+                      height: 90,
+                      borderRadius: "50%",
+                      background: "linear-gradient(135deg, #2f6175, #427e94)",
+                      color: "white",
+                      fontSize: 32,
+                      fontWeight: 700,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      margin: "0 auto 10px",
                     }}
                   >
-                    {selectedAd.name}
-                  </p>
-                </div>
-                <div>
-                  <p style={{ fontSize: 12, color: "#aaa", margin: "0 0 2px" }}>
-                    Email
-                  </p>
-                  <p style={{ fontSize: 14, color: "#333", margin: 0 }}>
-                    {selectedAd.email}
-                  </p>
-                </div>
-                {selectedAd.phone && (
-                  <div>
-                    <p
-                      style={{ fontSize: 12, color: "#aaa", margin: "0 0 2px" }}
-                    >
-                      Phone
-                    </p>
-                    <p style={{ fontSize: 14, color: "#333", margin: 0 }}>
-                      {selectedAd.phone}
-                    </p>
+                    {editItem.name
+                      ?.split(" ")
+                      .slice(-1)[0]
+                      ?.charAt(0)
+                      .toUpperCase() || "T"}
                   </div>
                 )}
-                {(selectedAd.city || selectedAd.state) && (
-                  <div>
-                    <p
-                      style={{ fontSize: 12, color: "#aaa", margin: "0 0 2px" }}
-                    >
-                      Location
-                    </p>
-                    <p style={{ fontSize: 14, color: "#333", margin: 0 }}>
-                      {[selectedAd.city, selectedAd.state]
-                        .filter(Boolean)
-                        .join(", ")}
-                    </p>
-                  </div>
-                )}
+                <label
+                  style={{
+                    cursor: "pointer",
+                    fontSize: 13,
+                    color: "#2f6175",
+                    fontWeight: 600,
+                  }}
+                >
+                  📷 {imagePreview ? "Change Photo" : "Upload Photo"}
+                  <input
+                    type='file'
+                    accept='image/*'
+                    onChange={handleImageChange}
+                    style={{ display: "none" }}
+                  />
+                </label>
               </div>
+            )}
+
+            {Object.entries(editItem)
+              .filter(
+                ([key]) =>
+                  ![
+                    "id",
+                    "teacherId",
+                    "createdAt",
+                    "status",
+                    "disabled",
+                    "photoURL",
+                    "applicants",
+                    "enrolledCount",
+                    "projects",
+                  ].includes(key),
+              )
+              .map(([key, value]) => (
+                <div key={key} style={{ marginBottom: 12 }}>
+                  <label
+                    style={{
+                      fontSize: 12,
+                      color: "#888",
+                      fontWeight: 600,
+                      textTransform: "capitalize",
+                      display: "block",
+                      marginBottom: 4,
+                    }}
+                  >
+                    {key.replace(/([A-Z])/g, " $1")}
+                  </label>
+                  {key === "gender" ? (
+                    <select
+                      value={value}
+                      onChange={(e) =>
+                        setEditItem({ ...editItem, [key]: e.target.value })
+                      }
+                      style={{
+                        width: "100%",
+                        padding: 8,
+                        borderRadius: 6,
+                        border: "1px solid #ddd",
+                        fontSize: 13,
+                        boxSizing: "border-box",
+                      }}
+                    >
+                      <option value='Female'>Female</option>
+                      <option value='Male'>Male</option>
+                    </select>
+                  ) : key === "mode" ? (
+                    <select
+                      value={value}
+                      onChange={(e) =>
+                        setEditItem({ ...editItem, [key]: e.target.value })
+                      }
+                      style={{
+                        width: "100%",
+                        padding: 8,
+                        borderRadius: 6,
+                        border: "1px solid #ddd",
+                        fontSize: 13,
+                        boxSizing: "border-box",
+                      }}
+                    >
+                      <option value='Remote'>Remote</option>
+                      <option value='In-Person'>In-Person</option>
+                      <option value='Hybrid'>Hybrid</option>
+                    </select>
+                  ) : key === "stipend" ? (
+                    <select
+                      value={value}
+                      onChange={(e) =>
+                        setEditItem({ ...editItem, [key]: e.target.value })
+                      }
+                      style={{
+                        width: "100%",
+                        padding: 8,
+                        borderRadius: 6,
+                        border: "1px solid #ddd",
+                        fontSize: 13,
+                        boxSizing: "border-box",
+                      }}
+                    >
+                      <option value='Unpaid'>Unpaid</option>
+                      <option value='Paid'>Paid</option>
+                      <option value='Academic Credit'>Academic Credit</option>
+                    </select>
+                  ) : key === "degree" ? (
+                    <select
+                      value={value}
+                      onChange={(e) =>
+                        setEditItem({ ...editItem, [key]: e.target.value })
+                      }
+                      style={{
+                        width: "100%",
+                        padding: 8,
+                        borderRadius: 6,
+                        border: "1px solid #ddd",
+                        fontSize: 13,
+                        boxSizing: "border-box",
+                      }}
+                    >
+                      <option value=''>Select degree</option>
+                      <option value='High School Diploma'>
+                        High School Diploma
+                      </option>
+                      <option value='Bachelor of Science (BS)'>
+                        Bachelor of Science (BS)
+                      </option>
+                      <option value='Bachelor of Arts (BA)'>
+                        Bachelor of Arts (BA)
+                      </option>
+                      <option value='Master of Science (MS)'>
+                        Master of Science (MS)
+                      </option>
+                      <option value='Master of Arts (MA)'>
+                        Master of Arts (MA)
+                      </option>
+                      <option value='Doctor of Philosophy (PhD)'>
+                        Doctor of Philosophy (PhD)
+                      </option>
+                      <option value='Doctor of Medicine (MD)'>
+                        Doctor of Medicine (MD)
+                      </option>
+                      <option value='Other'>Other</option>
+                    </select>
+                  ) : key === "deadline" ? (
+                    <input
+                      type='date'
+                      value={value}
+                      onChange={(e) =>
+                        setEditItem({ ...editItem, [key]: e.target.value })
+                      }
+                      style={{
+                        width: "100%",
+                        padding: 8,
+                        borderRadius: 6,
+                        border: "1px solid #ddd",
+                        fontSize: 13,
+                        boxSizing: "border-box",
+                      }}
+                    />
+                  ) : typeof value === "string" &&
+                    (key === "bio" ||
+                      key === "idea" ||
+                      key === "impact" ||
+                      key === "details" ||
+                      key === "description" ||
+                      key === "requirements" ||
+                      key === "outcomes") ? (
+                    <textarea
+                      value={value || ""}
+                      onChange={(e) =>
+                        setEditItem({ ...editItem, [key]: e.target.value })
+                      }
+                      rows={key === "bio" ? 10 : 5}
+                      style={{
+                        width: "100%",
+                        padding: 8,
+                        borderRadius: 6,
+                        border: "1px solid #ddd",
+                        fontSize: 13,
+                        boxSizing: "border-box",
+                        resize: "vertical",
+                      }}
+                    />
+                  ) : (
+                    <input
+                      value={value || ""}
+                      onChange={(e) =>
+                        setEditItem({ ...editItem, [key]: e.target.value })
+                      }
+                      style={{
+                        width: "100%",
+                        padding: 8,
+                        borderRadius: 6,
+                        border: "1px solid #ddd",
+                        fontSize: 13,
+                        boxSizing: "border-box",
+                      }}
+                    />
+                  )}
+                </div>
+              ))}
+
+            {/* Projects for mentor editing */}
+            {editType === "teachers" && (
+              <div style={{ marginBottom: 16 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: 8,
+                  }}
+                >
+                  <label
+                    style={{ fontSize: 12, color: "#888", fontWeight: 600 }}
+                  >
+                    PROJECT IDEAS
+                  </label>
+                </div>
+                {(editItem.projects || []).length === 0 && (
+                  <p style={{ fontSize: 13, color: "#aaa" }}>
+                    No projects yet.
+                  </p>
+                )}
+                {(editItem.projects || []).map((project, index) => (
+                  <div
+                    key={project.id}
+                    style={{
+                      background: "#f9fafb",
+                      borderRadius: 8,
+                      padding: 12,
+                      marginBottom: 8,
+                      border: "1px solid #eee",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        marginBottom: 6,
+                      }}
+                    >
+                      <label
+                        style={{ fontSize: 12, color: "#888", fontWeight: 600 }}
+                      >
+                        Project {index + 1}
+                      </label>
+                      <button
+                        type='button'
+                        onClick={() =>
+                          setEditItem({
+                            ...editItem,
+                            projects: editItem.projects.filter(
+                              (_, i) => i !== index,
+                            ),
+                          })
+                        }
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: "#a01f13",
+                          cursor: "pointer",
+                          fontSize: 13,
+                        }}
+                      >
+                        ✕ Remove
+                      </button>
+                    </div>
+                    <input
+                      placeholder='Project title'
+                      value={project.title}
+                      onChange={(e) => {
+                        const updated = [...editItem.projects];
+                        updated[index] = {
+                          ...updated[index],
+                          title: e.target.value,
+                        };
+                        setEditItem({ ...editItem, projects: updated });
+                      }}
+                      style={{
+                        width: "100%",
+                        padding: 8,
+                        borderRadius: 6,
+                        border: "1px solid #ddd",
+                        fontSize: 13,
+                        boxSizing: "border-box",
+                        marginBottom: 6,
+                      }}
+                    />
+                    <textarea
+                      placeholder='Project description'
+                      value={project.description}
+                      onChange={(e) => {
+                        const updated = [...editItem.projects];
+                        updated[index] = {
+                          ...updated[index],
+                          description: e.target.value,
+                        };
+                        setEditItem({ ...editItem, projects: updated });
+                      }}
+                      rows={5}
+                      style={{
+                        width: "100%",
+                        padding: 8,
+                        borderRadius: 6,
+                        border: "1px solid #ddd",
+                        fontSize: 13,
+                        boxSizing: "border-box",
+                        resize: "vertical",
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+              <button
+                onClick={handleSaveEdit}
+                disabled={imageUploading}
+                style={{ ...btnStyle("#1f6f4a"), flex: 1, padding: 12 }}
+              >
+                {imageUploading ? "Saving..." : "Save Changes ✓"}
+              </button>
+              <button
+                onClick={() => {
+                  setEditItem(null);
+                  setEditType(null);
+                  setImageFile(null);
+                  setImagePreview(null);
+                }}
+                style={{ ...btnStyle("#888"), flex: 1, padding: 12 }}
+              >
+                Cancel
+              </button>
             </div>
-
-            {/* Date */}
-            <p style={{ fontSize: 12, color: "#aaa", marginBottom: 20 }}>
-              🕐 Submitted:{" "}
-              {selectedAd.createdAt?.toDate?.().toLocaleString() || "Unknown"}
-            </p>
-
-            {/* Action buttons */}
-            {selectedAd.status === "pending" && (
-              <div style={{ display: "flex", gap: 8 }}>
-                <button
-                  onClick={() => {
-                    handleApprove(selectedAd.id);
-                    setSelectedAd(null);
-                  }}
-                  style={{
-                    flex: 1,
-                    padding: "12px",
-                    borderRadius: 8,
-                    border: "none",
-                    background: "#27ae60",
-                    color: "white",
-                    cursor: "pointer",
-                    fontWeight: 600,
-                    fontSize: 15,
-                  }}
-                >
-                  ✅ Approve
-                </button>
-                <button
-                  onClick={() => {
-                    handleReject(selectedAd.id);
-                    setSelectedAd(null);
-                  }}
-                  style={{
-                    flex: 1,
-                    padding: "12px",
-                    borderRadius: 8,
-                    border: "none",
-                    background: "#e74c3c",
-                    color: "white",
-                    cursor: "pointer",
-                    fontWeight: 600,
-                    fontSize: 15,
-                  }}
-                >
-                  ❌ Reject
-                </button>
-              </div>
-            )}
-            {selectedAd.status === "approved" && (
-              <button
-                onClick={() => {
-                  handleReject(selectedAd.id);
-                  setSelectedAd(null);
-                }}
-                style={{
-                  width: "100%",
-                  padding: "12px",
-                  borderRadius: 8,
-                  border: "none",
-                  background: "#e74c3c",
-                  color: "white",
-                  cursor: "pointer",
-                  fontWeight: 600,
-                }}
-              >
-                ❌ Remove
-              </button>
-            )}
-            {selectedAd.status === "rejected" && (
-              <button
-                onClick={() => {
-                  handleApprove(selectedAd.id);
-                  setSelectedAd(null);
-                }}
-                style={{
-                  width: "100%",
-                  padding: "12px",
-                  borderRadius: 8,
-                  border: "none",
-                  background: "#27ae60",
-                  color: "white",
-                  cursor: "pointer",
-                  fontWeight: 600,
-                }}
-              >
-                ✅ Approve
-              </button>
-            )}
           </div>
         </div>
       )}

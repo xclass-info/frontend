@@ -14,7 +14,8 @@ import emailjs from "@emailjs/browser";
 
 const DAILY_API_KEY = import.meta.env.VITE_DAILY_API_KEY;
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+const EMAILJS_BOOKING_TEMPLATE_ID = import.meta.env
+  .VITE_EMAILJS_BOOKING_TEMPLATE_ID;
 const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
 export default function BookingRequests() {
@@ -43,7 +44,7 @@ export default function BookingRequests() {
         Authorization: `Bearer ${DAILY_API_KEY}`,
       },
       body: JSON.stringify({
-        name: `HappyResearch-session-${bookingId.slice(-8)}`,
+        name: `happyresearch-session-${bookingId.slice(-8)}`,
         properties: {
           enable_chat: true,
           enable_screenshare: true,
@@ -71,7 +72,7 @@ export default function BookingRequests() {
   }) {
     await emailjs.send(
       EMAILJS_SERVICE_ID,
-      EMAILJS_TEMPLATE_ID,
+      EMAILJS_BOOKING_TEMPLATE_ID,
       {
         to_name: toName,
         to_email: toEmail,
@@ -202,7 +203,7 @@ export default function BookingRequests() {
                   padding: "6px 16px",
                   borderRadius: 6,
                   border: "none",
-                  background: "#27ae60",
+                  background: "#1f6f4a",
                   color: "white",
                   cursor: "pointer",
                   opacity: processing === req.id ? 0.6 : 1,
@@ -219,7 +220,7 @@ export default function BookingRequests() {
                   padding: "6px 16px",
                   borderRadius: 6,
                   border: "none",
-                  background: "#e74c3c",
+                  background: "#a01f13",
                   color: "white",
                   cursor: "pointer",
                   opacity: processing === req.id ? 0.6 : 1,

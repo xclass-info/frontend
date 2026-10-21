@@ -1,6 +1,6 @@
 .section {
-  padding: 80px 24px;
-  background: #f9fafb;
+  padding: 120px 24px 110px 24px; /* ← more top padding */
+  background: var(--bg);
 }
 
 .inner {
@@ -48,34 +48,15 @@
 
 .avatarWrapper {
   margin: 0 auto 16px;
-  width: 80px;
-  height: 80px;
+  width: 140px;
+  height: 140px;
 }
 
 .avatar {
-  width: 80px;
-  height: 80px;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
   object-fit: cover;
-}
-
-.avatarFallback {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  font-size: 2rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.name {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 8px;
 }
 
 .bio {
@@ -87,31 +68,6 @@
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-.rating {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.stars {
-  color: #f59e0b;
-  font-size: 1rem;
-  letter-spacing: 2px;
-}
-
-.ratingNum {
-  font-size: 0.875rem;
-  color: #888;
-  font-weight: 500;
-}
-
-.loading {
-  text-align: center;
-  color: #888;
-  padding: 40px;
 }
 
 .empty {

@@ -3,27 +3,27 @@ import styles from "./HowItWorks.module.css";
 const STEPS = [
   {
     icon: "🔍",
-    title: "Find a tutor",
-    desc: "Browse hundreds of expert tutors by subject, rating, price, and availability.",
-    color: "#34d399",
+    title: "Pick your path",
+    desc: "Browse Research, Projects, or 1-on-1 Learning — or tell us what you need and we'll help you find the right fit.",
+    color: "#427e94",
   },
   {
-    icon: "📅",
-    title: "Book a session",
-    desc: "Pick a time that works for you and book instantly — no back and forth.",
-    color: "#4a8fe2",
+    icon: "🧑‍🔬",
+    title: "Get matched with a mentor",
+    desc: "Connect with a PhD mentor from a top university who reviews your request and confirms your spot.",
+    color: "#9a772b",
   },
   {
     icon: "🎥",
-    title: "Learn live",
-    desc: "Join your session via our built-in video classroom with chat and whiteboard.",
-    color: "#9b6bff",
+    title: "Work together",
+    desc: "Meet with your mentor via live video sessions, chat, and shared docs — guided every step of the way.",
+    color: "#427e94",
   },
   {
-    icon: "⭐",
-    title: "Rate & grow",
-    desc: "Leave a review and track your progress over time.",
-    color: "#ff6ba8",
+    icon: "📄",
+    title: "Walk away with something real",
+    desc: "A finished paper, a project you built, or a skill you finally understand — your call.",
+    color: "#9a772b",
   },
 ];
 
@@ -33,11 +33,19 @@ export default function HowItWorks() {
       <div className={styles.inner}>
         <div className={`${styles.top} reveal`}>
           <div className='section-label'>✨ How it works</div>
-          <h2>Start learning in minutes 🎯</h2>
-          <p className='section-sub'>
-            From finding a tutor to your first session — it takes less than 5
-            minutes.
+          <h2>From interest to real work 🎯</h2>
+          <p className='section-sub' style={{ margin: "0 auto" }}>
+            Whether it's a research paper, a hands-on project, or 1-on-1
+            help — here's what to expect, start to finish.
           </p>
+        </div>
+
+        <div className={`${styles.banner} reveal`}>
+          <img
+            src='/photos/howitworks-banner.jpg'
+            alt='A mentor explaining a concept to a student in person'
+            className={styles.bannerImg}
+          />
         </div>
 
         <div className={styles.grid}>

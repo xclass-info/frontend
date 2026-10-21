@@ -1,40 +1,41 @@
 import { useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
+import GetStartedSection from "./components/GetStartedSection";
 import HowItWorks from "./components/HowItWorks";
-import Subjects from "./components/Subjects";
 import Tutors from "./components/Tutors";
 import Testimonials from "./components/Testimonials";
-import ClassPosts from "./components/ClassPosts";
 import Footer from "./components/Footer";
-import LoadingScreen from "./components/LoadingScreen";
 import TeacherRegister from "./components/TeacherRegister";
 import TeacherLogin from "./components/TeacherLogin";
 import TeacherDashboard from "./components/TeacherDashboard";
-import CreateClass from "./components/CreateClass";
-import ClassListing from "./components/ClassListing";
-import Classroom from "./components/Classroom";
-import AdPostForm from "./components/AdPostForm";
-import AdPost from "./components/AdPost";
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
 import AdminDashboard from "./components/AdminDashboard";
+import TeacherProfile from "./components/TeacherProfile";
+import ResearchListing from "./components/ResearchListing";
+import ResearchDetail from "./components/ResearchDetail";
+import ProjectListing from "./components/ProjectListing";
+import ProjectDetail from "./components/ProjectDetail";
+import ShowcaseListing from "./components/ShowcaseListing";
+import ExploreResources from "./components/ExploreResources";
+import TellUsWhatYouNeed from "./components/TellUsWhatYouNeed";
+import VerifyMentorEmail from "./components/VerifyMentorEmail";
+import VerifyAccountEmail from "./components/VerifyAccountEmail";
+import StudentLogin from "./components/StudentLogin";
+import StudentRegister from "./components/StudentRegister";
+import StudentDashboard from "./components/StudentDashboard";
+import ResearchSection from "./components/ResearchSection";
+import ProjectSection from "./components/ProjectSection";
+import OneOnOneSection from "./components/OneOnOneSection";
+import ActiveEnrolling from "./components/ActiveEnrolling";
+import WhyHappyResearch from "./components/WhyHappyResearch";
+import StudentResearchSection from "./components/StudentResearchSection";
+import FAQSection from "./components/FAQSection";
 
-import { useNavigate } from "react-router-dom";
-
-// Redirect component
-function MeetingRedirect() {
-  useEffect(() => {
-    window.location.href = "https://xclass-meeting.daily.co/happyresearch";
-  }, []);
-  return (
-    <div style={{ padding: 40, textAlign: "center" }}>
-      Redirecting to meeting...
-    </div>
-  );
-}
-
-// Add this route in App.jsx:
+import ContactUs from "./components/ContactUs";
+import AboutUs from "./components/AboutUs";
+import Gallery from "./components/Gallery";
 
 function HomePage() {
   useEffect(() => {
@@ -43,26 +44,52 @@ function HomePage() {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
           }
         });
       },
       { threshold: 0.15 },
     );
-    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    const observeReveals = (root) => {
+      root.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+    };
+    observeReveals(document);
+
+    // Sections like Tutors/ResearchSection render their real .reveal cards
+    // only after their own Firestore fetch resolves, which happens after
+    // this initial scan - watch for those being added to the page too.
+    const mutationObserver = new MutationObserver((mutations) => {
+      for (const { addedNodes } of mutations) {
+        addedNodes.forEach((node) => {
+          if (node.nodeType !== 1) return;
+          if (node.classList?.contains("reveal")) observer.observe(node);
+          observeReveals(node);
+        });
+      }
+    });
+    mutationObserver.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      observer.disconnect();
+      mutationObserver.disconnect();
+    };
   }, []);
 
   return (
     <>
-      <LoadingScreen />
       <Navbar />
-      <AdPost />
       <Hero />
-      {/* <HowItWorks /> */}
-      {/* <Subjects /> */}
-      <Tutors />
-      <ClassPosts />
+      <HowItWorks />
       <Testimonials />
+      <WhyHappyResearch />
+      <GetStartedSection />
+      <ActiveEnrolling />
+      <ResearchSection />
+      <ProjectSection />
+      <OneOnOneSection />
+      <StudentResearchSection />
+      <Tutors />
+      <FAQSection />
       <Footer />
     </>
   );
@@ -70,21 +97,36 @@ function HomePage() {
 
 export default function App() {
   return (
-    <HashRouter>
+    <BrowserRouter>
       <ScrollToTop />
       <Routes>
         <Route path='/' element={<HomePage />} />
-        <Route path='/tutors' element={<Tutors />} />
-        <Route path='/classes' element={<ClassListing />} />
-        <Route path='/classroom/:classId' element={<Classroom />} />
+        <Route path='/tutors' element={<Tutors standalone={true} />} />
+        <Route path='/student/login' element={<StudentLogin />} />
+        <Route path='/student/register' element={<StudentRegister />} />
+        <Route path='/student/dashboard' element={<StudentDashboard />} />
+        <Route
+          path='/student/registrations'
+          element={<Navigate to='/student/dashboard' replace />}
+        />
         <Route path='/teacher/register' element={<TeacherRegister />} />
         <Route path='/teacher/login' element={<TeacherLogin />} />
         <Route path='/teacher/dashboard' element={<TeacherDashboard />} />
-        <Route path='/teacher/create-class' element={<CreateClass />} />
-        <Route path='/adpost' element={<AdPostForm />} />
         <Route path='/admin' element={<AdminDashboard />} />
-        <Route path='/happyresearch' element={<MeetingRedirect />} />
+        <Route path='/teacher/:teacherId' element={<TeacherProfile />} />
+        <Route path='/research' element={<ResearchListing />} />
+        <Route path='/research/:researchId' element={<ResearchDetail />} />
+        <Route path='/projects' element={<ProjectListing />} />
+        <Route path='/projects/:projectId' element={<ProjectDetail />} />
+        <Route path='/showcase' element={<ShowcaseListing />} />
+        <Route path='/explore' element={<ExploreResources />} />
+        <Route path='/tell-us-what-you-need' element={<TellUsWhatYouNeed />} />
+        <Route path='/verify-mentor-email' element={<VerifyMentorEmail />} />
+        <Route path='/verify-account-email' element={<VerifyAccountEmail />} />
+        <Route path='/about' element={<AboutUs />} />
+        <Route path='/contact' element={<ContactUs />} />
+        <Route path='/gallery' element={<Gallery />} />
       </Routes>
-    </HashRouter>
+    </BrowserRouter>
   );
 }

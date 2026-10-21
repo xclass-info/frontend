@@ -1,12 +1,39 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./Navbar.module.css";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { auth, db } from "../firebase";
+import { signOut } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 
-// Replace with this:
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const [student, setStudent] = useState(null);
+
+  // Mentors are logged-in users too, so a student is someone with a
+  // students record.
+  useEffect(() => {
+    const unsub = auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        setStudent(null);
+        return;
+      }
+      try {
+        const snap = await getDoc(doc(db, "students", user.uid));
+        setStudent(snap.exists() ? { name: snap.data().name } : null);
+      } catch {
+        setStudent(null);
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  async function handleStudentLogout() {
+    await signOut(auth);
+    setStudent(null);
+    navigate("/");
+  }
 
   function scrollTo(id) {
     if (location.pathname !== "/") {
@@ -33,38 +60,95 @@ export default function Navbar() {
     <nav className={styles.nav}>
       {/* Logo */}
       <Link to='/' className={styles.logo}>
+        <svg
+          width='34'
+          height='34'
+          viewBox='0 0 100 100'
+          className={styles.logoMark}
+          aria-hidden='true'
+        >
+          <rect width='100' height='100' rx='22' fill='#2f6175' />
+          <path
+            d='M78,15 L80,20 L85,22 L80,24 L78,29 L76,24 L71,22 L76,20 Z'
+            fill='#ffffff'
+          />
+          <path
+            d='M43,17 L57,17 L57,37 L71,78 C72.5,83 69,87 63,87 L37,87 C31,87 27.5,83 29,78 L43,37 Z'
+            fill='none'
+            stroke='#9a772b'
+            strokeWidth='6'
+            strokeLinejoin='round'
+          />
+          <path
+            d='M33.5,68 L29,78 C27.5,83 31,87 37,87 L63,87 C69,87 72.5,83 71,78 L66.5,68 Z'
+            fill='#ffffff'
+          />
+          <circle cx='46' cy='76' r='3' fill='#9a772b' />
+          <circle cx='56' cy='80' r='2.3' fill='#9a772b' />
+          <circle cx='50' cy='71' r='2' fill='#9a772b' />
+        </svg>
         happy<span className={styles.logoClass}>Research</span>
-        {/* <span className={styles.logoInfo}>.org</span> */}
       </Link>
 
-      {/* Desktop links */}
       <ul className={styles.links}>
         <li>
           <a onClick={scrollToTop} style={{ cursor: "pointer" }}>
-            🏠 Home
+            Home
           </a>
         </li>
-        <li>
-          <a onClick={() => scrollTo("tutors")} style={{ cursor: "pointer" }}>
-            👩‍🏫 Teacher
-          </a>
+        <li className={styles.dropdown}>
+          <span className={styles.dropdownTrigger}>
+            Programs <span className={styles.dropdownCaret}>▾</span>
+          </span>
+          <div className={styles.dropdownMenu}>
+            <div className={styles.dropdownMenuInner}>
+              <Link to='/projects'>💡 Projects</Link>
+              <Link to='/research'>🔬 Research</Link>
+              <Link to='/tutors'>🧑‍🏫 1-on-1 Learning</Link>
+              <Link to='/tell-us-what-you-need'>💬 On-demand Learning</Link>
+            </div>
+          </div>
         </li>
         <li>
-          <Link to='/classes'>📚 Classes</Link>
+          <Link to='/showcase'>Student Work</Link>
         </li>
         <li>
-          <Link to='/adpost'>📌 Post Resources</Link>
+          <Link to='/tutors'>Mentor</Link>
+        </li>
+        <li>
+          <Link to='/gallery'>Gallery</Link>
+        </li>
+        <li>
+          <Link to='/about'>About Us</Link>
+        </li>
+        <li>
+          <Link to='/contact'>Contact</Link>
         </li>
       </ul>
 
       {/* Desktop right side buttons */}
       <div className={styles.navRight}>
-        <Link to='/teacher/login' className={styles.teacherBtn}>
-          👩‍🏫 Teacher Login
-        </Link>
-        <Link to='/register' className={styles.cta}>
-          Get Started →
-        </Link>
+        {student ? (
+          <button
+            className={styles.teacherBtn}
+            onClick={handleStudentLogout}
+            style={{ cursor: "pointer" }}
+          >
+            Logout
+          </button>
+        ) : (
+          <>
+            <Link to='/student/login' className={styles.teacherBtn}>
+              Student Login
+            </Link>
+            <Link to='/teacher/login' className={styles.teacherBtn}>
+              Mentor Login
+            </Link>
+            <Link to='/student/register' className={styles.cta}>
+              Apply Now
+            </Link>
+          </>
+        )}
       </div>
 
       {/* Hamburger button */}
@@ -77,26 +161,68 @@ export default function Navbar() {
         <ul className={styles.mobileMenu} onClick={() => setOpen(false)}>
           <li>
             <a onClick={scrollToTop} style={{ cursor: "pointer" }}>
-              🏠 Home
+              Home
             </a>
           </li>
+          <li>
+            <p className={styles.mobileGroupLabel}>Programs</p>
+          </li>
+          <li>
+            <Link to='/projects'>💡 Projects</Link>
+          </li>
+          <li>
+            <Link to='/research'>🔬 Research</Link>
+          </li>
+          <li>
+            <Link to='/tutors'>🧑‍🏫 1-on-1 Learning</Link>
+          </li>
+          <li>
+            <Link to='/tell-us-what-you-need'>💬 On-demand Learning</Link>
+          </li>
+          <li>
+            <Link to='/showcase'>🏆 Student Work</Link>
+          </li>
+
           <li>
             <a onClick={() => scrollTo("tutors")} style={{ cursor: "pointer" }}>
-              👩‍🏫 Tutors
+              Mentor
             </a>
           </li>
           <li>
-            <Link to='/classes'>📚 Classes</Link>
+            <Link to='/gallery'>Gallery</Link>
           </li>
           <li>
-            <Link to='/adpost'>📌 Post Ad</Link>
+            <Link to='/about'>About Us</Link>
           </li>
           <li>
-            <Link to='/teacher/login'>👩‍🏫 Tutor Login</Link>
+            <Link to='/contact'>Contact</Link>
           </li>
-          <li>
-            <Link to='/register'>Get Started →</Link>
-          </li>
+          {student ? (
+            <>
+              <li>
+                <Link to='/student/dashboard'>My Dashboard</Link>
+              </li>
+              <li>
+                <a onClick={handleStudentLogout} style={{ cursor: "pointer" }}>
+                  Logout
+                </a>
+              </li>
+            </>
+          ) : (
+            <>
+              <li>
+                <Link to='/student/login'>Student Login</Link>
+              </li>
+              <li>
+                <Link to='/teacher/login'>Mentor Login</Link>
+              </li>
+              <li>
+                <Link to='/student/register' className={styles.cta}>
+                  Apply Now
+                </Link>
+              </li>
+            </>
+          )}
         </ul>
       )}
     </nav>

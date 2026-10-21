@@ -1,849 +1,595 @@
 // src/components/Tutors.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { db } from "../firebase";
-import { collection, onSnapshot, addDoc, getDocs } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import styles from "./Tutors.module.css";
 import { SkeletonCard } from "./Skeleton";
+import { useNavigate } from "react-router-dom";
+import Navbar from "./Navbar";
+import Footer from "./Footer";
+import InitialsAvatar from "./InitialsAvatar";
+import { formatMentorName } from "../utils/mentorName";
+import { useScrollReveal } from "../utils/useScrollReveal";
 
-export default function Tutors() {
+const SORT_OPTIONS = [
+  { value: "featured", label: "Featured" },
+  { value: "name", label: "Name (A-Z)" },
+];
+
+const OPENING_OPTIONS = [
+  { value: "research", label: "Research" },
+  { value: "project", label: "Project" },
+];
+
+const checkboxRow = {
+  display: "flex",
+  alignItems: "center",
+  gap: 8,
+  fontSize: 14,
+  color: "var(--muted)",
+  marginBottom: 8,
+  cursor: "pointer",
+};
+
+const filterLabel = {
+  fontSize: 13,
+  fontWeight: 700,
+  color: "#2f6175",
+  textTransform: "uppercase",
+  letterSpacing: "0.04em",
+  margin: "20px 0 10px",
+};
+
+// Matches only the exact surname, not a substring anywhere in the full name
+// (a plain .includes("wu")/.includes("pan") would also match names like
+// "Pandey" or "Shuwen").
+function lastName(name) {
+  return name?.trim().split(/\s+/).pop()?.toLowerCase();
+}
+
+function featuredSort(a, b) {
+  if (lastName(a.name) === "wu") return -1;
+  if (lastName(b.name) === "wu") return 1;
+  if (lastName(a.name) === "pan") return 1;
+  if (lastName(b.name) === "pan") return -1;
+  return 0;
+}
+
+export default function Tutors({ standalone = false }) {
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedTeacher, setSelectedTeacher] = useState(null);
-  const [slots, setSlots] = useState([]);
-  const [selectedSlot, setSelectedSlot] = useState(null);
-  const [form, setForm] = useState({ name: "", email: "" });
-  const [errors, setErrors] = useState({});
-  const [submitting, setSubmitting] = useState(false);
-  const [booked, setBooked] = useState(false);
-  const [profileTeacher, setProfileTeacher] = useState(null);
+  const navigate = useNavigate();
+  const [research, setResearch] = useState([]);
+  const [projects, setProjects] = useState([]);
+
+  const [search, setSearch] = useState("");
+  const [selectedResearchAreas, setSelectedResearchAreas] = useState([]);
+  const [selectedOpenings, setSelectedOpenings] = useState([]);
+  const [sortBy, setSortBy] = useState("featured");
+  const [visibleCount, setVisibleCount] = useState(20);
+
+  // this component is used both embedded on the homepage (which sets up its
+  // own page-wide observer) and standalone at /tutors (which has no such
+  // observer), so it can't rely on a parent to make its cards visible.
+  const sectionRef = useScrollReveal([loading, teachers]);
 
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "teachers"), (snapshot) => {
-      setTeachers(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+      const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const filtered = data.filter(
+        (t) => !t.disabled && t.verificationStatus === "approved",
+      );
+      filtered.sort(featuredSort);
+      setTeachers(filtered);
       setLoading(false);
     });
     return () => unsub();
   }, []);
 
-  async function openBooking(teacher) {
-    setSelectedTeacher(teacher);
-    setSelectedSlot(null);
-    setBooked(false);
-    setForm({ name: "", email: "" });
+  // Fetched to know which mentors currently have an open (unfilled) research
+  // or project seat, for the Opening filter.
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, "research"), (snapshot) => {
+      setResearch(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+    });
+    return () => unsub();
+  }, []);
 
-    const snap = await getDocs(
-      collection(db, "teachers", teacher.id, "availability"),
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, "projects"), (snapshot) => {
+      setProjects(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+    });
+    return () => unsub();
+  }, []);
+
+  const researchAreaOptions = useMemo(
+    () => [...new Set(teachers.map((t) => t.researchArea).filter(Boolean))].sort(),
+    [teachers],
+  );
+
+  const openResearchTeacherIds = useMemo(() => {
+    const set = new Set();
+    research.forEach((r) => {
+      const left = (r.seats || 0) - (r.enrolledCount || 0);
+      if (r.status === "published" && left > 0) set.add(r.teacherId);
+    });
+    return set;
+  }, [research]);
+
+  const openProjectTeacherIds = useMemo(() => {
+    const set = new Set();
+    projects.forEach((p) => {
+      const left = (p.seats || 0) - (p.enrolledCount || 0);
+      if (left > 0) set.add(p.teacherId);
+    });
+    return set;
+  }, [projects]);
+
+  function toggleValue(list, setList, value) {
+    setList(
+      list.includes(value) ? list.filter((v) => v !== value) : [...list, value],
     );
-    const available = snap.docs
-      .map((d) => ({ id: d.id, ...d.data() }))
-      .filter((s) => !s.booked)
-      .sort(
-        (a, b) =>
-          new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`),
-      );
-    setSlots(available);
   }
 
-  function validate() {
-    const newErrors = {};
-    if (!form.name.trim()) newErrors.name = "Required";
-    if (!form.email.trim()) newErrors.email = "Required";
-    else if (!/\S+@\S+\.\S+/.test(form.email))
-      newErrors.email = "Invalid email";
-    return newErrors;
+  function clearFilters() {
+    setSearch("");
+    setSelectedResearchAreas([]);
+    setSelectedOpenings([]);
+    setSortBy("featured");
   }
 
-  async function handleBook() {
-    if (!selectedSlot) return alert("Please select a time slot");
-    const newErrors = validate();
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
+  const filteredTeachers = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    let list = teachers.filter((t) => {
+      if (q) {
+        const haystack = `${t.name || ""} ${t.expertise || ""} ${t.bio || ""} ${t.major || ""} ${t.researchArea || ""}`.toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
+      if (
+        selectedResearchAreas.length > 0 &&
+        !selectedResearchAreas.includes(t.researchArea)
+      ) {
+        return false;
+      }
+      if (selectedOpenings.length > 0) {
+        const hasOpenResearch = openResearchTeacherIds.has(t.id);
+        const hasOpenProject = openProjectTeacherIds.has(t.id);
+        const matches = selectedOpenings.some(
+          (o) =>
+            (o === "research" && hasOpenResearch) ||
+            (o === "project" && hasOpenProject),
+        );
+        if (!matches) return false;
+      }
+      return true;
+    });
 
-    setSubmitting(true);
-    try {
-      await addDoc(collection(db, "bookings"), {
-        teacherId: selectedTeacher.id,
-        teacherName: selectedTeacher.name,
-        slotId: selectedSlot.id,
-        studentName: form.name,
-        studentEmail: form.email,
-        date: selectedSlot.date,
-        time: selectedSlot.time,
-        duration: selectedSlot.duration,
-        status: "pending",
-        createdAt: new Date(),
-      });
-      setBooked(true);
-    } catch (err) {
-      console.error(err);
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
+    list = [...list].sort((a, b) => {
+      if (sortBy === "name") {
+        return (a.name || "").localeCompare(b.name || "");
+      }
+      return featuredSort(a, b);
+    });
+
+    return list;
+  }, [
+    teachers,
+    search,
+    selectedResearchAreas,
+    selectedOpenings,
+    openResearchTeacherIds,
+    openProjectTeacherIds,
+    sortBy,
+  ]);
+
+  // Reset pagination back to the first page whenever the filtered set changes,
+  // so "Show more" doesn't leave a stale page depth after a new search/filter.
+  useEffect(() => {
+    setVisibleCount(20);
+  }, [search, selectedResearchAreas, selectedOpenings, sortBy]);
+
+  const visibleTeachers = filteredTeachers.slice(0, visibleCount);
+
+  function renderCard(teacher) {
+    return (
+      <div
+        key={teacher.id}
+        className={`${styles.card} reveal`}
+        onClick={() => navigate(`/teacher/${teacher.id}`)}
+        style={{ cursor: "pointer" }}
+      >
+        {/* Avatar */}
+        <div className={styles.avatarWrapper}>
+          {teacher.photoURL ? (
+            <img
+              src={teacher.photoURL}
+              alt={teacher.name}
+              className={styles.avatar}
+            />
+          ) : (
+            <InitialsAvatar
+              name={teacher.name}
+              seed={teacher.id}
+              className={styles.avatar}
+              fontSize='2.5rem'
+            />
+          )}
+        </div>
+
+        <h1 style={{ margin: "0 0 8px", fontSize: 26 }}>
+          {formatMentorName(teacher.name, {
+            mentorType: teacher.mentorType,
+            degree: teacher.degree,
+          })}
+        </h1>
+
+        <div
+          style={{
+            display: "flex",
+            gap: 6,
+            flexWrap: "wrap",
+            justifyContent: "center",
+            marginBottom: 8,
+          }}
+        >
+          {teacher.gender && (
+            <span
+              style={{
+                fontSize: 11,
+                background: "var(--surface)",
+                color: "var(--muted)",
+                padding: "2px 10px",
+                borderRadius: 20,
+                fontWeight: 600,
+              }}
+            >
+              {teacher.gender === "Male" ? "👨" : "👩"} {teacher.gender}
+            </span>
+          )}
+          {teacher.degree && (
+            <span
+              style={{
+                fontSize: 11,
+                background: "var(--primary-soft)",
+                color: "var(--primary-hover)",
+                padding: "2px 10px",
+                borderRadius: 20,
+                fontWeight: 600,
+              }}
+            >
+              🎓 {teacher.degree}
+            </span>
+          )}
+        </div>
+        {teacher.major && (
+          <span
+            style={{
+              fontSize: 11,
+              background: "rgba(154,119,43,0.1)",
+              color: "var(--accent)",
+              padding: "2px 10px",
+              borderRadius: 20,
+              fontWeight: 600,
+            }}
+          >
+            🔬 {teacher.major}
+          </span>
+        )}
+
+        {teacher.expertise && (
+          <p
+            style={{
+              fontSize: 13,
+              color: "var(--muted)",
+              marginBottom: 6,
+              textAlign: "center",
+              fontWeight: 600,
+            }}
+          >
+            💡 {teacher.expertise}
+          </p>
+        )}
+
+        {teacher.bio && <p className={styles.bio}>{teacher.bio}</p>}
+
+        {teacher.projects && teacher.projects.length > 0 && (
+          <p
+            style={{
+              fontSize: 12,
+              color: "var(--muted)",
+              marginBottom: 6,
+              textAlign: "center",
+            }}
+          >
+            💡 {teacher.projects.length} project idea
+            {teacher.projects.length > 1 ? "s" : ""} available
+          </p>
+        )}
+
+        <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 8 }}>
+          Click to view full profile →
+        </p>
+      </div>
+    );
   }
 
   if (loading) {
     return (
-      <section id='tutors' className={styles.section}>
+      <>
+        {standalone && <Navbar />}
+        <section id='tutors' ref={sectionRef} className={styles.section}>
+          <div className={styles.inner}>
+            <div className={`${styles.header} reveal`}>
+              <h2 className={styles.title}>Meet Our Research Mentors</h2>
+              <p className={styles.sub}>
+                Expert mentors ready to help you learn anything.
+              </p>
+            </div>
+            <div className={styles.grid}>
+              {[1, 2, 3].map((i) => (
+                <SkeletonCard key={i} />
+              ))}
+            </div>
+          </div>
+        </section>
+        {standalone && <Footer />}
+      </>
+    );
+  }
+
+  if (!standalone) {
+    return (
+      <section id='tutors' ref={sectionRef} className={styles.section}>
         <div className={styles.inner}>
-          <div className={styles.header}>
-            <h2 className={styles.title}>👩‍🏫 Meet Our Tutors</h2>
+          <div className={`${styles.header} reveal`}>
+            <h2 className={styles.title}>Meet Our Research Mentors</h2>
             <p className={styles.sub}>
-              Expert tutors ready to help you learn anything.
+              Join world-class researchers and explore cutting-edge research
+              topics that match your passion, curiosity, and future ambitions.
             </p>
           </div>
-          <div className={styles.grid}>
-            {[1, 2, 3].map((i) => (
-              <SkeletonCard key={i} />
-            ))}
-          </div>
+
+          {teachers.length === 0 ? (
+            <div className={styles.empty}>
+              <p>😴 No tutors registered yet. Check back soon!</p>
+            </div>
+          ) : (
+            <>
+              <div className={styles.grid}>
+                {visibleTeachers.map(renderCard)}
+              </div>
+              {visibleCount < filteredTeachers.length && (
+                <div style={{ textAlign: "center", marginTop: 32 }}>
+                  <button
+                    onClick={() => setVisibleCount((c) => c + 20)}
+                    style={{
+                      padding: "12px 32px",
+                      borderRadius: 10,
+                      border: "2px solid #2f6175",
+                      background: "white",
+                      color: "#2f6175",
+                      fontSize: 14,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Show more (
+                    {filteredTeachers.length - visibleCount} more)
+                  </button>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </section>
     );
   }
 
   return (
-    <section id='tutors' className={styles.section}>
-      <div className={styles.inner}>
-        <div className={styles.header}>
-          <h2 className={styles.title}>👩‍🏫 Meet Our Tutors</h2>
-          <p className={styles.sub}>
-            Expert tutors ready to help you learn anything, at any level.
-          </p>
-        </div>
-
-        {teachers.length === 0 ? (
-          <div className={styles.empty}>
-            <p>😴 No tutors registered yet. Check back soon!</p>
-          </div>
-        ) : (
-          <div className={styles.grid}>
-            {teachers.map((teacher) => (
-              <div
-                key={teacher.id}
-                className={styles.card}
-                onClick={() => setProfileTeacher(teacher)}
-                style={{ cursor: "pointer" }}
-              >
-                {/* Avatar */}
-                <div className={styles.avatarWrapper}>
-                  {teacher.photoURL ? (
-                    <img
-                      src={teacher.photoURL}
-                      alt={teacher.name}
-                      className={styles.avatar}
-                    />
-                  ) : (
-                    <div className={styles.avatarFallback}>
-                      {teacher.name?.charAt(0).toUpperCase() || "T"}
-                    </div>
-                  )}
-                </div>
-
-                <h3 className={styles.name}>{teacher.name}</h3>
-
-                {/* Gender + Degree badges */}
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 6,
-                    flexWrap: "wrap",
-                    justifyContent: "center",
-                    marginBottom: 8,
-                  }}
-                >
-                  {teacher.gender && (
-                    <span
-                      style={{
-                        fontSize: 11,
-                        background: "#f0f4ff",
-                        color: "#4a90e2",
-                        padding: "2px 10px",
-                        borderRadius: 20,
-                        fontWeight: 600,
-                      }}
-                    >
-                      {teacher.gender === "Male" ? "👨" : "👩"} {teacher.gender}
-                    </span>
-                  )}
-                  {teacher.degree && (
-                    <span
-                      style={{
-                        fontSize: 11,
-                        background: "#f0fdf4",
-                        color: "#16a34a",
-                        padding: "2px 10px",
-                        borderRadius: 20,
-                        fontWeight: 600,
-                      }}
-                    >
-                      🎓 {teacher.degree}
-                    </span>
-                  )}
-                </div>
-
-                {teacher.expertise && (
-                  <p
-                    style={{
-                      fontSize: 13,
-                      color: "#555",
-                      marginBottom: 6,
-                      textAlign: "center",
-                      fontWeight: 600,
-                    }}
-                  >
-                    💡 {teacher.expertise}
-                  </p>
-                )}
-
-                {teacher.bio && <p className={styles.bio}>{teacher.bio}</p>}
-
-                <div className={styles.rating}>
-                  <span className={styles.stars}>
-                    {"★".repeat(Math.round(teacher.rating || 0))}
-                    {"☆".repeat(5 - Math.round(teacher.rating || 0))}
-                  </span>
-                  <span className={styles.ratingNum}>
-                    {teacher.rating ? teacher.rating.toFixed(1) : "New"}
-                  </span>
-                </div>
-
-                <p style={{ fontSize: 12, color: "#aaa", marginTop: 8 }}>
-                  Click to view full profile
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* ── Teacher Profile Modal ── */}
-      {profileTeacher && (
+    <>
+      <Navbar />
+      <section id='tutors' ref={sectionRef} className={styles.section}>
         <div
           style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.5)",
+            maxWidth: 1300,
+            margin: "0 auto",
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 100,
-            padding: 16,
+            gap: 32,
+            alignItems: "flex-start",
+            flexWrap: "wrap",
           }}
         >
-          <div
+          {/* Filters sidebar */}
+          <aside
             style={{
+              width: 240,
+              flexShrink: 0,
               background: "white",
               borderRadius: 16,
-              padding: 32,
-              width: "100%",
-              maxWidth: 520,
-              maxHeight: "90vh",
-              overflowY: "auto",
+              padding: 20,
+              boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
             }}
           >
-            {/* Header */}
             <div
               style={{
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                marginBottom: 24,
+                marginBottom: 4,
               }}
             >
-              <h3 style={{ margin: 0 }}>👤 Teacher Profile</h3>
+              <h3 style={{ margin: 0, fontSize: 16 }}>Filters</h3>
               <button
-                onClick={() => setProfileTeacher(null)}
+                onClick={clearFilters}
                 style={{
                   background: "none",
                   border: "none",
-                  fontSize: 20,
+                  color: "#2f6175",
+                  fontSize: 12,
+                  fontWeight: 600,
                   cursor: "pointer",
+                  textDecoration: "underline",
                 }}
               >
-                ✕
+                Clear all
               </button>
             </div>
 
-            {/* Avatar + Name */}
-            <div style={{ textAlign: "center", marginBottom: 20 }}>
-              {profileTeacher.photoURL ? (
-                <img
-                  src={profileTeacher.photoURL}
-                  alt={profileTeacher.name}
-                  style={{
-                    width: 90,
-                    height: 90,
-                    borderRadius: "50%",
-                    objectFit: "cover",
-                    marginBottom: 12,
-                  }}
-                />
-              ) : (
+            {researchAreaOptions.length > 0 && (
+              <>
+                <p style={filterLabel}>Research Area</p>
                 <div
                   style={{
-                    width: 90,
-                    height: 90,
-                    borderRadius: "50%",
-                    background: "linear-gradient(135deg, #667eea, #764ba2)",
-                    color: "white",
-                    fontSize: 32,
-                    fontWeight: 700,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "0 auto 12px",
+                    maxHeight: 180,
+                    overflowY: "auto",
+                    paddingRight: 4,
                   }}
                 >
-                  {profileTeacher.name?.charAt(0).toUpperCase() || "T"}
+                  {researchAreaOptions.map((r) => (
+                    <label key={r} style={checkboxRow}>
+                      <input
+                        type='checkbox'
+                        checked={selectedResearchAreas.includes(r)}
+                        onChange={() =>
+                          toggleValue(
+                            selectedResearchAreas,
+                            setSelectedResearchAreas,
+                            r,
+                          )
+                        }
+                      />
+                      {r}
+                    </label>
+                  ))}
                 </div>
-              )}
-              <h2 style={{ margin: "0 0 8px", fontSize: 22 }}>
-                {profileTeacher.name}
-              </h2>
-
-              {/* Badges */}
-              <div
-                style={{
-                  display: "flex",
-                  gap: 6,
-                  flexWrap: "wrap",
-                  justifyContent: "center",
-                }}
-              >
-                {profileTeacher.gender && (
-                  <span
-                    style={{
-                      fontSize: 12,
-                      background: "#f0f4ff",
-                      color: "#4a90e2",
-                      padding: "4px 12px",
-                      borderRadius: 20,
-                      fontWeight: 600,
-                    }}
-                  >
-                    {profileTeacher.gender === "Male" ? "👨" : "👩"}{" "}
-                    {profileTeacher.gender}
-                  </span>
-                )}
-                {profileTeacher.degree && (
-                  <span
-                    style={{
-                      fontSize: 12,
-                      background: "#f0fdf4",
-                      color: "#16a34a",
-                      padding: "4px 12px",
-                      borderRadius: 20,
-                      fontWeight: 600,
-                    }}
-                  >
-                    🎓 {profileTeacher.degree}
-                  </span>
-                )}
-                {profileTeacher.rating > 0 && (
-                  <span
-                    style={{
-                      fontSize: 12,
-                      background: "#fffbeb",
-                      color: "#d97706",
-                      padding: "4px 12px",
-                      borderRadius: 20,
-                      fontWeight: 600,
-                    }}
-                  >
-                    ⭐ {profileTeacher.rating.toFixed(1)}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {profileTeacher.bio && (
-              <div
-                style={{
-                  marginTop: 16,
-                  padding: 14,
-                  background: "#f9fafb",
-                  borderRadius: 8,
-                }}
-              >
-                <p style={{ fontSize: 12, color: "#aaa", margin: "0 0 8px" }}>
-                  Self Introduction
-                </p>
-                <p
-                  style={{
-                    fontSize: 14,
-                    color: "#555",
-                    margin: 0,
-                    lineHeight: 1.7,
-                  }}
-                >
-                  {profileTeacher.bio}
-                </p>
-              </div>
+              </>
             )}
 
-            {/* Info rows */}
-            <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: 16 }}>
-              {profileTeacher.university && (
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 12,
-                    marginBottom: 12,
-                    alignItems: "flex-start",
-                  }}
-                >
-                  <span style={{ fontSize: 18 }}>🏛</span>
-                  <div>
-                    <p
-                      style={{ fontSize: 12, color: "#aaa", margin: "0 0 2px" }}
-                    >
-                      University / Institution
-                    </p>
-                    <p
-                      style={{
-                        fontSize: 14,
-                        color: "#333",
-                        margin: 0,
-                        fontWeight: 600,
-                      }}
-                    >
-                      {profileTeacher.university}
-                    </p>
-                  </div>
-                </div>
-              )}
+            <p style={filterLabel}>Opening</p>
+            {OPENING_OPTIONS.map((o) => (
+              <label key={o.value} style={checkboxRow}>
+                <input
+                  type='checkbox'
+                  checked={selectedOpenings.includes(o.value)}
+                  onChange={() =>
+                    toggleValue(selectedOpenings, setSelectedOpenings, o.value)
+                  }
+                />
+                {o.label}
+              </label>
+            ))}
+          </aside>
 
-              {profileTeacher.expertise && (
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 12,
-                    marginBottom: 12,
-                    alignItems: "flex-start",
-                  }}
-                >
-                  <span style={{ fontSize: 18 }}>💡</span>
-                  <div>
-                    <p
-                      style={{ fontSize: 12, color: "#aaa", margin: "0 0 2px" }}
-                    >
-                      Area of Expertise
-                    </p>
-                    <p
-                      style={{
-                        fontSize: 14,
-                        color: "#333",
-                        margin: 0,
-                        fontWeight: 600,
-                      }}
-                    >
-                      {profileTeacher.expertise}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Add this after the expertise line on the card */}
-              {profileTeacher.projects &&
-                profileTeacher.projects.length > 0 && (
-                  <p
-                    style={{
-                      fontSize: 12,
-                      color: "#888",
-                      marginBottom: 6,
-                      textAlign: "center",
-                    }}
-                  >
-                    💡 {profileTeacher.projects.length} project idea
-                    {profileTeacher.projects.length > 1 ? "s" : ""} available
-                  </p>
-                )}
-
-              {profileTeacher.researchArea && (
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 12,
-                    marginBottom: 12,
-                    alignItems: "flex-start",
-                  }}
-                >
-                  <span style={{ fontSize: 18 }}>🔬</span>
-                  <div>
-                    <p
-                      style={{ fontSize: 12, color: "#aaa", margin: "0 0 2px" }}
-                    >
-                      Research Area
-                    </p>
-                    <p style={{ fontSize: 14, color: "#333", margin: 0 }}>
-                      {profileTeacher.researchArea}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {profileTeacher.yearsOfExperience && (
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 12,
-                    marginBottom: 12,
-                    alignItems: "flex-start",
-                  }}
-                >
-                  <span style={{ fontSize: 18 }}>📆</span>
-                  <div>
-                    <p
-                      style={{ fontSize: 12, color: "#aaa", margin: "0 0 2px" }}
-                    >
-                      Teaching Experience
-                    </p>
-                    <p style={{ fontSize: 14, color: "#333", margin: 0 }}>
-                      {profileTeacher.yearsOfExperience}{" "}
-                      {Number(profileTeacher.yearsOfExperience) === 1
-                        ? "year"
-                        : "years"}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {profileTeacher.languages && (
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 12,
-                    marginBottom: 12,
-                    alignItems: "flex-start",
-                  }}
-                >
-                  <span style={{ fontSize: 18 }}>🌍</span>
-                  <div>
-                    <p
-                      style={{ fontSize: 12, color: "#aaa", margin: "0 0 2px" }}
-                    >
-                      Languages Spoken
-                    </p>
-                    <p style={{ fontSize: 14, color: "#333", margin: 0 }}>
-                      {profileTeacher.languages}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {profileTeacher.website && (
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 12,
-                    marginBottom: 12,
-                    alignItems: "flex-start",
-                  }}
-                >
-                  <span style={{ fontSize: 18 }}>🔗</span>
-                  <div>
-                    <p
-                      style={{ fontSize: 12, color: "#aaa", margin: "0 0 2px" }}
-                    >
-                      Website / LinkedIn
-                    </p>
-                    <a
-                      href={profileTeacher.website}
-                      target='_blank'
-                      rel='noreferrer'
-                      style={{ fontSize: 14, color: "#4a90e2" }}
-                    >
-                      {profileTeacher.website}
-                    </a>
-                  </div>
-                </div>
-              )}
-
-              {/* Projects */}
-              {profileTeacher.projects &&
-                profileTeacher.projects.length > 0 && (
-                  <div style={{ marginTop: 16 }}>
-                    <p
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: "#333",
-                        marginBottom: 10,
-                      }}
-                    >
-                      💡 Project Ideas
-                    </p>
-                    {/* ← Add this */}
-                    {/* ← Add this */}
-                    <p
-                      style={{
-                        fontSize: 12,
-                        color: "#4a90e2",
-                        marginTop: 12,
-                        lineHeight: 1.6,
-                        fontStyle: "italic",
-                        background: "#eff6ff",
-                        padding: "10px 14px",
-                        borderRadius: 8,
-                        borderLeft: "3px solid #4a90e2",
-                      }}
-                    >
-                      Students are encouraged to propose their own ideas or
-                      collaborate with mentors to develop projects that align
-                      with their interests.
-                    </p>
-
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 10,
-                      }}
-                    >
-                      {profileTeacher.projects.map((project) => (
-                        <div
-                          key={project.id}
-                          style={{
-                            padding: 14,
-                            borderRadius: 10,
-                            background: "#f9fafb",
-                            border: "1px solid #eee",
-                          }}
-                        >
-                          <h4
-                            style={{
-                              margin: "0 0 4px",
-                              fontSize: 14,
-                              color: "#333",
-                            }}
-                          >
-                            {project.title}
-                          </h4>
-                          {project.description && (
-                            <p
-                              style={{
-                                margin: 0,
-                                fontSize: 13,
-                                color: "#666",
-                                lineHeight: 1.5,
-                              }}
-                            >
-                              {project.description}
-                            </p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+          {/* Main content */}
+          <div style={{ flex: "1 1 600px", minWidth: 0 }}>
+            <div className={`${styles.header} reveal`} style={{ marginBottom: 24 }}>
+              <h2 className={styles.title}>Meet Our Research Mentors</h2>
+              <p className={styles.sub}>
+                Join world-class researchers and explore cutting-edge research
+                topics that match your passion, curiosity, and future
+                ambitions.
+              </p>
             </div>
 
-            {/* Book button */}
-            <button
-              onClick={() => {
-                setProfileTeacher(null);
-                openBooking(profileTeacher);
-              }}
+            <div
               style={{
-                width: "100%",
-                marginTop: 24,
-                padding: "14px",
-                borderRadius: 10,
-                border: "none",
-                background: "#4a90e2",
-                color: "white",
-                fontSize: 16,
-                fontWeight: 600,
-                cursor: "pointer",
+                display: "flex",
+                gap: 12,
+                flexWrap: "wrap",
+                marginBottom: 16,
               }}
             >
-              📅 Book a Session with {profileTeacher.name}
-            </button>
-          </div>
-        </div>
-      )}
+              <input
+                type='text'
+                placeholder='Search mentors...'
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{
+                  flex: "1 1 260px",
+                  padding: "12px 16px",
+                  borderRadius: 10,
+                  border: "1px solid #ddd",
+                  fontSize: 14,
+                  boxSizing: "border-box",
+                }}
+              />
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                style={{
+                  padding: "12px 16px",
+                  borderRadius: 10,
+                  border: "1px solid #ddd",
+                  fontSize: 14,
+                  background: "white",
+                }}
+              >
+                {SORT_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    Sort: {o.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-      {/* ── Booking Modal ── */}
-      {selectedTeacher && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 100,
-            padding: 16,
-          }}
-        >
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              padding: 32,
-              width: "100%",
-              maxWidth: 480,
-              maxHeight: "90vh",
-              overflowY: "auto",
-            }}
-          >
-            {booked ? (
-              <div style={{ textAlign: "center", padding: 20 }}>
-                <p style={{ fontSize: 48 }}>✅</p>
-                <h3>Booking Request Sent!</h3>
-                <p style={{ color: "#888", marginBottom: 20 }}>
-                  {selectedTeacher.name} will confirm your session soon.
-                </p>
+            <p style={{ color: "var(--muted)", fontSize: 13, margin: "0 0 20px" }}>
+              {filteredTeachers.length} of {teachers.length} mentor
+              {teachers.length === 1 ? "" : "s"} match your filters
+            </p>
+
+            {teachers.length === 0 ? (
+              <div className={styles.empty}>
+                <p>😴 No tutors registered yet. Check back soon!</p>
+              </div>
+            ) : filteredTeachers.length === 0 ? (
+              <div className={styles.empty}>
+                <p>No mentors match your filters.</p>
                 <button
-                  onClick={() => setSelectedTeacher(null)}
+                  onClick={clearFilters}
                   style={{
-                    padding: "10px 24px",
+                    marginTop: 12,
+                    padding: "8px 20px",
                     borderRadius: 8,
                     border: "none",
-                    background: "#4a90e2",
+                    background: "#2f6175",
                     color: "white",
                     cursor: "pointer",
                   }}
                 >
-                  Done
+                  Clear filters
                 </button>
               </div>
             ) : (
               <>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: 20,
-                  }}
-                >
-                  <h3 style={{ margin: 0 }}>
-                    Book a session with {selectedTeacher.name}
-                  </h3>
-                  <button
-                    onClick={() => setSelectedTeacher(null)}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      fontSize: 20,
-                      cursor: "pointer",
-                    }}
-                  >
-                    ✕
-                  </button>
+                <div className={styles.grid}>
+                  {visibleTeachers.map(renderCard)}
                 </div>
-
-                {/* Time slots */}
-                <h4 style={{ marginBottom: 8 }}>Available Slots</h4>
-                {slots.length === 0 ? (
-                  <p style={{ color: "#888", fontSize: 14, marginBottom: 16 }}>
-                    No available slots at the moment.
-                  </p>
-                ) : (
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 8,
-                      marginBottom: 20,
-                    }}
-                  >
-                    {slots.map((slot) => (
-                      <div
-                        key={slot.id}
-                        onClick={() => setSelectedSlot(slot)}
-                        style={{
-                          padding: "10px 16px",
-                          borderRadius: 8,
-                          border: `2px solid ${selectedSlot?.id === slot.id ? "#4a90e2" : "#eee"}`,
-                          background:
-                            selectedSlot?.id === slot.id ? "#eff6ff" : "white",
-                          cursor: "pointer",
-                          fontSize: 14,
-                        }}
-                      >
-                        📅 {slot.date} &nbsp; ⏰ {slot.time} &nbsp; (
-                        {slot.duration} min) &nbsp;
-                        {slot.price > 0 ? `💰 $${slot.price}` : "🆓 Free"}
-                      </div>
-                    ))}
+                {visibleCount < filteredTeachers.length && (
+                  <div style={{ textAlign: "center", marginTop: 32 }}>
+                    <button
+                      onClick={() => setVisibleCount((c) => c + 20)}
+                      style={{
+                        padding: "12px 32px",
+                        borderRadius: 10,
+                        border: "2px solid #2f6175",
+                        background: "white",
+                        color: "#2f6175",
+                        fontSize: 14,
+                        fontWeight: 700,
+                        cursor: "pointer",
+                      }}
+                    >
+                      Show more (
+                      {filteredTeachers.length - visibleCount} more)
+                    </button>
                   </div>
                 )}
-
-                {/* Student info */}
-                <h4 style={{ marginBottom: 8 }}>Your Details</h4>
-                <input
-                  placeholder='Your full name'
-                  value={form.name}
-                  onChange={(e) => {
-                    setForm({ ...form, name: e.target.value });
-                    setErrors({ ...errors, name: "" });
-                  }}
-                  style={{
-                    width: "100%",
-                    padding: 10,
-                    borderRadius: 8,
-                    border: `1px solid ${errors.name ? "red" : "#ddd"}`,
-                    marginBottom: 8,
-                    boxSizing: "border-box",
-                  }}
-                />
-                {errors.name && (
-                  <p style={{ color: "red", fontSize: 12, marginBottom: 8 }}>
-                    {errors.name}
-                  </p>
-                )}
-
-                <input
-                  placeholder='Your email'
-                  type='email'
-                  value={form.email}
-                  onChange={(e) => {
-                    setForm({ ...form, email: e.target.value });
-                    setErrors({ ...errors, email: "" });
-                  }}
-                  style={{
-                    width: "100%",
-                    padding: 10,
-                    borderRadius: 8,
-                    border: `1px solid ${errors.email ? "red" : "#ddd"}`,
-                    marginBottom: 16,
-                    boxSizing: "border-box",
-                  }}
-                />
-                {errors.email && (
-                  <p style={{ color: "red", fontSize: 12, marginBottom: 8 }}>
-                    {errors.email}
-                  </p>
-                )}
-
-                <button
-                  onClick={handleBook}
-                  disabled={submitting || slots.length === 0}
-                  style={{
-                    width: "100%",
-                    padding: "12px",
-                    borderRadius: 8,
-                    border: "none",
-                    background: "#4a90e2",
-                    color: "white",
-                    fontSize: 16,
-                    cursor: "pointer",
-                    opacity: slots.length === 0 ? 0.5 : 1,
-                  }}
-                >
-                  {submitting ? "Sending Request..." : "Request Booking →"}
-                </button>
               </>
             )}
           </div>
         </div>
-      )}
-    </section>
+      </section>
+      <Footer />
+    </>
   );
 }
