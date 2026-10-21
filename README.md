@@ -69,6 +69,7 @@ This repo holds both halves:
 **Who does what**
 
 - **Firebase Authentication** — logins only (sign up, log in, forgot password). Keep it turned on in the Firebase console.
+  Its password-reset emails link to our own page `https://happyresearch.org/reset-password` (set in Firebase console → Authentication → Templates → Password reset → Customize action URL); that page finishes the reset with the Firebase SDK.
 - **Flask backend** — everything else: data, permissions, uploads, and every email (via Gmail SMTP).
 - **PostgreSQL** — all data. Each `users` row's id is the Firebase uid; a user is a student and/or mentor if they have a row in `students` / `teachers` with the same id. Admin = email listed in `ADMIN_EMAILS`.
 - **Cloudflare R2** — uploaded files. Mentor photos / student work / request images are public (`/files/...`); transcripts and degree certificates are private and only reachable through signed links that expire after an hour.
