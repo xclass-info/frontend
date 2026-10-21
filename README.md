@@ -101,21 +101,43 @@ npm run dev        # http://localhost:5173
 
 ## Deploying
 
-Frontend → GitHub Pages:
+The frontend and backend live in different places, so each has its own deploy command. Run them from the repo root.
+
+**Frontend → GitHub Pages** (after changing `src/` or `public/`):
 
 ```bash
 npm run build
 npx gh-pages -d dist -b gh-pages -f
-git push origin main
 ```
 
-Backend → Heroku (database migrations run automatically on each deploy):
+**Backend → Heroku** (after changing `backend/`; database migrations run automatically on each deploy):
 
 ```bash
 git push heroku "$(git subtree split --prefix backend main)":refs/heads/main
 ```
 
-After changing the database models: `cd backend && FLASK_APP=app.py ./venv/bin/flask db migrate -m "what changed"`, check the generated file in `backend/migrations/versions/`, then commit and deploy.
+**Always, to save the code on GitHub:**
+
+```bash
+git push origin main
+```
+
+Which one do I need?
+
+| You changed | Deploy |
+|---|---|
+| `src/` or `public/` | Frontend |
+| `backend/` | Backend |
+| Both | Backend first, then frontend |
+| Only docs (like this README) | Nothing - just commit and push |
+
+Things to remember:
+
+- **Commit before deploying the backend.** The Heroku command deploys what's committed on `main`, not uncommitted edits.
+- **Deploy the frontend from this machine.** It builds from your working folder and needs the gitignored `.env` file.
+- **When a change touches both, deploy the backend first** so the new site never calls API endpoints that don't exist yet.
+
+After changing the database models: `cd backend && FLASK_APP=app.py ./venv/bin/flask db migrate -m "what changed"`, check the generated file in `backend/migrations/versions/`, then commit and deploy the backend.
 
 ## Settings (Heroku config vars)
 
