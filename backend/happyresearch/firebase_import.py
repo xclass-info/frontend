@@ -188,7 +188,11 @@ def import_users(auth_users, teachers, students, log):
         log(f"users: {len(auth_users)} from auth export")
     else:
         log("users: no auth export given - creating password-less logins from profiles")
-        for row in [*students, *teachers]:
+        # Firebase allows one login per email, so when several old records
+        # share an email the newest one is the account that's actually in use.
+        epoch = datetime.min.replace(tzinfo=timezone.utc)
+        rows = sorted([*students, *teachers], key=lambda r: r.createdAt or epoch, reverse=True)
+        for row in rows:
             _upsert_user(row.id, row.email, row.createdAt, None, None, log)
 
     for email in current_app.config["ADMIN_EMAILS"]:
