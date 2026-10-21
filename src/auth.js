@@ -1,21 +1,39 @@
 // src/auth.js
-// Login state. Accounts are Firebase Authentication users; our backend
-// holds each account's student/mentor record. The logged-in account is
-// `{ uid, email, isAdmin, student, teacher }` from /api/auth/me, where
-// `student` / `teacher` are that account's records (or null).
-import {
-  createUserWithEmailAndPassword,
-  onAuthStateChanged as onFirebaseAuthChanged,
-  sendPasswordResetEmail,
-  signInWithEmailAndPassword,
-  signOut,
-} from "firebase/auth";
-import { firebaseAuth } from "./firebase";
+// Login state for our own backend (replaces Firebase Auth). The logged-in
+// account is `{ uid, email, isAdmin, student, teacher }` from /api/auth/me:
+// `student` / `teacher` are that account's records (or null), the same
+// "is there a students/{uid} or teachers/{uid} doc" checks as before.
 import { api } from "./api";
 
+const TOKEN_KEY = "hr_auth_token";
+
+let token = readToken();
 let user = null;
 let loaded = false;
+let loading = null;
 const listeners = new Set();
+
+function readToken() {
+  try {
+    return localStorage.getItem(TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function writeToken(value) {
+  token = value;
+  try {
+    if (value) localStorage.setItem(TOKEN_KEY, value);
+    else localStorage.removeItem(TOKEN_KEY);
+  } catch {
+    // Private mode etc. - stays logged in for this page load only.
+  }
+}
+
+export function getToken() {
+  return token;
+}
 
 function setUser(next) {
   user = next;
@@ -23,30 +41,14 @@ function setUser(next) {
   listeners.forEach((cb) => cb(user));
 }
 
-let loadSeq = 0;
-
 async function loadUser() {
-  // A later login/logout supersedes a lookup that's still in flight.
-  const seq = ++loadSeq;
-  let next = null;
-  if (firebaseAuth.currentUser) {
-    try {
-      next = await api.get("/auth/me");
-    } catch {
-      next = null;
-    }
+  if (!token) return setUser(null);
+  try {
+    setUser(await api.get("/auth/me"));
+  } catch (err) {
+    if (err.status === 401) writeToken(null);
+    setUser(null);
   }
-  if (seq === loadSeq) setUser(next);
-  return next;
-}
-
-onFirebaseAuthChanged(firebaseAuth, () => {
-  loadUser();
-});
-
-// Current Firebase ID token for API calls (refreshed by Firebase as needed).
-export function getToken() {
-  return firebaseAuth.currentUser?.getIdToken() ?? Promise.resolve(null);
 }
 
 export function getCurrentUser() {
@@ -54,79 +56,35 @@ export function getCurrentUser() {
 }
 
 // Calls `cb(user | null)` now (once known) and on every login/logout.
-// Returns an unsubscribe function.
+// Returns an unsubscribe function, like Firebase's onAuthStateChanged.
 export function onAuthStateChanged(cb) {
   listeners.add(cb);
   if (loaded) cb(user);
+  else if (!loading) loading = loadUser().finally(() => (loading = null));
   return () => listeners.delete(cb);
 }
 
 // Re-fetch the account (e.g. after it changed on the server).
 export function refreshUser() {
-  return loadUser();
-}
-
-// Firebase's error codes, as the short codes the pages switch on.
-const ERROR_CODES = {
-  "auth/invalid-credential": "INVALID_CREDENTIALS",
-  "auth/wrong-password": "INVALID_CREDENTIALS",
-  "auth/user-not-found": "INVALID_CREDENTIALS",
-  "auth/invalid-email": "INVALID_EMAIL",
-  "auth/email-already-in-use": "EMAIL_IN_USE",
-  "auth/weak-password": "WEAK_PASSWORD",
-  "auth/too-many-requests": "RATE_LIMITED",
-  "auth/user-disabled": "USER_DISABLED",
-};
-
-async function firebase(call) {
-  try {
-    return await call();
-  } catch (err) {
-    if (ERROR_CODES[err.code]) err.code = ERROR_CODES[err.code];
-    throw err;
-  }
+  return loadUser().then(() => user);
 }
 
 export async function login(email, password) {
-  await firebase(() => signInWithEmailAndPassword(firebaseAuth, email.trim(), password));
-  return loadUser();
+  const res = await api.post("/auth/login", { email: email.trim(), password });
+  writeToken(res.token);
+  setUser(res.user);
+  return res.user;
 }
 
 export function logout() {
-  loadSeq++;
+  writeToken(null);
   setUser(null);
-  return signOut(firebaseAuth);
 }
 
-// Creates the Firebase account, then its student/mentor record (which
-// emails the verification link), then signs out - they log in after
-// verifying. Resolves to { emailSent }.
-export async function register({ kind, email, password, ...profile }) {
-  await firebase(() => createUserWithEmailAndPassword(firebaseAuth, email.trim(), password));
-  try {
-    return await api.post("/auth/profile", { kind, ...profile });
-  } finally {
-    await logout();
-  }
+export function register(fields) {
+  return api.post("/auth/register", fields);
 }
 
-export function sendPasswordReset(email, continueUrl) {
-  return firebase(() =>
-    sendPasswordResetEmail(
-      firebaseAuth,
-      email.trim(),
-      continueUrl ? { url: continueUrl, handleCodeInApp: false } : undefined,
-    ),
-  );
-}
-
-// Re-sends the verification email. Needs the password, since the account
-// is signed out until it's verified.
-export async function resendVerificationEmail({ kind, email, password }) {
-  await firebase(() => signInWithEmailAndPassword(firebaseAuth, email.trim(), password));
-  try {
-    await api.post("/auth/resend-verification", { kind });
-  } finally {
-    await logout();
-  }
+export function sendPasswordReset(email) {
+  return api.post("/auth/forgot-password", { email: email.trim() });
 }

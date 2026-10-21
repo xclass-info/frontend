@@ -26,3 +26,6 @@ npm-debug.log*
 firebase-debug.log
 # Local env overrides
 *.local
+
+# Firebase auth export (password hashes) - never commit
+users.json

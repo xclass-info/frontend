@@ -1,121 +1,112 @@
-"""Who is making this request.
-
-Logins are Firebase Authentication accounts. The browser signs in with the
-Firebase SDK and sends its Firebase ID token as `Authorization: Bearer ...`;
-we verify that token against Google's published signing certificates (no
-service account needed) and map its uid to our `users` row, creating it on
-first sight.
-"""
+import base64
+import hashlib
+import hmac
 import secrets
-import threading
-import time
+from datetime import datetime, timedelta, timezone
 from functools import wraps
 
 import jwt
-import requests
-from cryptography.x509 import load_pem_x509_certificate
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from flask import current_app, request
-from sqlalchemy.exc import IntegrityError
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from .errors import ApiError
 from .extensions import db
 from .models import Student, Teacher, User
 
-GOOGLE_CERTS_URL = (
-    "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com"
-)
-
-_certs = {"keys": {}, "expires": 0}
-_certs_lock = threading.Lock()
+MIN_PASSWORD_LENGTH = 6
 
 
-def _google_certs():
-    """{key id: public key} for Firebase ID tokens, cached as long as Google
-    says (Cache-Control max-age)."""
-    with _certs_lock:
-        if time.time() >= _certs["expires"]:
-            resp = requests.get(GOOGLE_CERTS_URL, timeout=10)
-            resp.raise_for_status()
-            max_age = 3600
-            for part in resp.headers.get("Cache-Control", "").split(","):
-                if part.strip().startswith("max-age="):
-                    max_age = int(part.strip()[8:])
-            _certs["keys"] = {
-                kid: load_pem_x509_certificate(pem.encode()).public_key()
-                for kid, pem in resp.json().items()
-            }
-            _certs["expires"] = time.time() + max_age
-        return _certs["keys"]
+# ── Passwords ─────────────────────────────────────────────────────────────
 
 
-def verify_firebase_token(token):
-    """The claims of a valid Firebase ID token for our project, else None."""
-    project = current_app.config["FIREBASE_PROJECT_ID"]
-    try:
-        kid = jwt.get_unverified_header(token).get("kid")
-        key = _google_certs().get(kid)
-        if not key:
-            return None
-        claims = jwt.decode(
-            token,
-            key,
-            algorithms=["RS256"],
-            audience=project,
-            issuer=f"https://securetoken.google.com/{project}",
-            leeway=30,
-        )
-    except (jwt.PyJWTError, ValueError):
-        return None
-    return claims if claims.get("sub") else None
+def set_password(user, password):
+    user.passwordHash = generate_password_hash(password)
+    user.passwordAlgo = "werkzeug"
+    user.passwordSalt = None
 
 
-# ── Current user ──────────────────────────────────────────────────────────
+def check_password(user, password):
+    """True if `password` is right. Imported Firebase hashes are upgraded to
+    our own format on the first successful check."""
+    if user.passwordAlgo == "werkzeug":
+        return check_password_hash(user.passwordHash, password)
+    if user.passwordAlgo == "firebase_scrypt":
+        if not _check_firebase_scrypt(password, user.passwordSalt, user.passwordHash):
+            return False
+        set_password(user, password)
+        db.session.commit()
+        return True
+    return False
 
-_USER_KEY = "happyresearch.user"
+
+def _check_firebase_scrypt(password, salt_b64, hash_b64):
+    """Firebase Auth's modified scrypt: scrypt-derive a key from the password,
+    then AES-256-CTR encrypt the project's signer key with it. The stored hash
+    is that ciphertext."""
+    cfg = current_app.config
+    if not cfg["FIREBASE_HASH_SIGNER_KEY"] or not salt_b64 or not hash_b64:
+        return False
+    salt = base64.b64decode(salt_b64) + base64.b64decode(cfg["FIREBASE_HASH_SALT_SEPARATOR"])
+    n = 2 ** cfg["FIREBASE_HASH_MEM_COST"]
+    r = cfg["FIREBASE_HASH_ROUNDS"]
+    derived = hashlib.scrypt(
+        password.encode("utf-8"), salt=salt, n=n, r=r, p=1, dklen=64,
+        maxmem=256 * r * n + 1024 * 1024,
+    )
+    encryptor = Cipher(algorithms.AES(derived[:32]), modes.CTR(b"\x00" * 16)).encryptor()
+    signer_key = base64.b64decode(cfg["FIREBASE_HASH_SIGNER_KEY"])
+    computed = encryptor.update(signer_key) + encryptor.finalize()
+    return hmac.compare_digest(computed, base64.b64decode(hash_b64))
+
+
+# ── One-off tokens (email verification, password reset) ──────────────────
+
+
+def random_token():
+    return secrets.token_hex(24)
+
+
+def hash_token(token):
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+# ── Login tokens ──────────────────────────────────────────────────────────
+
+
+def issue_auth_token(user):
+    now = datetime.now(timezone.utc)
+    payload = {
+        "sub": user.id,
+        "tv": user.tokenVersion,
+        "iat": now,
+        "exp": now + timedelta(days=current_app.config["AUTH_TOKEN_DAYS"]),
+    }
+    return jwt.encode(payload, current_app.config["SECRET_KEY"], algorithm="HS256")
 
 
 def current_user():
-    """The User behind this request's Firebase token, or None (cached per request)."""
+    """The User behind this request's Bearer token, or None (cached per request)."""
     if _USER_KEY not in request.environ:
         request.environ[_USER_KEY] = _user_from_token()
     return request.environ[_USER_KEY]
+
+
+_USER_KEY = "happyresearch.user"
 
 
 def _user_from_token():
     header = request.headers.get("Authorization", "")
     if not header.startswith("Bearer "):
         return None
-    claims = verify_firebase_token(header[7:])
-    if not claims:
+    try:
+        payload = jwt.decode(header[7:], current_app.config["SECRET_KEY"], algorithms=["HS256"])
+    except jwt.PyJWTError:
         return None
-    email = (claims.get("email") or "").strip().lower()
-    user = db.session.get(User, claims["sub"])
-    if email:
-        # Firebase emails are unique, so another row with this email is a
-        # stale placeholder (e.g. created by the one-time data import).
-        stale = User.query.filter(User.email == email, User.id != claims["sub"]).first()
-        if stale:
-            db.session.delete(stale)
-            db.session.flush()
-    if not user:
-        if not email:
-            return None
-        user = User(id=claims["sub"], email=email)
-        db.session.add(user)
-    # Keep in step with Firebase (the email can be changed there).
-    if email and user.email != email:
-        user.email = email
-    is_admin = user.email in current_app.config["ADMIN_EMAILS"]
-    if user.isAdmin != is_admin:
-        user.isAdmin = is_admin
-    if db.session.dirty or db.session.new or db.session.deleted:
-        try:
-            db.session.commit()
-        except IntegrityError:
-            # A parallel first request for this account created it already.
-            db.session.rollback()
-            user = db.session.get(User, claims["sub"])
-    return user
+    user = db.session.get(User, payload.get("sub"))
+    if user and user.tokenVersion == payload.get("tv"):
+        return user
+    return None
 
 
 def login_required(fn):
@@ -171,7 +162,3 @@ def is_verified(account):
     # Accounts created before email verification existed have no value at
     # all - treat that as verified so nobody gets locked out.
     return account.accountEmailVerified is not False
-
-
-def random_token():
-    return secrets.token_hex(24)

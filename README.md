@@ -16,29 +16,22 @@ This repo holds both halves:
                           │   Visitor's browser          │
                           │   React app (Vite build)     │
                           └──────┬────────┬────────┬─────┘
-                  loads the site │        │ login  │ Daily.co rooms
-                                 ▼        │        ▼ (mentor approves
+                  loads the site │        │ API    │ Daily.co rooms
+                                 ▼        │ calls  ▼ (mentor approves
                 ┌─────────────────────┐   │   ┌──────────────┐  a booking)
                 │   GitHub Pages      │   │   │  Daily.co    │
                 │   happyresearch.org │   │   │  video API   │
                 │   (static files)    │   │   └──────────────┘
                 └─────────────────────┘   │
-                                          ▼
-                          ┌──────────────────────────────┐
-                          │ Firebase Authentication      │
-                          │ sign up · log in · reset pw  │
-                          │ → gives the browser an       │
-                          │   ID token                   │
-                          └──────────────────────────────┘
                                           │
-          every API call: Authorization: Bearer <Firebase ID token>
+          logged-in calls carry: Authorization: Bearer <login token>
                                           ▼
    ┌──────────────────────────────────────────────────────────────┐
    │  Heroku app "happyresearch"   (Flask, gunicorn)              │
    │  https://happyresearch-2f4424e63b99.herokuapp.com            │
    │                                                              │
-   │  • checks the token against Google's public keys             │
-   │  • /api/auth        account records, email verification      │
+   │  • /api/auth        sign up, log in, password reset,         │
+   │                     email verification                       │
    │  • /api/teachers    mentor profiles, verification, slots     │
    │  • /api/research · /projects · /showcase                     │
    │  • /api/registrations  (seat limits, admin approval)         │
@@ -62,20 +55,25 @@ This repo holds both halves:
 **Example: a student applies for a research post**
 
 1. The browser loads the React app from GitHub Pages.
-2. The student logs in with Firebase Authentication, which gives the browser an ID token.
+2. The student logs in; Flask checks the password and gives the browser a login token.
 3. The browser sends the application to Flask with that token attached.
 4. Flask checks the token, checks seats in Postgres, saves the application and replies.
 
 **Who does what**
 
-- **Firebase Authentication** — logins only (sign up, log in, forgot password). Keep it turned on in the Firebase console.
-  Its password-reset emails link to our own page `https://happyresearch.org/reset-password` (set in Firebase console → Authentication → Templates → Password reset → Customize action URL); that page finishes the reset with the Firebase SDK.
-- **Flask backend** — everything else: data, permissions, uploads, and every email (via Gmail SMTP).
-- **PostgreSQL** — all data. Each `users` row's id is the Firebase uid; a user is a student and/or mentor if they have a row in `students` / `teachers` with the same id. Admin = email listed in `ADMIN_EMAILS`.
+- **Flask backend** — everything: logins, data, permissions, uploads, and every email (via Gmail SMTP). Passwords are stored only as one-way hashes; login tokens are signed with `SECRET_KEY` and last 30 days (a password reset logs out old sessions).
+- **Password reset** — "Forgot password?" emails a link to `https://happyresearch.org/reset-password?token=...` (valid 1 hour, single use).
+- **PostgreSQL** — all data. A user (`users`) is a student and/or mentor if they have a row in `students` / `teachers` with the same id. Admin = email listed in `ADMIN_EMAILS`.
 - **Cloudflare R2** — uploaded files. Mentor photos / student work / request images are public (`/files/...`); transcripts and degree certificates are private and only reachable through signed links that expire after an hour.
 - **Daily.co** — the mentor's browser creates a video room when approving a booking; Flask stores the link and emails both sides.
 
-**No longer used** (since Oct 2026): Firestore, Firebase Storage, EmailJS.
+**No longer used** (since Oct 2026): Firebase (Firestore, Storage and Authentication) and EmailJS. Accounts carried over from Firebase have no password in the new system yet; on their first login they're asked to use "Forgot password?". To let them keep their old Firebase password instead, export it with `firebase auth:export users.json --format=json` (project `xclass-3e2f3`), set the `FIREBASE_HASH_*` config vars from Firebase console → Authentication → Users → ⋮ → Password hash parameters, then from `backend/` run:
+
+```bash
+DATABASE_URL=$(heroku config:get DATABASE_URL -a happyresearch) FLASK_APP=app.py ./venv/bin/flask import-firebase-passwords users.json
+```
+
+Don't commit `users.json` - it contains password hashes. Delete it afterwards.
 
 ## Running it locally
 
@@ -147,8 +145,8 @@ See them with `heroku config -a happyresearch`. Never commit their values.
 | Name | What |
 |---|---|
 | `DATABASE_URL` | Postgres connection (set by Heroku) |
-| `SECRET_KEY` | Signs private-file links |
-| `FIREBASE_PROJECT_ID` | Optional; defaults to `xclass-3e2f3` |
+| `SECRET_KEY` | Signs login tokens and private-file links (changing it logs everyone out) |
+| `FIREBASE_HASH_SIGNER_KEY` etc. | Only for the optional one-time Firebase password import |
 | `ADMIN_EMAILS` | Comma-separated admin emails |
 | `FRONTEND_ORIGIN`, `FRONTEND_URL` | `https://happyresearch.org` (CORS + links in emails) |
 | `API_URL` | The backend's own public URL (for `/files/...` links) |

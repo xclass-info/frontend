@@ -1,64 +1,20 @@
 // src/components/ResetPassword.jsx
-// Our own landing page for Firebase Authentication's email links, so they
-// point at happyresearch.org/reset-password instead of
-// xclass-3e2f3.firebaseapp.com/__/auth/action. Set as the custom action URL
-// in Firebase console > Authentication > Templates. Firebase appends
-// ?mode=...&oobCode=...; we finish the action with the Firebase SDK.
-import { useEffect, useState } from "react";
+// Landing page for the "reset your password" email link (?token=...).
+// Works for students, mentors and the admin - they share one login system.
+import { useState } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import {
-  applyActionCode,
-  confirmPasswordReset,
-  verifyPasswordResetCode,
-} from "firebase/auth";
-import { firebaseAuth } from "../firebase";
+import { api } from "../api";
 import styles from "./TeacherAuth.module.css";
 import Footer from "./Footer";
-
-// Only send people back to our own site after a reset.
-function safeContinueUrl(url) {
-  try {
-    const u = new URL(url);
-    return u.origin === window.location.origin ? u.pathname + u.search : null;
-  } catch {
-    return null;
-  }
-}
 
 export default function ResetPassword() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const mode = searchParams.get("mode");
-  const oobCode = searchParams.get("oobCode");
-  const continuePath = safeContinueUrl(searchParams.get("continueUrl"));
-
-  // checking | form | done | invalid | applied
-  const [status, setStatus] = useState("checking");
-  const [email, setEmail] = useState("");
+  const token = searchParams.get("token");
   const [form, setForm] = useState({ password: "", confirmPassword: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (!oobCode) {
-      setStatus("invalid");
-      return;
-    }
-    if (mode === "resetPassword") {
-      verifyPasswordResetCode(firebaseAuth, oobCode)
-        .then((addr) => {
-          setEmail(addr);
-          setStatus("form");
-        })
-        .catch(() => setStatus("invalid"));
-    } else if (mode === "verifyEmail" || mode === "recoverEmail") {
-      applyActionCode(firebaseAuth, oobCode)
-        .then(() => setStatus("applied"))
-        .catch(() => setStatus("invalid"));
-    } else {
-      setStatus("invalid");
-    }
-  }, [mode, oobCode]);
+  const [done, setDone] = useState(false);
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -77,49 +33,18 @@ export default function ResetPassword() {
     }
     setLoading(true);
     try {
-      await confirmPasswordReset(firebaseAuth, oobCode, form.password);
-      setStatus("done");
+      await api.post("/auth/reset-password", { token, password: form.password });
+      setDone(true);
     } catch (err) {
-      if (err.code === "auth/weak-password") {
-        setError("Password should be at least 6 characters.");
-      } else if (
-        err.code === "auth/expired-action-code" ||
-        err.code === "auth/invalid-action-code"
-      ) {
-        setStatus("invalid");
-      } else {
-        setError("Something went wrong. Please try again.");
-      }
+      setError(
+        err.code === "INVALID_TOKEN"
+          ? "This reset link is invalid or has expired. Please request a new one from the login page."
+          : "Something went wrong. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
   }
-
-  const loginLinks = continuePath ? (
-    <Link to={continuePath} className={styles.btn} style={{ textDecoration: "none" }}>
-      Go to Login →
-    </Link>
-  ) : (
-    <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
-      <Link to='/student/login' className={styles.btn} style={{ textDecoration: "none" }}>
-        Student Login →
-      </Link>
-      <Link to='/teacher/login' className={styles.btn} style={{ textDecoration: "none" }}>
-        Mentor Login →
-      </Link>
-    </div>
-  );
-
-  const message = (icon, title, text, action) => (
-    <div style={{ textAlign: "center", padding: 20 }}>
-      <p style={{ fontSize: 48, marginBottom: 12 }}>{icon}</p>
-      <h3 style={{ color: "var(--primary-hover)", marginBottom: 8 }}>{title}</h3>
-      <p style={{ color: "var(--muted)", fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>
-        {text}
-      </p>
-      {action}
-    </div>
-  );
 
   return (
     <>
@@ -129,33 +54,36 @@ export default function ResetPassword() {
             ✕
           </button>
 
-          {status === "checking" && message("⏳", "Checking your link...", "")}
-
-          {status === "invalid" &&
-            message(
-              "⚠️",
-              "Link not valid",
-              "This link is invalid, has expired, or has already been used. Request a new one with \"Forgot password?\" on the login page.",
-              loginLinks,
-            )}
-
-          {status === "applied" &&
-            message("✅", "All set", "Your account has been updated. You can log in now.", loginLinks)}
-
-          {status === "done" &&
-            message(
-              "✅",
-              "Password updated",
-              "You can now log in with your new password.",
-              loginLinks,
-            )}
-
-          {status === "form" && (
+          {done ? (
+            <div style={{ textAlign: "center", padding: 20 }}>
+              <p style={{ fontSize: 48, marginBottom: 12 }}>✅</p>
+              <h3 style={{ color: "var(--primary-hover)", marginBottom: 8 }}>
+                Password updated
+              </h3>
+              <p style={{ color: "var(--muted)", fontSize: 14, marginBottom: 20 }}>
+                You can now log in with your new password.
+              </p>
+              <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
+                <Link to='/student/login' className={styles.btn} style={{ textDecoration: "none" }}>
+                  Student Login →
+                </Link>
+                <Link to='/teacher/login' className={styles.btn} style={{ textDecoration: "none" }}>
+                  Mentor Login →
+                </Link>
+              </div>
+            </div>
+          ) : !token ? (
+            <div style={{ textAlign: "center", padding: 20 }}>
+              <p style={{ fontSize: 48, marginBottom: 12 }}>⚠️</p>
+              <h3 style={{ marginBottom: 8 }}>Link not valid</h3>
+              <p style={{ color: "var(--muted)", fontSize: 14 }}>
+                Request a new password reset link from the login page.
+              </p>
+            </div>
+          ) : (
             <>
               <h1 className={styles.title}>🔑 Choose a New Password</h1>
-              <p className={styles.sub}>
-                For <strong>{email}</strong>
-              </p>
+              <p className={styles.sub}>For your HappyResearch account</p>
 
               {error && <p className={styles.error}>{error}</p>}
 

@@ -67,15 +67,33 @@ def _iso(value):
 
 
 class User(Model):
-    """A Firebase Authentication account (id = Firebase uid). Whether it's a
-    student and/or mentor is decided by having a row in `students` /
-    `teachers` with the same id, just like the old Firebase-only setup."""
+    """A login. Whether it's a student and/or mentor is decided by having a
+    row in `students` / `teachers` with the same id, just like the old
+    Firebase setup (auth user + students/{uid} or teachers/{uid} doc)."""
 
     __tablename__ = "users"
+    PRIVATE = (
+        "passwordHash",
+        "passwordAlgo",
+        "passwordSalt",
+        "tokenVersion",
+        "resetTokenHash",
+        "resetTokenExpires",
+    )
 
-    id = col("id", db.String(64), primary_key=True)
+    id = col("id", db.String(64), primary_key=True, default=new_id)
     email = col("email", db.String(320), unique=True, nullable=False, index=True)
+    # passwordAlgo: "werkzeug" for passwords set here, "firebase_scrypt" for
+    # hashes imported from Firebase Auth (rehashed on first login), or None
+    # when no hash was imported - that account must reset its password.
+    passwordHash = col("password_hash", db.Text)
+    passwordAlgo = col("password_algo", db.String(32))
+    passwordSalt = col("password_salt", db.Text)
     isAdmin = col("is_admin", db.Boolean, nullable=False, default=False)
+    # Bumped on password change/reset so older login tokens stop working.
+    tokenVersion = col("token_version", db.Integer, nullable=False, default=0)
+    resetTokenHash = col("reset_token_hash", db.String(64), index=True)
+    resetTokenExpires = col("reset_token_expires", db.DateTime(timezone=True))
     createdAt = col("created_at", db.DateTime(timezone=True), default=utcnow)
 
 
