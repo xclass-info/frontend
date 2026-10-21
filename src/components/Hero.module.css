@@ -91,7 +91,7 @@
 
 @media (max-width: 560px) {
   .hero {
-    padding: 60px 4% 40px;
+    padding: 110px 4% 40px;
   }
   .actions {
     flex-direction: column;
