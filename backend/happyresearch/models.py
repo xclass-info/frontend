@@ -293,4 +293,17 @@ class Registration(Model):
     createdAt = col("created_at", db.DateTime(timezone=True), default=utcnow)
 
 
+class StoredFile(Model):
+    """An uploaded file's bytes, when files are kept in Postgres (no S3
+    bucket configured) - see storage.py."""
+
+    __tablename__ = "stored_files"
+
+    key = col("key", db.String(512), primary_key=True)
+    contentType = col("content_type", db.String(255), nullable=False)
+    size = col("size", db.Integer, nullable=False)
+    data = col("data", db.LargeBinary, nullable=False)
+    createdAt = col("created_at", db.DateTime(timezone=True), default=utcnow)
+
+
 ITEM_MODELS = {"research": Research, "project": Project}

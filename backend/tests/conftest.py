@@ -11,7 +11,7 @@ from happyresearch.security import set_password  # noqa: E402
 
 
 @pytest.fixture()
-def app(tmp_path, monkeypatch):
+def app():
     app = create_app(
         {
             "TESTING": True,
@@ -24,7 +24,6 @@ def app(tmp_path, monkeypatch):
             "MAIL_DEFAULT_SENDER": ("HappyResearch", "noreply@example.com"),
         }
     )
-    monkeypatch.setattr("happyresearch.storage._LOCAL_DIR", str(tmp_path))
     limiter.enabled = False
     with app.app_context():
         db.drop_all()

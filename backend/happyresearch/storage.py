@@ -1,17 +1,21 @@
 """Uploaded files.
 
-Files live in an S3-compatible bucket (Cloudflare R2 in production). When no
-bucket is configured (local development) they're written under
-backend/uploads/ instead.
+Files are stored in Postgres (the `stored_files` table). If an S3-compatible
+bucket is configured (S3_BUCKET etc. - e.g. Cloudflare R2) they go there
+instead; nothing else changes.
 
-Database fields hold a reference of the form "s3:<key>". file_url() turns a
-reference into something a browser can open:
+Database fields hold a reference of the form "s3:<key>" (the prefix is just
+a marker - it's used for both backends). file_url() turns a reference into
+something a browser can open:
   * public keys (mentor photos, showcase files, request images) become
-    <API_URL>/files/<key>, which redirects to a short-lived signed URL;
-  * private keys (mentor verification documents) are only ever handed out as
-    signed URLs to the mentor themselves or an admin.
+    <API_URL>/files/<key>;
+  * private keys (mentor verification documents) are only ever handed out,
+    to the mentor themselves or an admin, as signed links that expire after
+    an hour.
 Anything that isn't an "s3:" reference (an old external link) passes through.
 """
+import hashlib
+import hmac
 import mimetypes
 import os
 import re
@@ -19,11 +23,12 @@ import time
 
 from flask import current_app
 
+from .extensions import db
+from .models import StoredFile
+
 PREFIX = "s3:"
 PUBLIC_PREFIXES = ("mentors/", "showcase-files/", "requests/")
 SIGNED_URL_SECONDS = 3600
-
-_LOCAL_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads")
 
 
 def _client():
@@ -39,7 +44,7 @@ def _client():
     )
 
 
-def _use_s3():
+def use_s3():
     return bool(current_app.config["S3_BUCKET"])
 
 
@@ -53,16 +58,32 @@ def make_key(folder, filename):
 
 
 def put(key, data, content_type):
-    if _use_s3():
+    if use_s3():
         _client().put_object(
             Bucket=current_app.config["S3_BUCKET"], Key=key, Body=data, ContentType=content_type
         )
     else:
-        path = os.path.join(_LOCAL_DIR, key)
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, "wb") as f:
-            f.write(data)
+        db.session.merge(StoredFile(key=key, contentType=content_type, size=len(data), data=data))
+        db.session.commit()
     return PREFIX + key
+
+
+def get(key):
+    """(bytes, content_type) of a file stored in Postgres, or None."""
+    row = db.session.get(StoredFile, key)
+    return (row.data, row.contentType) if row else None
+
+
+def exists(key):
+    if use_s3():
+        from botocore.exceptions import ClientError
+
+        try:
+            _client().head_object(Bucket=current_app.config["S3_BUCKET"], Key=key)
+            return True
+        except ClientError:
+            return False
+    return db.session.query(StoredFile.key).filter_by(key=key).first() is not None
 
 
 def key_of(ref):
@@ -75,14 +96,34 @@ def is_public(key):
     return key.startswith(PUBLIC_PREFIXES)
 
 
+# ── Signed links (private files) ─────────────────────────────────────────
+
+
+def _signature(key, expires):
+    secret = current_app.config["SECRET_KEY"].encode()
+    return hmac.new(secret, f"{key}:{expires}".encode(), hashlib.sha256).hexdigest()
+
+
+def check_signature(key, expires, sig):
+    try:
+        expires = int(expires)
+    except (TypeError, ValueError):
+        return False
+    return expires > time.time() and hmac.compare_digest(_signature(key, expires), sig or "")
+
+
 def signed_url(key):
-    if _use_s3():
+    if use_s3():
         return _client().generate_presigned_url(
             "get_object",
             Params={"Bucket": current_app.config["S3_BUCKET"], "Key": key},
             ExpiresIn=SIGNED_URL_SECONDS,
         )
-    return f"{current_app.config['API_URL']}/files/{key}"
+    expires = int(time.time()) + SIGNED_URL_SECONDS
+    return (
+        f"{current_app.config['API_URL']}/files/{key}"
+        f"?expires={expires}&sig={_signature(key, expires)}"
+    )
 
 
 def file_url(ref):
@@ -95,25 +136,5 @@ def file_url(ref):
     return signed_url(key)
 
 
-def local_path(key):
-    path = os.path.realpath(os.path.join(_LOCAL_DIR, key))
-    if not path.startswith(os.path.realpath(_LOCAL_DIR) + os.sep):
-        return None
-    return path
-
-
 def guess_type(filename):
     return mimetypes.guess_type(filename)[0] or "application/octet-stream"
-
-
-def exists(key):
-    if _use_s3():
-        from botocore.exceptions import ClientError
-
-        try:
-            _client().head_object(Bucket=current_app.config["S3_BUCKET"], Key=key)
-            return True
-        except ClientError:
-            return False
-    path = local_path(key)
-    return bool(path and os.path.exists(path))
