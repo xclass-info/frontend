@@ -1,8 +1,7 @@
 // src/components/ProjectSection.jsx
 import { useEffect, useState } from "react";
+import { api, live } from "../api";
 import { useNavigate } from "react-router-dom";
-import { db } from "../firebase";
-import { collection, query, limit, onSnapshot } from "firebase/firestore";
 import { TopicIcon } from "../utils/topicIcons";
 import { LESSON_STRUCTURE_LABEL } from "../utils/format";
 
@@ -12,9 +11,9 @@ export default function ProjectSection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const q = query(collection(db, "projects"), limit(3));
-    const unsub = onSnapshot(q, (snap) => {
-      setProjects(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    const q = () => api.get("/projects?limit=3");
+    const unsub = live(q, (rows) => {
+      setProjects(rows);
       setLoading(false);
     });
     return () => unsub();

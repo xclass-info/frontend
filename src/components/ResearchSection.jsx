@@ -1,15 +1,7 @@
 // src/components/ResearchSection.jsx
 import { useEffect, useState } from "react";
+import { api, live } from "../api";
 import { useNavigate } from "react-router-dom";
-import { db } from "../firebase";
-import {
-  collection,
-  query,
-  where,
-  onSnapshot,
-  limit,
-  getDocs,
-} from "firebase/firestore";
 import { TopicIcon } from "../utils/topicIcons";
 import { LESSON_STRUCTURE_LABEL } from "../utils/format";
 import { formatMentorName } from "../utils/mentorName";
@@ -27,24 +19,21 @@ export default function ResearchSection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const q = query(
-      collection(db, "research"),
-      where("status", "==", "published"),
-      limit(6),
-    );
-    const unsub = onSnapshot(q, (snap) => {
-      setResearch(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    const q = () => api.get("/research?status=published&limit=6");
+    const unsub = live(q, (rows) => {
+      setResearch(rows);
       setLoading(false);
     });
     return () => unsub();
   }, []);
 
   useEffect(() => {
-    getDocs(collection(db, "teachers"))
-      .then((snap) => {
+    api
+      .get("/teachers")
+      .then((rows) => {
         const map = {};
-        snap.docs.forEach((d) => {
-          map[d.id] = d.data();
+        rows.forEach((t) => {
+          map[t.id] = t;
         });
         setTeachers(map);
       })

@@ -1,7 +1,6 @@
 import { useEffect, useState, useMemo, useRef, useLayoutEffect } from "react";
+import { api, live } from "../api";
 import { useNavigate } from "react-router-dom";
-import { db } from "../firebase";
-import { collection, onSnapshot } from "firebase/firestore";
 import styles from "./ActiveEnrolling.module.css";
 import InitialsAvatar from "./InitialsAvatar";
 import { formatMentorName } from "../utils/mentorName";
@@ -61,10 +60,9 @@ export default function ActiveEnrolling() {
   const [duration, setDuration] = useState(120);
 
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "teachers"), (snapshot) => {
+    const unsub = live(() => api.get("/teachers"), (rows) => {
       setTeachers(
-        snapshot.docs
-          .map((d) => ({ id: d.id, ...d.data() }))
+        rows
           .filter((t) => !t.disabled && t.name && t.verificationStatus === "approved"),
       );
     });
@@ -72,15 +70,15 @@ export default function ActiveEnrolling() {
   }, []);
 
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "research"), (snapshot) => {
-      setResearch(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+    const unsub = live(() => api.get("/research"), (rows) => {
+      setResearch(rows);
     });
     return () => unsub();
   }, []);
 
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "projects"), (snapshot) => {
-      setProjects(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+    const unsub = live(() => api.get("/projects"), (rows) => {
+      setProjects(rows);
     });
     return () => unsub();
   }, []);

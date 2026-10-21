@@ -2,8 +2,7 @@
 // Public proof-of-outcomes page: finished student projects, published by
 // mentors from their dashboard's Showcase tab.
 import { useEffect, useState } from "react";
-import { db } from "../firebase";
-import { collection, onSnapshot, getDocs } from "firebase/firestore";
+import { api, live, toMillis, formatDate } from "../api";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { Link } from "react-router-dom";
@@ -102,9 +101,9 @@ function ShowcaseDetailModal({ entry, mentorLabel, onClose }) {
           {entry.summary}
         </p>
 
-        {entry.createdAt?.toDate && (
+        {entry.createdAt && (
           <p style={{ fontSize: 12, color: "#aaa", marginBottom: 20 }}>
-            Published {entry.createdAt.toDate().toLocaleDateString()}
+            Published {formatDate(entry.createdAt)}
           </p>
         )}
 
@@ -144,11 +143,10 @@ export default function ShowcaseListing() {
   const pageRef = useScrollReveal([loading, entries]);
 
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "showcase"), (snap) => {
+    const unsub = live(() => api.get("/showcase"), (rows) => {
       setEntries(
-        snap.docs
-          .map((d) => ({ id: d.id, ...d.data() }))
-          .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)),
+        rows
+          .sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt)),
       );
       setLoading(false);
     });
@@ -156,11 +154,12 @@ export default function ShowcaseListing() {
   }, []);
 
   useEffect(() => {
-    getDocs(collection(db, "teachers"))
-      .then((snap) => {
+    api
+      .get("/teachers")
+      .then((rows) => {
         const map = {};
-        snap.docs.forEach((d) => {
-          map[d.id] = d.data();
+        rows.forEach((t) => {
+          map[t.id] = t;
         });
         setTeachers(map);
       })

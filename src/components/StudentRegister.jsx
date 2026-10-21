@@ -1,15 +1,9 @@
 import { useState } from "react";
-import { auth, db } from "../firebase";
-import { createUserWithEmailAndPassword, signOut } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { register } from "../auth";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import styles from "./TeacherAuth.module.css";
 import Footer from "./Footer";
 import { GRADE_OPTIONS } from "../utils/grades";
-import {
-  generateVerificationToken,
-  sendVerificationEmail,
-} from "../utils/accountVerification";
 
 export default function StudentRegister() {
   const navigate = useNavigate();
@@ -44,44 +38,24 @@ export default function StudentRegister() {
     }
     setLoading(true);
     try {
-      const { user } = await createUserWithEmailAndPassword(
-        auth,
-        form.email,
-        form.password,
-      );
-
-      const name = form.name.trim();
-      const email = form.email.trim().toLowerCase();
-      const token = generateVerificationToken();
-
-      // The students record marks this as a student account (mentors share
-      // the same login system), so create it before anything else can fail.
-      await setDoc(doc(db, "students", user.uid), {
-        name,
-        email,
+      // Creates the account and its student record, and emails the
+      // verification link. They must verify and then log in, like mentors.
+      const { emailSent } = await register({
+        kind: "student",
+        name: form.name.trim(),
+        email: form.email.trim(),
         grade: form.grade.trim(),
         phone: form.phone.trim(),
-        createdAt: new Date(),
-        accountEmailToken: token,
-        accountEmailVerified: false,
+        password: form.password,
       });
-
-      try {
-        await sendVerificationEmail({ kind: "student", uid: user.uid, name, email, token });
-      } catch (err) {
-        console.error(err);
-        setEmailFailed(true);
-      }
-
-      // They must verify their email and log in, like mentors do.
-      await signOut(auth);
+      setEmailFailed(!emailSent);
       setDone(true);
     } catch (err) {
-      if (err.code === "auth/email-already-in-use") {
+      if (err.code === "EMAIL_IN_USE") {
         setError("This email is already registered. Please log in instead.");
-      } else if (err.code === "auth/weak-password") {
+      } else if (err.code === "WEAK_PASSWORD") {
         setError("Password should be at least 6 characters.");
-      } else if (err.code === "auth/invalid-email") {
+      } else if (err.code === "INVALID_EMAIL") {
         setError("Please enter a valid email address.");
       } else {
         setError("Something went wrong. Please try again.");

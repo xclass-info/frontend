@@ -122,11 +122,8 @@ export function RegisterModal({ kind, item, student, onClose }) {
     setSubmitting(true);
     setFormError("");
     try {
-      await registerForItem(kind, item.id, {
-        name: student.name,
-        email: student.email,
-        studentUid: student.uid,
-      });
+      // Name/email come from the logged-in account on the backend.
+      await registerForItem(kind, item.id);
       setDone(true);
     } catch (err) {
       console.error(err);

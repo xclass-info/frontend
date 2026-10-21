@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import emailjs from "@emailjs/browser";
+import { api } from "../api";
 
 export default function ContactUs() {
   const [form, setForm] = useState({
@@ -24,18 +24,13 @@ export default function ContactUs() {
     setLoading(true);
     setError("");
     try {
-      await emailjs.send(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-        {
-          from_name: form.name,
-          from_email: form.email,
-          subject: form.subject,
-          message: form.message,
-          to_email: "happyprogramming.us@gmail.com",
-        },
-        import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
-      );
+      // Emailed to the team inbox; replying goes straight to the sender.
+      await api.post("/contact", {
+        name: form.name,
+        email: form.email,
+        subject: form.subject,
+        message: form.message,
+      });
       setSubmitted(true);
       setForm({ name: "", email: "", subject: "", message: "" });
     } catch (err) {

@@ -1,0 +1,205 @@
+import io
+from urllib.parse import quote
+
+from happyresearch.extensions import db
+from happyresearch.models import Availability, Booking, Research, Teacher
+
+from .conftest import login, make_user
+
+
+def _research(client, headers, **extra):
+    payload = {
+        "title": "Ocean study", "idea": "i", "impact": "x", "seats": 1, "type": "t",
+        "deliverable": "paper", "difficulty": "easy", "gradeLevel": "9-12",
+        "prerequisites": [" Bio ", "", "Chem"], "scheduleStartDate": "2026-11-01",
+        "scheduleTime": "10:00", "scheduleLocation": "Online",
+    }
+    payload.update(extra)
+    res = client.post("/api/research", json=payload, headers=headers)
+    assert res.status_code == 201, res.json
+    return res.json
+
+
+def test_public_teacher_hides_private_fields(client):
+    t = make_user("t@example.com", teacher=True)
+    teacher = db.session.get(Teacher, t.id)
+    teacher.workEmailToken = "secret"
+    teacher.transcriptURL = "s3:mentor-documents/x/doc.pdf"
+    db.session.commit()
+    data = client.get(f"/api/teachers/{t.id}").json
+    for field in ("email", "workEmailToken", "accountEmailToken", "transcriptURL"):
+        assert field not in data
+    assert data["name"] == "Dr. T"
+    listed = client.get("/api/teachers").json
+    assert "email" not in listed[0]
+
+
+def test_mentor_content_crud_and_ownership(client):
+    a = make_user("a@example.com", teacher=True, name="Dr. A")
+    make_user("b@example.com", teacher=True)
+    ha, hb = login(client, "a@example.com"), login(client, "b@example.com")
+
+    item = _research(client, ha)
+    assert item["teacherName"] == "Dr. A" and item["teacherId"] == a.id
+    assert item["status"] == "published" and item["stage"] == "active"
+    assert item["prerequisites"] == ["Bio", "Chem"]
+
+    assert client.patch(f"/api/research/{item['id']}", json={"title": "x"}, headers=hb).status_code == 404
+    assert client.delete(f"/api/research/{item['id']}", headers=hb).status_code == 404
+    assert client.post("/api/research", json={"title": "x"}).status_code == 401
+
+    res = client.patch(f"/api/research/{item['id']}", json={"stage": "completed", "teacherId": "evil"}, headers=ha)
+    assert res.json["stage"] == "completed" and res.json["teacherId"] == a.id
+
+    listed = client.get("/api/research?status=published").json
+    assert [r["id"] for r in listed] == [item["id"]]
+    assert client.delete(f"/api/research/{item['id']}", headers=ha).status_code == 200
+
+
+def test_registration_seats_and_admin_review(client):
+    make_user("t@example.com", teacher=True)
+    make_user("s1@example.com", student=True, name="S1")
+    make_user("s2@example.com", student=True, name="S2")
+    make_user("admin@example.com", admin=True)
+    item = _research(client, login(client, "t@example.com"), seats=1)
+    h1, h2 = login(client, "s1@example.com"), login(client, "s2@example.com")
+    hadmin = login(client, "admin@example.com")
+
+    # Both can apply - applying doesn't take the seat.
+    assert client.post("/api/registrations", json={"kind": "research", "itemId": item["id"]}, headers=h1).status_code == 201
+    assert client.post("/api/registrations", json={"kind": "research", "itemId": item["id"]}, headers=h2).status_code == 201
+    dup = client.post("/api/registrations", json={"kind": "research", "itemId": item["id"]}, headers=h1)
+    assert dup.json["code"] == "DUPLICATE"
+
+    regs = client.get("/api/admin/registrations", headers=hadmin).json
+    by_email = {r["studentEmail"]: quote(r["id"], safe="") for r in regs}
+    assert client.post(f"/api/admin/registrations/{by_email['s1@example.com']}/approve", headers=hadmin).status_code == 200
+    full = client.post(f"/api/admin/registrations/{by_email['s2@example.com']}/approve", headers=hadmin)
+    assert full.json["code"] == "FULL"
+    assert db.session.get(Research, item["id"]).enrolledCount == 1
+
+    # Student dashboard shows the item and mentor.
+    rows = client.get("/api/students/me/registrations", headers=h1).json
+    assert rows[0]["reg"]["status"] == "approved" and rows[0]["mentorName"] == "Dr. T"
+
+    # Rejected -> can reapply.
+    client.post(f"/api/admin/registrations/{by_email['s2@example.com']}/reject", json={"reason": "Not a fit right now."}, headers=hadmin)
+    again = client.post("/api/registrations", json={"kind": "research", "itemId": item["id"]}, headers=h2)
+    assert again.json["code"] == "FULL"
+
+
+def test_registration_list_only_for_owner(client):
+    make_user("t@example.com", teacher=True)
+    make_user("o@example.com", teacher=True)
+    item = _research(client, login(client, "t@example.com"))
+    assert client.get(f"/api/registrations?itemId={item['id']}", headers=login(client, "t@example.com")).status_code == 200
+    assert client.get(f"/api/registrations?itemId={item['id']}", headers=login(client, "o@example.com")).status_code == 403
+
+
+def test_admin_routes_require_admin(client):
+    make_user("s@example.com", student=True)
+    h = login(client, "s@example.com")
+    assert client.get("/api/admin/students", headers=h).status_code == 403
+    assert client.get("/api/admin/students").status_code == 401
+
+
+def test_admin_edit_cannot_touch_secrets(client):
+    t = make_user("t@example.com", teacher=True)
+    make_user("admin@example.com", admin=True)
+    h = login(client, "admin@example.com")
+    res = client.patch(
+        f"/api/admin/teachers/{t.id}",
+        json={"name": "New", "workEmailToken": "x", "photoURL": "http://evil", "createdAt": "2020-01-01", "disabled": True},
+        headers=h,
+    )
+    assert res.status_code == 200
+    teacher = db.session.get(Teacher, t.id)
+    assert teacher.name == "New" and teacher.disabled is True
+    assert teacher.workEmailToken is None and teacher.photoURL is None
+
+
+def test_booking_flow(client, outbox):
+    t = make_user("t@example.com", teacher=True)
+    ht = login(client, "t@example.com")
+    slot = client.post("/api/teachers/me/availability", json={"date": "2026-11-02", "time": "09:00", "duration": 30, "price": 0}, headers=ht).json
+    res = client.post("/api/bookings", json={"teacherId": t.id, "slotId": slot["id"], "studentName": "Kid", "studentEmail": "kid@example.com"})
+    assert res.status_code == 201
+    booking_id = res.json["id"]
+    pending = client.get("/api/teachers/me/bookings?status=pending", headers=ht).json
+    assert pending[0]["date"] == "2026-11-02" and pending[0]["duration"] == 30
+
+    res = client.post(f"/api/bookings/{booking_id}/approve", json={"meeting_link": "https://x.daily.co/room"}, headers=ht)
+    assert res.json["status"] == "approved"
+    assert db.session.get(Availability, slot["id"]).booked is True
+    assert {m.recipients[0] for m in outbox} == {"kid@example.com", "t@example.com"}
+    assert "https://x.daily.co/room" in outbox[0].html
+    # Booked slots can't be removed or re-booked.
+    assert client.delete(f"/api/teachers/me/availability/{slot['id']}", headers=ht).status_code == 409
+    again = client.post("/api/bookings", json={"teacherId": t.id, "slotId": slot["id"], "studentName": "K", "studentEmail": "k@example.com"})
+    assert again.json["code"] == "SLOT_BOOKED"
+
+
+def test_mentor_verification_document_is_private(client):
+    t = make_user("t@example.com", teacher=True, verificationStatus="incomplete")
+    make_user("admin@example.com", admin=True)
+    ht = login(client, "t@example.com")
+    client.post("/api/teachers/me/mentor-type", json={"mentorType": "phd_student"}, headers=ht)
+    res = client.post(
+        "/api/teachers/me/verification-document",
+        data={"file": (io.BytesIO(b"%PDF-1.4"), "transcript.pdf", "application/pdf")},
+        headers=ht,
+        content_type="multipart/form-data",
+    )
+    assert res.status_code == 200 and res.json["verificationStatus"] == "pending_review"
+    key = db.session.get(Teacher, t.id).transcriptURL[3:]
+    # Not reachable without a signed link...
+    assert client.get(f"/files/{key}").status_code == 404
+    assert client.get(f"/files/{key}?expires=9999999999&sig=forged").status_code == 404
+
+    # ...which only the mentor and admins are given.
+    hadmin = login(client, "admin@example.com")
+    admin_view = next(m for m in client.get("/api/admin/teachers", headers=hadmin).json if m["id"] == t.id)
+    signed = admin_view["transcriptURL"].replace("http://api.test", "")
+    res = client.get(signed)
+    assert res.status_code == 200 and res.data == b"%PDF-1.4"
+    assert "transcriptURL" not in client.get(f"/api/teachers/{t.id}").json
+
+    assert client.post(f"/api/admin/teachers/{t.id}/approve", headers=hadmin).json["verificationStatus"] == "approved"
+
+
+def test_showcase_file_must_be_own_upload(client):
+    make_user("t@example.com", teacher=True)
+    make_user("o@example.com", teacher=True)
+    ht, ho = login(client, "t@example.com"), login(client, "o@example.com")
+    up = client.post(
+        "/api/showcase/files",
+        data={"file": (io.BytesIO(b"\x89PNG"), "pic.png", "image/png")},
+        headers=ht,
+        content_type="multipart/form-data",
+    ).json
+    base = {"title": "T", "studentName": "S", "outputType": "paper", "summary": "s"}
+    bad = client.post("/api/showcase", json={**base, "fileUrl": up["ref"], "fileType": "image"}, headers=ho)
+    assert bad.json["code"] == "INVALID_FILE"
+    ok = client.post("/api/showcase", json={**base, "fileUrl": up["ref"], "fileType": "image"}, headers=ht)
+    assert ok.json["fileUrl"] == up["url"]
+    assert client.get(up["url"].replace("http://api.test", "")).status_code == 200
+    # Editing with the URL echoed back keeps the file.
+    edited = client.patch(f"/api/showcase/{ok.json['id']}", json={**base, "title": "T2", "fileUrl": ok.json["fileUrl"]}, headers=ht)
+    assert edited.json["fileUrl"] == up["url"] and edited.json["title"] == "T2"
+
+
+def test_contact_goes_to_team_inbox(client, outbox):
+    res = client.post("/api/contact", json={"name": "V", "email": "v@example.com", "subject": "Hi", "message": "<b>hello</b>"})
+    assert res.status_code == 200
+    assert outbox[0].recipients == ["happyprogramming.us@gmail.com"]
+    assert outbox[0].subject == "Hi" and outbox[0].reply_to == "v@example.com"
+    assert "<b>hello</b>" not in outbox[0].html
+
+
+def test_bookings_reject_wrong_teacher(client):
+    t = make_user("t@example.com", teacher=True)
+    make_user("o@example.com", teacher=True)
+    db.session.add(Booking(id="b1", teacherId=t.id, status="pending"))
+    db.session.commit()
+    res = client.post("/api/bookings/b1/reject", headers=login(client, "o@example.com"))
+    assert res.status_code == 404

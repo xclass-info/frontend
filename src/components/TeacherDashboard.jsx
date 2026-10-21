@@ -1,15 +1,6 @@
 import { useEffect, useState } from "react";
-import { auth, db } from "../firebase";
-import { signOut } from "firebase/auth";
-import {
-  collection,
-  query,
-  where,
-  onSnapshot,
-  doc,
-  updateDoc,
-  deleteDoc,
-} from "firebase/firestore";
+import { api, live, seg, toMillis } from "../api";
+import { onAuthStateChanged, logout } from "../auth";
 import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./TeacherDashboard.module.css";
 
@@ -26,7 +17,7 @@ import { statusInfo } from "../utils/mentorVerification";
 import Footer from "./Footer";
 import { safeUrl } from "../utils/format";
 
-const COLLECTION_BY_KIND = {
+const PATH_BY_KIND = {
   research: "research",
   project: "projects",
   showcase: "showcase",
@@ -87,65 +78,55 @@ export default function TeacherDashboard() {
   useEffect(() => {
     let profileLoaded = false;
     let unsubscribeTeacher = () => {};
-    let unsubscribeResearch = () => {};
-    let unsubscribeProjects = () => {};
-    let unsubscribeShowcase = () => {};
-    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+    let unsubscribeContent = () => {};
+    const unsubscribeAuth = onAuthStateChanged((user) => {
+      unsubscribeTeacher();
+      unsubscribeContent();
       if (!user) {
         navigate("/teacher/login");
         return;
       }
 
-      // Live, not a one-time fetch: verification status can change while
-      // this tab is open (admin approves it, or the work-email link gets
-      // clicked in another tab) and the dashboard should reflect that
-      // without a refresh. The profile FORM fields only sync in once,
-      // on first load, so a live update never clobbers an in-progress edit.
-      unsubscribeTeacher = onSnapshot(doc(db, "teachers", user.uid), (snap) => {
-        if (!snap.exists()) return;
-        const data = snap.data();
-        setTeacher(data);
-        if (!profileLoaded) {
-          profileLoaded = true;
-          setProfile(profileFromTeacherData(data));
-          setWordCount(
-            (data.bio || "").trim().split(/\s+/).filter(Boolean).length,
-          );
-        }
-      });
-
-      const researchQuery = query(
-        collection(db, "research"),
-        where("teacherId", "==", user.uid),
+      // Kept fresh, not a one-time fetch: verification status can change
+      // while this tab is open (admin approves it, or the work-email link
+      // gets clicked in another tab) and the dashboard should reflect that
+      // without a refresh. The profile FORM fields only sync in once, on
+      // first load, so a refresh never clobbers an in-progress edit.
+      unsubscribeTeacher = live(
+        () => api.get("/teachers/me"),
+        (data) => {
+          setTeacher(data);
+          if (!profileLoaded) {
+            profileLoaded = true;
+            setProfile(profileFromTeacherData(data));
+            setWordCount(
+              (data.bio || "").trim().split(/\s+/).filter(Boolean).length,
+            );
+          }
+        },
       );
-      unsubscribeResearch = onSnapshot(researchQuery, (snapshot) => {
-        setResearch(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
-        setLoading(false);
-      });
 
-      const projectsQuery = query(
-        collection(db, "projects"),
-        where("teacherId", "==", user.uid),
+      const mine = `teacherId=${seg(user.uid)}`;
+      unsubscribeContent = live(
+        () =>
+          Promise.all([
+            api.get(`/research?${mine}`),
+            api.get(`/projects?${mine}`),
+            api.get(`/showcase?${mine}`),
+          ]),
+        ([r, p, s]) => {
+          setResearch(r);
+          setProjects(p);
+          setShowcase(s);
+          setLoading(false);
+        },
       );
-      unsubscribeProjects = onSnapshot(projectsQuery, (snapshot) => {
-        setProjects(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
-      });
-
-      const showcaseQuery = query(
-        collection(db, "showcase"),
-        where("teacherId", "==", user.uid),
-      );
-      unsubscribeShowcase = onSnapshot(showcaseQuery, (snapshot) => {
-        setShowcase(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
-      });
     });
 
     return () => {
       unsubscribeAuth();
       unsubscribeTeacher();
-      unsubscribeResearch();
-      unsubscribeProjects();
-      unsubscribeShowcase();
+      unsubscribeContent();
     };
   }, []);
 
@@ -159,15 +140,15 @@ export default function TeacherDashboard() {
     setIsEditingProfile(false);
   }
 
-  async function handleLogout() {
-    await signOut(auth);
+  function handleLogout() {
+    logout();
     navigate("/teacher/login");
   }
 
   async function deleteItem(kind, id) {
     if (!confirm("Delete this? This can't be undone.")) return;
     try {
-      await deleteDoc(doc(db, COLLECTION_BY_KIND[kind], id));
+      await api.del(`/${PATH_BY_KIND[kind]}/${seg(id)}`);
     } catch (err) {
       console.error(err);
       alert("Failed to delete. Please try again.");
@@ -177,7 +158,7 @@ export default function TeacherDashboard() {
   async function toggleStage(kind, item) {
     const nextStage = item.stage === "completed" ? "active" : "completed";
     try {
-      await updateDoc(doc(db, COLLECTION_BY_KIND[kind], item.id), {
+      await api.patch(`/${PATH_BY_KIND[kind]}/${seg(item.id)}`, {
         stage: nextStage,
       });
     } catch (err) {
@@ -212,11 +193,7 @@ export default function TeacherDashboard() {
 
     setProfileSaving(true);
     try {
-      const user = auth.currentUser;
-      await updateDoc(doc(db, "teachers", user.uid), {
-        ...profile,
-        updatedAt: new Date(),
-      });
+      await api.patch("/teachers/me", profile);
       setTeacher((prev) => ({ ...prev, ...profile }));
       setProfileSaved(true);
       setTimeout(() => {
@@ -273,7 +250,7 @@ export default function TeacherDashboard() {
     ...research.map((r) => ({ ...r, kind: "research" })),
     ...projects.map((p) => ({ ...p, kind: "project" })),
     ...showcase.map((s) => ({ ...s, kind: "showcase" })),
-  ].sort((a, b) => (b.createdAt?.toMillis?.() ?? 0) - (a.createdAt?.toMillis?.() ?? 0));
+  ].sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt));
 
   const visibleContent =
     contentFilter === "all"

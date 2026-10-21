@@ -1,14 +1,8 @@
 import { useState } from "react";
-import { auth, db } from "../firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { register } from "../auth";
 import { useNavigate, Link } from "react-router-dom";
 import styles from "./TeacherAuth.module.css";
 import Footer from "./Footer";
-import {
-  generateVerificationToken,
-  sendVerificationEmail,
-} from "../utils/accountVerification";
 
 export default function TeacherRegister() {
   const navigate = useNavigate();
@@ -40,47 +34,25 @@ export default function TeacherRegister() {
     }
     setLoading(true);
     try {
-      const { user } = await createUserWithEmailAndPassword(
-        auth,
-        form.email,
-        form.password,
-      );
-
-      const token = generateVerificationToken();
-
-      // Save teacher to Firestore
-      await setDoc(doc(db, "teachers", user.uid), {
+      // Creates the account and its mentor record (verificationStatus
+      // "incomplete"), and emails the verification link.
+      const { emailSent } = await register({
+        kind: "teacher",
         name: form.name,
         email: form.email,
-        verificationStatus: "incomplete",
-        createdAt: new Date(),
-        accountEmailToken: token,
-        accountEmailVerified: false,
+        password: form.password,
       });
-
-      try {
-        await sendVerificationEmail({
-          kind: "teacher",
-          uid: user.uid,
-          name: form.name,
-          email: form.email,
-          token,
-        });
-      } catch (err) {
-        console.error(err);
-        setEmailFailed(true);
-      }
-
+      setEmailFailed(!emailSent);
       setVerificationSent(true);
     } catch (err) {
-      if (err.code === "auth/email-already-in-use") {
+      if (err.code === "EMAIL_IN_USE") {
         setError("This email is already registered. Please login instead.");
-      } else if (err.code === "auth/weak-password") {
+      } else if (err.code === "WEAK_PASSWORD") {
         setError("Password should be at least 6 characters.");
-      } else if (err.code === "auth/invalid-email") {
+      } else if (err.code === "INVALID_EMAIL") {
         setError("Please enter a valid email address.");
       } else {
-        setError(err.message);
+        setError(err.detail || "Something went wrong. Please try again.");
       }
     } finally {
       setLoading(false);

@@ -1,16 +1,13 @@
 // src/components/VerifyAccountEmail.jsx
-// Landing page for the account-verification link emailed via EmailJS (see
-// utils/accountVerification.js). Reads ?kind=student|teacher&uid=&token=
-// from the URL and, if the token matches what's on that account's doc,
-// marks it verified. Same trust model as VerifyMentorEmail.jsx.
+// Landing page for the account-verification link emailed by the backend.
+// Reads ?kind=student|teacher&uid=&token= from the URL and asks the backend
+// to check the token and mark the account verified.
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { db } from "../firebase";
+import { api } from "../api";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
-const COLLECTION = { student: "students", teacher: "teachers" };
 const LOGIN_PATH = { student: "/student/login", teacher: "/teacher/login" };
 const LOGIN_LABEL = { student: "Student Login", teacher: "Mentor Login" };
 
@@ -23,32 +20,13 @@ export default function VerifyAccountEmail() {
 
   useEffect(() => {
     async function run() {
-      const collection = COLLECTION[kind];
-      if (!collection || !uid || !token) {
+      if (!LOGIN_PATH[kind] || !uid || !token) {
         setStatus("invalid");
         return;
       }
       try {
-        const ref = doc(db, collection, uid);
-        const snap = await getDoc(ref);
-        if (!snap.exists()) {
-          setStatus("invalid");
-          return;
-        }
-        const data = snap.data();
-        if (data.accountEmailVerified) {
-          setStatus("success");
-          return;
-        }
-        if (!data.accountEmailToken || data.accountEmailToken !== token) {
-          setStatus("invalid");
-          return;
-        }
-        await updateDoc(ref, {
-          accountEmailVerified: true,
-          accountEmailToken: null,
-        });
-        setStatus("success");
+        const res = await api.post("/auth/verify-email", { kind, uid, token });
+        setStatus(res.status);
       } catch (err) {
         console.error(err);
         setStatus("error");

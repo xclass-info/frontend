@@ -4,15 +4,11 @@
 // for an admin to approve. See utils/mentorVerification.js for the shared
 // status/type constants.
 import { useState } from "react";
-import emailjs from "@emailjs/browser";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { doc, updateDoc } from "firebase/firestore";
-import { auth, db, storage } from "../firebase";
+import { api } from "../api";
 import {
   MENTOR_TYPES,
   mentorTypeLabel,
   statusInfo,
-  generateVerificationToken,
 } from "../utils/mentorVerification";
 
 const MAX_FILE_MB = 10;
@@ -65,7 +61,6 @@ const primaryBtn = {
 };
 
 export default function MentorVerificationForm({ teacher }) {
-  const uid = auth.currentUser?.uid;
   const [savingType, setSavingType] = useState(false);
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -80,10 +75,7 @@ export default function MentorVerificationForm({ teacher }) {
   async function chooseMentorType(value) {
     setSavingType(true);
     try {
-      await updateDoc(doc(db, "teachers", uid), {
-        mentorType: value,
-        verificationStatus: "incomplete",
-      });
+      await api.post("/teachers/me/mentor-type", { mentorType: value });
     } catch (err) {
       console.error(err);
       alert("Something went wrong. Please try again.");
@@ -93,7 +85,7 @@ export default function MentorVerificationForm({ teacher }) {
   }
 
   async function changeMentorType() {
-    await updateDoc(doc(db, "teachers", uid), { mentorType: null });
+    await api.post("/teachers/me/mentor-type", { mentorType: null });
   }
 
   function handleFileChange(e) {
@@ -120,20 +112,11 @@ export default function MentorVerificationForm({ teacher }) {
     setUploading(true);
     setUploadError("");
     try {
-      const field =
-        teacher.mentorType === "phd_student"
-          ? "transcriptURL"
-          : "degreeCertificateURL";
-      const path = `mentor-documents/${uid}/${Date.now()}_${file.name}`;
-      const fileRef = ref(storage, path);
-      await uploadBytes(fileRef, file);
-      const url = await getDownloadURL(fileRef);
-      await updateDoc(doc(db, "teachers", uid), {
-        [field]: url,
-        verificationStatus: "pending_review",
-        rejectionReason: null,
-        submittedAt: new Date(),
-      });
+      // Stored privately; the backend files it as the transcript or degree
+      // certificate (by mentor type) and moves the application to review.
+      const upload = new FormData();
+      upload.append("file", file);
+      await api.post("/teachers/me/verification-document", upload);
     } catch (err) {
       console.error(err);
       setUploadError("Upload failed. Please try again.");
@@ -150,24 +133,7 @@ export default function MentorVerificationForm({ teacher }) {
     setEmailError("");
     setSendingEmail(true);
     try {
-      const token = generateVerificationToken();
-      await updateDoc(doc(db, "teachers", uid), {
-        workEmail: workEmail.trim(),
-        workEmailToken: token,
-        workEmailVerified: false,
-      });
-      await emailjs.send(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-        {
-          from_name: "HappyResearch",
-          from_email: "happyprogramming.us@gmail.com",
-          subject: "Verify your work email for HappyResearch",
-          message: `Hi ${teacher.name || ""},\n\nClick the link below to verify this is your work email and continue your mentor application:\n\nhttps://happyresearch.org/verify-mentor-email?uid=${uid}&token=${token}\n\nIf you didn't request this, you can ignore this email.`,
-          to_email: workEmail.trim(),
-        },
-        import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
-      );
+      await api.post("/teachers/me/work-email", { workEmail: workEmail.trim() });
       setResent(true);
       setTimeout(() => setResent(false), 3000);
     } catch (err) {
@@ -185,11 +151,8 @@ export default function MentorVerificationForm({ teacher }) {
     }
     setSubmittingFaculty(true);
     try {
-      await updateDoc(doc(db, "teachers", uid), {
+      await api.post("/teachers/me/faculty-application", {
         universityProfileURL: profileUrl.trim(),
-        verificationStatus: "pending_review",
-        rejectionReason: null,
-        submittedAt: new Date(),
       });
     } catch (err) {
       console.error(err);

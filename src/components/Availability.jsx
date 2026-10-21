@@ -1,13 +1,7 @@
 // src/components/Availability.jsx
 import { useState, useEffect } from "react";
-import { db, auth } from "../firebase";
-import {
-  collection,
-  addDoc,
-  onSnapshot,
-  deleteDoc,
-  doc,
-} from "firebase/firestore";
+import { api, live, seg } from "../api";
+import { getCurrentUser } from "../auth";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -19,7 +13,7 @@ export default function Availability() {
   const [events, setEvents] = useState([]);
   const [selected, setSelected] = useState(null); // selected slot to confirm
   const [loading, setLoading] = useState(false);
-  const teacherId = auth.currentUser?.uid;
+  const teacherId = getCurrentUser()?.uid;
   const [form, setForm] = useState({
     date: "",
     time: "",
@@ -29,10 +23,9 @@ export default function Availability() {
 
   useEffect(() => {
     if (!teacherId) return;
-    const unsub = onSnapshot(
-      collection(db, "teachers", teacherId, "availability"),
-      (snap) => {
-        const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const unsub = live(
+      () => api.get("/teachers/me/availability"),
+      (data) => {
         setSlots(data);
 
         // Convert to calendar events
@@ -70,7 +63,9 @@ export default function Availability() {
           `Remove slot on ${event.slotData.date} at ${event.slotData.time}?`,
         )
       ) {
-        deleteDoc(doc(db, "teachers", teacherId, "availability", event.id));
+        api
+          .del(`/teachers/me/availability/${seg(event.id)}`)
+          .catch((err) => console.error(err));
       }
     }
   }
@@ -79,13 +74,11 @@ export default function Availability() {
     if (!selected) return;
     setLoading(true);
     try {
-      await addDoc(collection(db, "teachers", teacherId, "availability"), {
+      await api.post("/teachers/me/availability", {
         date: selected.date,
         time: selected.time,
         duration: Number(selected.duration),
         price: Number(form.price),
-        booked: false,
-        createdAt: new Date(),
       });
       setSelected(null);
     } catch (err) {

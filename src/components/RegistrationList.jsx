@@ -1,8 +1,7 @@
 // src/components/RegistrationList.jsx
 // Mentor-side: who has registered for a research post / project.
 import { useEffect, useState } from "react";
-import { db } from "../firebase";
-import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { api, live, seg, toMillis, formatDate } from "../api";
 
 // Older registrations predate the review step and have no status field -
 // they were confirmed under the old instant-accept flow, so treat missing
@@ -18,19 +17,14 @@ export default function RegistrationList({ itemId }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const q = query(
-      collection(db, "registrations"),
-      where("itemId", "==", itemId),
+    const unsub = live(
+      () => api.get(`/registrations?itemId=${seg(itemId)}`),
+      (rows) => {
+        setRegs(
+          [...rows].sort((a, b) => toMillis(a.createdAt) - toMillis(b.createdAt)),
+        );
+      },
     );
-    const unsub = onSnapshot(q, (snap) => {
-      setRegs(
-        snap.docs
-          .map((d) => ({ id: d.id, ...d.data() }))
-          .sort(
-            (a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0),
-          ),
-      );
-    });
     return () => unsub();
   }, [itemId]);
 
@@ -107,9 +101,7 @@ export default function RegistrationList({ itemId }) {
                   {r.studentEmail}
                 </div>
                 <div style={{ color: "#aaa", fontSize: 11 }}>
-                  {r.createdAt?.toDate
-                    ? r.createdAt.toDate().toLocaleDateString()
-                    : ""}
+                  {formatDate(r.createdAt)}
                 </div>
               </div>
             );

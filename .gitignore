@@ -24,3 +24,5 @@ npm-debug.log*
 # Firebase
 .firebase/
 firebase-debug.log
+# Local env overrides
+*.local

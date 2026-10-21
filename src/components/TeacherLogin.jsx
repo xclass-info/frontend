@@ -1,11 +1,5 @@
 import { useState } from "react";
-import { auth, db } from "../firebase";
-import {
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail,
-  signOut,
-} from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { login, logout, sendPasswordReset } from "../auth";
 import { useNavigate, Link } from "react-router-dom";
 import styles from "./TeacherAuth.module.css";
 import Footer from "./Footer";
@@ -35,17 +29,12 @@ export default function TeacherLogin() {
     e.preventDefault();
     setLoading(true);
     try {
-      const { user } = await signInWithEmailAndPassword(
-        auth,
-        form.email,
-        form.password,
-      );
+      const user = await login(form.email, form.password);
 
       // Check if email is verified (accounts predating this field are
       // treated as verified - see isAccountVerified)
-      const teacherSnap = await getDoc(doc(db, "teachers", user.uid));
-      if (teacherSnap.exists() && !isAccountVerified(teacherSnap.data())) {
-        await signOut(auth);
+      if (user.teacher && !isAccountVerified(user.teacher)) {
+        logout();
         setError(
           "Please verify your email before logging in. Check your inbox for the verification link.",
         );
@@ -55,14 +44,13 @@ export default function TeacherLogin() {
 
       navigate("/teacher/dashboard");
     } catch (err) {
-      if (
-        err.code === "auth/invalid-credential" ||
-        err.code === "auth/wrong-password"
-      ) {
+      if (err.code === "INVALID_CREDENTIALS") {
         setError("Invalid email or password.");
-      } else if (err.code === "auth/user-not-found") {
-        setError("No account found with this email.");
-      } else if (err.code === "auth/too-many-requests") {
+      } else if (err.code === "PASSWORD_RESET_REQUIRED") {
+        setError(
+          'We\'ve moved to a new login system - please click "Forgot password?" below to set your password.',
+        );
+      } else if (err.code === "RATE_LIMITED") {
         setError("Too many failed attempts. Please try again later.");
       } else {
         setError("Invalid email or password");
@@ -79,14 +67,11 @@ export default function TeacherLogin() {
     }
     setResetLoading(true);
     try {
-      await sendPasswordResetEmail(auth, form.email, {
-        url: "https://happyresearch.org/teacher/login",
-        handleCodeInApp: false,
-      });
+      await sendPasswordReset(form.email);
       setResetSent(true);
       setError("");
     } catch (err) {
-      console.error("Reset error:", err.code, err.message);
+      console.error("Reset error:", err.code);
       setError("Could not send reset email. Please check your email address.");
     } finally {
       setResetLoading(false);
@@ -100,21 +85,14 @@ export default function TeacherLogin() {
     }
     setResendLoading(true);
     try {
-      const { user } = await signInWithEmailAndPassword(
-        auth,
-        form.email,
-        form.password,
-      );
       await resendVerificationEmail({
         kind: "teacher",
-        uid: user.uid,
-        name: "",
-        email: user.email,
+        email: form.email,
+        password: form.password,
       });
-      await signOut(auth);
       setResendSent(true);
       setError("");
-    } catch (err) {
+    } catch {
       setError(
         "Could not resend verification email. Please check your credentials.",
       );

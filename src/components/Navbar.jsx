@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import styles from "./Navbar.module.css";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { auth, db } from "../firebase";
-import { signOut } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { onAuthStateChanged, logout } from "../auth";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -13,24 +11,16 @@ export default function Navbar() {
 
   // Mentors are logged-in users too, so a student is someone with a
   // students record.
-  useEffect(() => {
-    const unsub = auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        setStudent(null);
-        return;
-      }
-      try {
-        const snap = await getDoc(doc(db, "students", user.uid));
-        setStudent(snap.exists() ? { name: snap.data().name } : null);
-      } catch {
-        setStudent(null);
-      }
-    });
-    return () => unsub();
-  }, []);
+  useEffect(
+    () =>
+      onAuthStateChanged((user) =>
+        setStudent(user?.student ? { name: user.student.name } : null),
+      ),
+    [],
+  );
 
-  async function handleStudentLogout() {
-    await signOut(auth);
+  function handleStudentLogout() {
+    logout();
     setStudent(null);
     navigate("/");
   }

@@ -1,13 +1,6 @@
 // src/components/ResearchForm.jsx
 import { useState } from "react";
-import { db, auth } from "../firebase";
-import {
-  collection,
-  addDoc,
-  doc,
-  getDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { api, seg } from "../api";
 import styles from "./TeacherAuth.module.css";
 import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
 import { GRADE_RANGE_OPTIONS } from "../utils/gradeRange";
@@ -82,8 +75,6 @@ export default function ResearchForm({ research, onClose }) {
 
     setLoading(true);
     try {
-      const user = auth.currentUser;
-      const teacherSnap = await getDoc(doc(db, "teachers", user.uid));
       const payload = {
         title: form.title.trim(),
         idea: form.idea.trim(),
@@ -103,19 +94,11 @@ export default function ResearchForm({ research, onClose }) {
         scheduleLocation: form.scheduleLocation,
       };
       if (isEditing) {
-        await updateDoc(doc(db, "research", research.id), {
-          ...payload,
-          updatedAt: new Date(),
-        });
+        await api.patch(`/research/${seg(research.id)}`, payload);
       } else {
-        await addDoc(collection(db, "research"), {
-          ...payload,
-          teacherId: user.uid,
-          teacherName: teacherSnap.data()?.name || user.displayName || "Teacher",
-          createdAt: new Date(),
-          status: "published",
-          stage: "active",
-        });
+        // The backend fills in teacherId/teacherName, createdAt, and the
+        // initial status/stage.
+        await api.post("/research", payload);
       }
       setSaved(true);
       setTimeout(() => {
