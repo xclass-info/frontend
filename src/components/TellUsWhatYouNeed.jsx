@@ -5,9 +5,7 @@
 // Projects/Research/1-1 themselves.
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import emailjs from "@emailjs/browser";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from "../firebase";
+import { api } from "../api";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
@@ -69,30 +67,14 @@ export default function TellUsWhatYouNeed() {
     setSubmitting(true);
     setSubmitError("");
     try {
-      let imageUrl = "";
-      if (imageFile) {
-        const imageRef = ref(
-          storage,
-          `requests/${Date.now()}_${imageFile.name}`,
-        );
-        await uploadBytes(imageRef, imageFile);
-        imageUrl = await getDownloadURL(imageRef);
-      }
-
-      await emailjs.send(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-        {
-          from_name: form.name,
-          from_email: form.email,
-          subject: "New request: On-demand Learning",
-          message:
-            form.details.trim() +
-            (imageUrl ? `\n\nAttached image: ${imageUrl}` : ""),
-          to_email: "happyprogramming.us@gmail.com",
-        },
-        import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
-      );
+      // Emailed to the team inbox; an attached image is stored and linked
+      // in the email.
+      const data = new FormData();
+      data.append("name", form.name);
+      data.append("email", form.email);
+      data.append("details", form.details.trim());
+      if (imageFile) data.append("image", imageFile);
+      await api.post("/on-demand-request", data);
       setDone(true);
     } catch (err) {
       console.error(err);

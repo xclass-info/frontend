@@ -1,11 +1,5 @@
 import { useState } from "react";
-import { auth, db } from "../firebase";
-import {
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail,
-  signOut,
-} from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { login, logout, sendPasswordReset } from "../auth";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import styles from "./TeacherAuth.module.css";
 import Footer from "./Footer";
@@ -13,8 +7,6 @@ import {
   isAccountVerified,
   resendVerificationEmail,
 } from "../utils/accountVerification";
-
-const CONTINUE_URL = "https://happyresearch.org/student/login";
 
 export default function StudentLogin() {
   const navigate = useNavigate();
@@ -38,24 +30,19 @@ export default function StudentLogin() {
     e.preventDefault();
     setLoading(true);
     try {
-      const { user } = await signInWithEmailAndPassword(
-        auth,
-        form.email,
-        form.password,
-      );
+      const user = await login(form.email, form.password);
 
       // Mentors have accounts too - only student accounts belong here.
-      const student = await getDoc(doc(db, "students", user.uid));
-      if (!student.exists()) {
-        await signOut(auth);
+      if (!user.student) {
+        logout();
         setError(
           "No student account found for this email. If you're a mentor, use Mentor Login.",
         );
         return;
       }
 
-      if (!isAccountVerified(student.data())) {
-        await signOut(auth);
+      if (!isAccountVerified(user.student)) {
+        logout();
         setError(
           "Please verify your email before logging in. Check your inbox (and spam folder) for the verification link.",
         );
@@ -66,13 +53,13 @@ export default function StudentLogin() {
       // Came here from a "Register now" click - go back and let them finish.
       navigate(location.state?.from || "/student/dashboard");
     } catch (err) {
-      if (
-        err.code === "auth/invalid-credential" ||
-        err.code === "auth/wrong-password" ||
-        err.code === "auth/user-not-found"
-      ) {
+      if (err.code === "INVALID_CREDENTIALS") {
         setError("Invalid email or password.");
-      } else if (err.code === "auth/too-many-requests") {
+      } else if (err.code === "PASSWORD_RESET_REQUIRED") {
+        setError(
+          'We\'ve moved to a new login system - please click "Forgot password?" below to set your password.',
+        );
+      } else if (err.code === "RATE_LIMITED") {
         setError("Too many failed attempts. Please try again later.");
       } else {
         setError("Something went wrong. Please try again.");
@@ -89,14 +76,11 @@ export default function StudentLogin() {
     }
     setResetLoading(true);
     try {
-      await sendPasswordResetEmail(auth, form.email, {
-        url: CONTINUE_URL,
-        handleCodeInApp: false,
-      });
+      await sendPasswordReset(form.email);
       setResetSent(true);
       setError("");
     } catch (err) {
-      console.error("Reset error:", err.code, err.message);
+      console.error("Reset error:", err.code);
       setError("Could not send reset email. Please check your email address.");
     } finally {
       setResetLoading(false);
@@ -110,18 +94,11 @@ export default function StudentLogin() {
     }
     setResendLoading(true);
     try {
-      const { user } = await signInWithEmailAndPassword(
-        auth,
-        form.email,
-        form.password,
-      );
       await resendVerificationEmail({
         kind: "student",
-        uid: user.uid,
-        name: "",
-        email: user.email,
+        email: form.email,
+        password: form.password,
       });
-      await signOut(auth);
       setResendSent(true);
       setError("");
     } catch {

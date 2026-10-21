@@ -40,11 +40,3 @@ export const VERIFICATION_STATUS = {
 export function statusInfo(status) {
   return VERIFICATION_STATUS[status] || VERIFICATION_STATUS.incomplete;
 }
-
-// A random-enough token for the work-email verification link. Doesn't
-// need to be cryptographically strong - it just has to be unguessable
-// and unique per request, since it's single-use and tied to one uid.
-export function generateVerificationToken() {
-  const bytes = crypto.getRandomValues(new Uint8Array(24));
-  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
-}

@@ -3,14 +3,13 @@
 // research they've registered for. Laid out like the mentor dashboard.
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { auth, db } from "../firebase";
-import { signOut } from "firebase/auth";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { api, formatDate } from "../api";
+import { onAuthStateChanged, logout as signOut, refreshUser } from "../auth";
 import styles from "./TeacherDashboard.module.css";
 import Footer from "./Footer";
 import { formatMentorName } from "../utils/mentorName";
 import { GRADE_OPTIONS } from "../utils/grades";
-import { loadStudentRegistrations } from "../utils/studentData";
+import { loadMyRegistrations } from "../utils/studentData";
 import { isAccountVerified } from "../utils/accountVerification";
 
 const TABS = [
@@ -87,7 +86,7 @@ function RegistrationCard({ row }) {
       <div className={styles.cardMeta}>
         <span>
           📝 Applied{" "}
-          {reg.createdAt?.toDate ? reg.createdAt.toDate().toLocaleDateString() : ""}
+          {formatDate(reg.createdAt)}
         </span>
         {mentorName && reg.teacherId && (
           <span>
@@ -334,11 +333,11 @@ export function StudentDashboardView({
                   <p style={valueStyle}>{student.phone || "—"}</p>
                 )}
               </div>
-              {student.createdAt?.toDate && (
+              {student.createdAt && (
                 <div style={{ marginBottom: 20 }}>
                   <p style={labelStyle}>Member since</p>
                   <p style={valueStyle}>
-                    {student.createdAt.toDate().toLocaleDateString()}
+                    {formatDate(student.createdAt)}
                   </p>
                 </div>
               )}
@@ -425,20 +424,19 @@ export default function StudentDashboard() {
   const [data, setData] = useState(null); // { uid, student, email, rows }
 
   useEffect(() => {
-    const unsub = auth.onAuthStateChanged(async (user) => {
+    const unsub = onAuthStateChanged(async (user) => {
       if (!user) {
         navigate("/student/login");
         return;
       }
       try {
-        const snap = await getDoc(doc(db, "students", user.uid));
         // Only verified student accounts belong here.
-        if (!snap.exists() || !isAccountVerified(snap.data())) {
+        if (!user.student || !isAccountVerified(user.student)) {
           navigate("/student/login");
           return;
         }
-        const rows = await loadStudentRegistrations(user.email, user.uid);
-        setData({ uid: user.uid, student: snap.data(), email: user.email, rows });
+        const rows = await loadMyRegistrations();
+        setData({ uid: user.uid, student: user.student, email: user.email, rows });
       } catch (err) {
         console.error(err);
         navigate("/student/login");
@@ -448,12 +446,13 @@ export default function StudentDashboard() {
   }, [navigate]);
 
   async function saveProfile(fields) {
-    await updateDoc(doc(db, "students", data.uid), fields);
+    await api.patch("/students/me", fields);
     setData({ ...data, student: { ...data.student, ...fields } });
+    refreshUser(); // so the navbar picks up a changed name
   }
 
-  async function logout() {
-    await signOut(auth);
+  function logout() {
+    signOut();
     navigate("/");
   }
 

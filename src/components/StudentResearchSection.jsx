@@ -1,8 +1,7 @@
 // src/components/StudentResearchSection.jsx
 import { useEffect, useState } from "react";
+import { api, live, toMillis } from "../api";
 import { useNavigate } from "react-router-dom";
-import { db } from "../firebase";
-import { collection, query, limit, onSnapshot } from "firebase/firestore";
 import { TopicIcon } from "../utils/topicIcons";
 
 export default function StudentResearchSection() {
@@ -11,12 +10,11 @@ export default function StudentResearchSection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const q = query(collection(db, "showcase"), limit(3));
-    const unsub = onSnapshot(q, (snap) => {
+    const q = () => api.get("/showcase?limit=3");
+    const unsub = live(q, (rows) => {
       setEntries(
-        snap.docs
-          .map((d) => ({ id: d.id, ...d.data() }))
-          .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)),
+        rows
+          .sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt)),
       );
       setLoading(false);
     });

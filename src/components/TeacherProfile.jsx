@@ -1,16 +1,7 @@
 // src/components/TeacherProfile.jsx
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { db } from "../firebase";
-import {
-  doc,
-  onSnapshot,
-  collection,
-  getDocs,
-  addDoc,
-  query,
-  where,
-} from "firebase/firestore";
+import { api, getOrNull, live, seg, toMillis } from "../api";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { safeUrl, LESSON_STRUCTURE_LABEL } from "../utils/format";
@@ -302,8 +293,7 @@ function ResearchItem({ r, onRegister, expertiseTags }) {
   );
 }
 
-const newestFirst = (a, b) =>
-  (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
+const newestFirst = (a, b) => toMillis(b.createdAt) - toMillis(a.createdAt);
 
 export default function TeacherProfile() {
   const { teacherId } = useParams();
@@ -325,20 +315,20 @@ export default function TeacherProfile() {
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   useEffect(() => {
-    const unsub = onSnapshot(doc(db, "teachers", teacherId), (snap) => {
-      if (snap.exists()) setTeacher({ id: snap.id, ...snap.data() });
-      setLoading(false);
-    });
+    const unsub = live(
+      () => getOrNull(`/teachers/${seg(teacherId)}`),
+      (data) => {
+        if (data) setTeacher(data);
+        setLoading(false);
+      },
+    );
     return () => unsub();
   }, [teacherId]);
 
   useEffect(() => {
     async function fetchSlots() {
-      const snap = await getDocs(
-        collection(db, "teachers", teacherId, "availability"),
-      );
-      const available = snap.docs
-        .map((d) => ({ id: d.id, ...d.data() }))
+      const rows = await api.get(`/teachers/${seg(teacherId)}/availability`);
+      const available = rows
         .filter((s) => !s.booked)
         .sort(
           (a, b) =>
@@ -354,9 +344,8 @@ export default function TeacherProfile() {
   useEffect(() => {
     async function loadPortfolio() {
       const byTeacher = (name) =>
-        getDocs(query(collection(db, name), where("teacherId", "==", teacherId)));
-      const toList = (snap) =>
-        snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort(newestFirst);
+        api.get(`/${name}?teacherId=${seg(teacherId)}`);
+      const toList = (rows) => [...rows].sort(newestFirst);
       try {
         const [r, p] = await Promise.all([
           byTeacher("research"),
@@ -401,17 +390,12 @@ export default function TeacherProfile() {
     }
     setSubmitting(true);
     try {
-      await addDoc(collection(db, "bookings"), {
+      // The backend copies date/time/duration from the slot itself.
+      await api.post("/bookings", {
         teacherId: teacher.id,
-        teacherName: teacher.name,
         slotId: selectedSlot.id,
         studentName: form.name,
         studentEmail: form.email,
-        date: selectedSlot.date,
-        time: selectedSlot.time,
-        duration: selectedSlot.duration,
-        status: "pending",
-        createdAt: new Date(),
       });
       setBooked(true);
     } catch (err) {

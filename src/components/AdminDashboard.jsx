@@ -1,19 +1,7 @@
 // src/components/AdminDashboard.jsx
 import { useEffect, useState } from "react";
-import { db, auth, storage } from "../firebase";
-import {
-  collection,
-  onSnapshot,
-  doc,
-  updateDoc,
-  deleteDoc,
-} from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import {
-  signInWithEmailAndPassword,
-  signOut,
-  sendPasswordResetEmail,
-} from "firebase/auth";
+import { api, live, seg, toMillis, formatDate } from "../api";
+import { onAuthStateChanged, login, logout, sendPasswordReset } from "../auth";
 import { Link } from "react-router-dom";
 import { mentorTypeLabel } from "../utils/mentorVerification";
 import { loadStudentRegistrations } from "../utils/studentData";
@@ -21,8 +9,6 @@ import {
   approveStudentApplication,
   rejectStudentApplication,
 } from "../utils/registration";
-
-const ADMIN_EMAIL = "zhenhepan@gmail.com";
 
 export default function AdminDashboard() {
   const [user, setUser] = useState(null);
@@ -88,49 +74,40 @@ export default function AdminDashboard() {
   const [studentAppSort, setStudentAppSort] = useState("oldest");
 
   useEffect(() => {
-    const unsub = auth.onAuthStateChanged((u) => {
-      if (u && u.email === ADMIN_EMAIL) setUser(u);
-      else setUser(null);
-    });
+    // The admin role is granted by the backend (ADMIN_EMAILS) and enforced
+    // on every /api/admin call - this check only picks which screen to show.
+    const unsub = onAuthStateChanged((u) => setUser(u?.isAdmin ? u : null));
     return () => unsub();
   }, []);
 
   useEffect(() => {
     if (!user) return;
-    const unsub = onSnapshot(collection(db, "students"), (snap) => {
-      setStudents(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    });
+    const unsub = live(() => api.get("/admin/students"), setStudents);
     return () => unsub();
   }, [user]);
 
   useEffect(() => {
     if (!user) return;
-    const unsub = onSnapshot(collection(db, "research"), (snap) => {
-      setResearch(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    });
+    const unsub = live(() => api.get("/admin/research"), setResearch);
     return () => unsub();
   }, [user]);
 
   useEffect(() => {
     if (!user) return;
-    const unsub = onSnapshot(collection(db, "teachers"), (snap) => {
-      setMentors(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    });
+    const unsub = live(() => api.get("/admin/teachers"), setMentors);
     return () => unsub();
   }, [user]);
 
   useEffect(() => {
     if (!user) return;
-    const unsub = onSnapshot(collection(db, "registrations"), (snap) => {
-      setRegistrations(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    });
+    const unsub = live(() => api.get("/admin/registrations"), setRegistrations);
     return () => unsub();
   }, [user]);
 
   async function uploadMentorImage(file, mentorId) {
-    const imageRef = ref(storage, `mentors/${mentorId}_${Date.now()}`);
-    await uploadBytes(imageRef, file);
-    return await getDownloadURL(imageRef);
+    const data = new FormData();
+    data.append("file", file);
+    await api.post(`/admin/teachers/${seg(mentorId)}/photo`, data);
   }
 
   function handleImageChange(e) {
@@ -146,20 +123,20 @@ export default function AdminDashboard() {
     setError("");
     setResetSent(false);
     try {
-      const result = await signInWithEmailAndPassword(auth, email, password);
-      if (result.user.email !== ADMIN_EMAIL) {
-        await signOut(auth);
+      const result = await login(email, password);
+      if (!result.isAdmin) {
+        logout();
         setError("You are not authorized as admin.");
       }
     } catch (err) {
-      if (err.code === "auth/too-many-requests") {
+      if (err.code === "RATE_LIMITED") {
         setError(
           "Too many failed attempts. Wait a few minutes, or reset your password below.",
         );
-      } else if (err.code === "auth/invalid-email") {
-        setError("That doesn't look like a valid email address.");
-      } else if (err.code === "auth/user-disabled") {
-        setError("This account has been disabled.");
+      } else if (err.code === "PASSWORD_RESET_REQUIRED") {
+        setError(
+          'We\'ve moved to a new login system - click "Forgot password?" below to set your password.',
+        );
       } else {
         setError("Invalid email or password.");
       }
@@ -177,10 +154,10 @@ export default function AdminDashboard() {
     setError("");
     setResetSent(false);
     try {
-      await sendPasswordResetEmail(auth, email.trim());
+      await sendPasswordReset(email);
       setResetSent(true);
     } catch (err) {
-      if (err.code === "auth/invalid-email") {
+      if (err.code === "INVALID_EMAIL") {
         setError("That doesn't look like a valid email address.");
       } else {
         setError("Could not send reset email. Please try again.");
@@ -190,8 +167,8 @@ export default function AdminDashboard() {
     }
   }
 
-  async function handleLogout() {
-    await signOut(auth);
+  function handleLogout() {
+    logout();
     setUser(null);
   }
 
@@ -199,10 +176,7 @@ export default function AdminDashboard() {
     if (actionBusy) return;
     setActionBusy(true);
     try {
-      await updateDoc(doc(db, "teachers", mentorId), {
-        verificationStatus: "approved",
-        rejectionReason: null,
-      });
+      await api.post(`/admin/teachers/${seg(mentorId)}/approve`);
     } catch (err) {
       console.error(err);
       alert("Something went wrong. Please try again.");
@@ -212,9 +186,8 @@ export default function AdminDashboard() {
   }
 
   async function rejectApplication(mentorId, reason) {
-    await updateDoc(doc(db, "teachers", mentorId), {
-      verificationStatus: "rejected",
-      rejectionReason: reason.trim(),
+    await api.post(`/admin/teachers/${seg(mentorId)}/reject`, {
+      reason: reason.trim(),
     });
   }
 
@@ -276,7 +249,7 @@ export default function AdminDashboard() {
     setStudentDetail(student);
     setStudentRegsLoading(true);
     try {
-      const rows = await loadStudentRegistrations(student.email, student.id);
+      const rows = await loadStudentRegistrations(student.id);
       setStudentRegistrations(rows);
     } catch (err) {
       console.error(err);
@@ -288,7 +261,7 @@ export default function AdminDashboard() {
 
   async function handleDisable(collection_, id, currentStatus) {
     try {
-      await updateDoc(doc(db, collection_, id), {
+      await api.patch(`/admin/${collection_}/${seg(id)}`, {
         status: currentStatus === "disabled" ? "published" : "disabled",
       });
     } catch (err) {
@@ -305,7 +278,7 @@ export default function AdminDashboard() {
     )
       return;
     try {
-      await deleteDoc(doc(db, collection_, id));
+      await api.del(`/admin/${collection_}/${seg(id)}`);
     } catch (err) {
       console.error(err);
       alert("Something went wrong. Please try again.");
@@ -318,10 +291,9 @@ export default function AdminDashboard() {
     try {
       const { id, ...data } = editItem;
       if (imageFile && editType === "teachers") {
-        const url = await uploadMentorImage(imageFile, id);
-        data.photoURL = url;
+        await uploadMentorImage(imageFile, id);
       }
-      await updateDoc(doc(db, editType, id), data);
+      await api.patch(`/admin/${editType}/${seg(id)}`, data);
       setEditItem(null);
       setEditType(null);
       setImageFile(null);
@@ -481,8 +453,8 @@ export default function AdminDashboard() {
 
   function sortByDate(list, field, direction) {
     return [...list].sort((a, b) => {
-      const ta = a[field]?.toMillis?.() ?? 0;
-      const tb = b[field]?.toMillis?.() ?? 0;
+      const ta = toMillis(a[field]);
+      const tb = toMillis(b[field]);
       return direction === "oldest" ? ta - tb : tb - ta;
     });
   }
@@ -562,8 +534,8 @@ export default function AdminDashboard() {
           (a.name || "").localeCompare(b.name || ""),
         )
       : [...visibleApplications].sort((a, b) => {
-          const ta = a.submittedAt?.toMillis?.() ?? a.createdAt?.toMillis?.() ?? 0;
-          const tb = b.submittedAt?.toMillis?.() ?? b.createdAt?.toMillis?.() ?? 0;
+          const ta = toMillis(a.submittedAt) || toMillis(a.createdAt);
+          const tb = toMillis(b.submittedAt) || toMillis(b.createdAt);
           return applicationSort === "oldest" ? ta - tb : tb - ta;
         });
 
@@ -582,8 +554,8 @@ export default function AdminDashboard() {
           (a.studentName || "").localeCompare(b.studentName || ""),
         )
       : [...visibleStudentApplications].sort((a, b) => {
-          const ta = a.createdAt?.toMillis?.() ?? 0;
-          const tb = b.createdAt?.toMillis?.() ?? 0;
+          const ta = toMillis(a.createdAt);
+          const tb = toMillis(b.createdAt);
           return studentAppSort === "oldest" ? ta - tb : tb - ta;
         });
 
@@ -1252,9 +1224,7 @@ export default function AdminDashboard() {
                       {mentor && <div>Mentor: {mentor.name}</div>}
                       <div style={{ color: "#aaa" }}>
                         Applied{" "}
-                        {reg.createdAt?.toDate
-                          ? reg.createdAt.toDate().toLocaleDateString()
-                          : ""}
+                        {formatDate(reg.createdAt)}
                       </div>
                     </div>
 
@@ -1451,7 +1421,7 @@ export default function AdminDashboard() {
                     </button>
                     <button
                       onClick={async () => {
-                        await updateDoc(doc(db, "teachers", mentor.id), {
+                        await api.patch(`/admin/teachers/${seg(mentor.id)}`, {
                           disabled: !mentor.disabled,
                         });
                       }}
@@ -1648,7 +1618,7 @@ export default function AdminDashboard() {
               {studentDetail.createdAt && (
                 <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
                   Member since{" "}
-                  {studentDetail.createdAt.toDate?.().toLocaleDateString()}
+                  {formatDate(studentDetail.createdAt)}
                 </p>
               )}
             </div>
@@ -1737,7 +1707,7 @@ export default function AdminDashboard() {
                             </p>
                             <p style={{ fontSize: 11, color: "#aaa", margin: 0 }}>
                               Registered{" "}
-                              {reg.createdAt?.toDate?.().toLocaleDateString()}
+                              {formatDate(reg.createdAt)}
                             </p>
                           </div>
                         ))

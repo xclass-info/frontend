@@ -1,12 +1,10 @@
 // src/components/VerifyMentorEmail.jsx
 // Landing page for the link sent to a faculty mentor's work email. Reads
 // ?uid=&token= from the URL, and if they match what's on the teacher doc,
-// marks the work email verified. No backend needed - just a Firestore
-// read + conditional write, same trust model as the rest of this app.
+// marks the work email verified (checked by the backend).
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { db } from "../firebase";
+import { api } from "../api";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
@@ -23,23 +21,8 @@ export default function VerifyMentorEmail() {
         return;
       }
       try {
-        const ref = doc(db, "teachers", uid);
-        const snap = await getDoc(ref);
-        if (!snap.exists()) {
-          setStatus("invalid");
-          return;
-        }
-        const data = snap.data();
-        if (data.workEmailVerified) {
-          setStatus("success");
-          return;
-        }
-        if (!data.workEmailToken || data.workEmailToken !== token) {
-          setStatus("invalid");
-          return;
-        }
-        await updateDoc(ref, { workEmailVerified: true, workEmailToken: null });
-        setStatus("success");
+        const res = await api.post("/teachers/verify-work-email", { uid, token });
+        setStatus(res.status);
       } catch (err) {
         console.error(err);
         setStatus("error");

@@ -1,38 +1,21 @@
 // src/components/BookingRequests.jsx
 import { useState, useEffect } from "react";
-import { db, auth } from "../firebase";
-import {
-  collection,
-  query,
-  where,
-  onSnapshot,
-  doc,
-  updateDoc,
-  getDoc,
-} from "firebase/firestore";
-import emailjs from "@emailjs/browser";
+import { api, live, seg } from "../api";
+import { getCurrentUser } from "../auth";
 
 const DAILY_API_KEY = import.meta.env.VITE_DAILY_API_KEY;
-const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-const EMAILJS_BOOKING_TEMPLATE_ID = import.meta.env
-  .VITE_EMAILJS_BOOKING_TEMPLATE_ID;
-const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
 export default function BookingRequests() {
   const [requests, setRequests] = useState([]);
   const [processing, setProcessing] = useState(null);
-  const teacherId = auth.currentUser?.uid;
+  const teacherId = getCurrentUser()?.uid;
 
   useEffect(() => {
     if (!teacherId) return;
-    const q = query(
-      collection(db, "bookings"),
-      where("teacherId", "==", teacherId),
-      where("status", "==", "pending"),
+    const unsub = live(
+      () => api.get("/teachers/me/bookings?status=pending"),
+      setRequests,
     );
-    const unsub = onSnapshot(q, (snap) => {
-      setRequests(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    });
     return () => unsub();
   }, [teacherId]);
 
@@ -60,81 +43,17 @@ export default function BookingRequests() {
     return data.url;
   }
 
-  async function sendEmail({
-    toName,
-    toEmail,
-    teacherName,
-    studentName,
-    date,
-    time,
-    duration,
-    meetingLink,
-  }) {
-    await emailjs.send(
-      EMAILJS_SERVICE_ID,
-      EMAILJS_BOOKING_TEMPLATE_ID,
-      {
-        to_name: toName,
-        to_email: toEmail,
-        teacher_name: teacherName,
-        student_name: studentName,
-        date,
-        time,
-        duration,
-        meeting_link: meetingLink,
-      },
-      EMAILJS_PUBLIC_KEY,
-    );
-  }
-
   async function handleApprove(req) {
     setProcessing(req.id);
     try {
       // 1. Generate Daily.co meeting link
       const meetingLink = await generateMeetingLink(req.id);
 
-      // 2. Get teacher email from Firestore
-      const teacherDoc = await getDoc(doc(db, "teachers", teacherId));
-      const teacherEmail = teacherDoc.data()?.email;
-      const teacherName = teacherDoc.data()?.name;
-
-      // 3. Update booking in Firestore
-      await updateDoc(doc(db, "bookings", req.id), {
-        status: "approved",
+      // 2. Approve: the backend saves the link, marks the slot booked and
+      // emails the confirmation to the student and to you.
+      await api.post(`/bookings/${seg(req.id)}/approve`, {
         meeting_link: meetingLink,
       });
-
-      // 4. Mark slot as booked
-      await updateDoc(
-        doc(db, "teachers", teacherId, "availability", req.slotId),
-        { booked: true },
-      );
-
-      // 5. Send email to student
-      await sendEmail({
-        toName: req.studentName,
-        toEmail: req.studentEmail,
-        teacherName: req.teacherName,
-        studentName: req.studentName,
-        date: req.date,
-        time: req.time,
-        duration: req.duration,
-        meetingLink,
-      });
-
-      // 6. Send email to teacher
-      if (teacherEmail) {
-        await sendEmail({
-          toName: teacherName,
-          toEmail: teacherEmail,
-          teacherName: req.teacherName,
-          studentName: req.studentName,
-          date: req.date,
-          time: req.time,
-          duration: req.duration,
-          meetingLink,
-        });
-      }
 
       alert(`✅ Approved! Meeting link sent to ${req.studentEmail}`);
     } catch (err) {
@@ -148,7 +67,7 @@ export default function BookingRequests() {
   async function handleReject(req) {
     setProcessing(req.id);
     try {
-      await updateDoc(doc(db, "bookings", req.id), { status: "rejected" });
+      await api.post(`/bookings/${seg(req.id)}/reject`);
     } catch (err) {
       console.error(err);
     } finally {

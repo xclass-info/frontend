@@ -1,7 +1,6 @@
 // src/components/Tutors.jsx
 import { useEffect, useMemo, useState } from "react";
-import { db } from "../firebase";
-import { collection, onSnapshot } from "firebase/firestore";
+import { api, live } from "../api";
 import styles from "./Tutors.module.css";
 import { SkeletonCard } from "./Skeleton";
 import { useNavigate } from "react-router-dom";
@@ -74,8 +73,8 @@ export default function Tutors({ standalone = false }) {
   const sectionRef = useScrollReveal([loading, teachers]);
 
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "teachers"), (snapshot) => {
-      const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const unsub = live(() => api.get("/teachers"), (rows) => {
+      const data = rows;
       const filtered = data.filter(
         (t) => !t.disabled && t.verificationStatus === "approved",
       );
@@ -89,15 +88,15 @@ export default function Tutors({ standalone = false }) {
   // Fetched to know which mentors currently have an open (unfilled) research
   // or project seat, for the Opening filter.
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "research"), (snapshot) => {
-      setResearch(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+    const unsub = live(() => api.get("/research"), (rows) => {
+      setResearch(rows);
     });
     return () => unsub();
   }, []);
 
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "projects"), (snapshot) => {
-      setProjects(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+    const unsub = live(() => api.get("/projects"), (rows) => {
+      setProjects(rows);
     });
     return () => unsub();
   }, []);

@@ -1,7 +1,6 @@
 // src/components/ProjectListing.jsx
 import { useEffect, useMemo, useState } from "react";
-import { db } from "../firebase";
-import { collection, onSnapshot, getDocs } from "firebase/firestore";
+import { api, live, toMillis } from "../api";
 import Navbar from "./Navbar";
 import { SkeletonClassCard } from "./Skeleton";
 import { useNavigate, Link } from "react-router-dom";
@@ -85,19 +84,20 @@ export default function ProjectListing() {
   const pageRef = useScrollReveal([loading, projects]);
 
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "projects"), (snap) => {
-      setProjects(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    const unsub = live(() => api.get("/projects"), (rows) => {
+      setProjects(rows);
       setLoading(false);
     });
     return () => unsub();
   }, []);
 
   useEffect(() => {
-    getDocs(collection(db, "teachers"))
-      .then((snap) => {
+    api
+      .get("/teachers")
+      .then((rows) => {
         const map = {};
-        snap.docs.forEach((d) => {
-          map[d.id] = d.data();
+        rows.forEach((t) => {
+          map[t.id] = t;
         });
         setTeachers(map);
       })
@@ -193,7 +193,7 @@ export default function ProjectListing() {
         const leftB = (b.seats || 0) - (b.enrolledCount || 0);
         return leftB - leftA;
       }
-      return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
+      return toMillis(b.createdAt) - toMillis(a.createdAt);
     });
 
     return list;

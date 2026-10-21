@@ -1,8 +1,7 @@
 // src/components/OneOnOneSection.jsx
 import { useEffect, useState } from "react";
+import { api, live } from "../api";
 import { useNavigate } from "react-router-dom";
-import { db } from "../firebase";
-import { collection, onSnapshot } from "firebase/firestore";
 import InitialsAvatar from "./InitialsAvatar";
 import { formatMentorName } from "../utils/mentorName";
 
@@ -12,9 +11,8 @@ export default function OneOnOneSection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "teachers"), (snap) => {
-      const data = snap.docs
-        .map((d) => ({ id: d.id, ...d.data() }))
+    const unsub = live(() => api.get("/teachers"), (rows) => {
+      const data = rows
         .filter((t) => !t.disabled && t.name && t.verificationStatus === "approved");
       data.sort((a, b) => {
         const ratingA = typeof a.rating === "number" ? a.rating : -1;

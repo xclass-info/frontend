@@ -1,13 +1,6 @@
 // src/components/ProjectForm.jsx
 import { useState } from "react";
-import { db, auth } from "../firebase";
-import {
-  collection,
-  addDoc,
-  doc,
-  getDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { api, seg } from "../api";
 import styles from "./TeacherAuth.module.css";
 import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
 import { GRADE_RANGE_OPTIONS } from "../utils/gradeRange";
@@ -85,8 +78,6 @@ export default function ProjectForm({ project, onClose }) {
 
     setLoading(true);
     try {
-      const user = auth.currentUser;
-      const teacherSnap = await getDoc(doc(db, "teachers", user.uid));
       const payload = {
         title: form.title.trim(),
         description: form.description.trim(),
@@ -105,18 +96,11 @@ export default function ProjectForm({ project, onClose }) {
         scheduleLocation: form.scheduleLocation,
       };
       if (isEditing) {
-        await updateDoc(doc(db, "projects", project.id), {
-          ...payload,
-          updatedAt: new Date(),
-        });
+        await api.patch(`/projects/${seg(project.id)}`, payload);
       } else {
-        await addDoc(collection(db, "projects"), {
-          ...payload,
-          teacherId: user.uid,
-          teacherName: teacherSnap.data()?.name || user.displayName || "Teacher",
-          createdAt: new Date(),
-          stage: "active",
-        });
+        // The backend fills in teacherId/teacherName, createdAt, and the
+        // initial status/stage.
+        await api.post("/projects", payload);
       }
       setSaved(true);
       setTimeout(() => {

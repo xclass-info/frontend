@@ -1,8 +1,7 @@
 // src/components/ResearchDetail.jsx
 import { useEffect, useState } from "react";
 import { useParams, Link, useLocation } from "react-router-dom";
-import { db } from "../firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { getOrNull, seg } from "../api";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { formatMentorName } from "../utils/mentorName";
@@ -56,18 +55,17 @@ export default function ResearchDetail() {
     let cancelled = false;
     async function load() {
       try {
-        const snap = await getDoc(doc(db, "research", researchId));
-        const data = snap.exists() ? { id: snap.id, ...snap.data() } : null;
+        const data = await getOrNull(`/research/${seg(researchId)}`);
         // Only published research is public, same as the listing page.
         if (!data || data.status !== "published") {
           if (!cancelled) setResearch(null);
           return;
         }
         if (!cancelled) setResearch(data);
-        const teacherSnap = await getDoc(doc(db, "teachers", data.teacherId));
-        if (!cancelled && teacherSnap.exists() && teacherSnap.data().name) {
-          setMentor({ id: teacherSnap.id, ...teacherSnap.data() });
-        }
+        const teacher = data.teacherId
+          ? await getOrNull(`/teachers/${seg(data.teacherId)}`)
+          : null;
+        if (!cancelled && teacher?.name) setMentor(teacher);
       } catch (err) {
         console.error(err);
         if (!cancelled) setResearch(null);

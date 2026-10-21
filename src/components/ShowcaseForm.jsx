@@ -2,15 +2,7 @@
 // Lets a mentor publish a finished student project to the public Showcase
 // page - the "here's proof, not just a claim" feature.
 import { useState } from "react";
-import { db, auth, storage } from "../firebase";
-import {
-  collection,
-  addDoc,
-  doc,
-  getDoc,
-  updateDoc,
-} from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { api, seg } from "../api";
 import styles from "./TeacherAuth.module.css";
 import { DELIVERABLE_OPTIONS } from "../utils/deliverables";
 import { safeUrl } from "../utils/format";
@@ -91,17 +83,14 @@ export default function ShowcaseForm({ entry, onClose }) {
 
     setLoading(true);
     try {
-      const user = auth.currentUser;
-      const teacherSnap = await getDoc(doc(db, "teachers", user.uid));
-
       let fileUrl = entry?.fileUrl || null;
       let fileType = entry?.fileType || null;
       if (file) {
-        const path = `showcase-files/${user.uid}/${Date.now()}_${file.name}`;
-        const fileRef = ref(storage, path);
-        await uploadBytes(fileRef, file);
-        fileUrl = await getDownloadURL(fileRef);
-        fileType = file.type.startsWith("image/") ? "image" : "pdf";
+        const upload = new FormData();
+        upload.append("file", file);
+        const uploaded = await api.post("/showcase/files", upload);
+        fileUrl = uploaded.ref;
+        fileType = uploaded.fileType;
       }
 
       const payload = {
@@ -114,17 +103,10 @@ export default function ShowcaseForm({ entry, onClose }) {
         fileType,
       };
       if (isEditing) {
-        await updateDoc(doc(db, "showcase", entry.id), {
-          ...payload,
-          updatedAt: new Date(),
-        });
+        await api.patch(`/showcase/${seg(entry.id)}`, payload);
       } else {
-        await addDoc(collection(db, "showcase"), {
-          ...payload,
-          teacherId: user.uid,
-          teacherName: teacherSnap.data()?.name || user.displayName || "Teacher",
-          createdAt: new Date(),
-        });
+        // The backend fills in teacherId/teacherName and createdAt.
+        await api.post("/showcase", payload);
       }
       setSaved(true);
       setTimeout(() => {
