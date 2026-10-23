@@ -95,9 +95,13 @@ export default function Testimonials() {
           {TESTIMONIALS.map((t) => (
             <Card key={`a-${t.name}`} t={t} />
           ))}
-          {TESTIMONIALS.map((t) => (
-            <Card key={`b-${t.name}`} t={t} />
-          ))}
+          {/* Second copy only makes the scroll loop seamless - hidden from
+              screen readers so each review is read once. */}
+          <div aria-hidden='true' style={{ display: "contents" }}>
+            {TESTIMONIALS.map((t) => (
+              <Card key={`b-${t.name}`} t={t} />
+            ))}
+          </div>
         </div>
       </div>
     </section>

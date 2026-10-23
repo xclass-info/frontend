@@ -336,6 +336,10 @@ export default function Tutors({ standalone = false }) {
     );
   }
 
+  // On the homepage, an empty mentor section reads as "we have no mentors" -
+  // leave it out until there's someone to show.
+  if (!standalone && !loading && teachers.length === 0) return null;
+
   if (!standalone) {
     return (
       <section id='tutors' ref={sectionRef} className={styles.section}>
@@ -347,37 +351,28 @@ export default function Tutors({ standalone = false }) {
               topics that match your passion, curiosity, and future ambitions.
             </p>
           </div>
-
-          {teachers.length === 0 ? (
-            <div className={styles.empty}>
-              <p>😴 No tutors registered yet. Check back soon!</p>
+          <div className={styles.grid}>
+            {visibleTeachers.map(renderCard)}
+          </div>
+          {visibleCount < filteredTeachers.length && (
+            <div style={{ textAlign: "center", marginTop: 32 }}>
+              <button
+                onClick={() => setVisibleCount((c) => c + 20)}
+                style={{
+                  padding: "12px 32px",
+                  borderRadius: 10,
+                  border: "2px solid #2f6175",
+                  background: "white",
+                  color: "#2f6175",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                Show more (
+                {filteredTeachers.length - visibleCount} more)
+              </button>
             </div>
-          ) : (
-            <>
-              <div className={styles.grid}>
-                {visibleTeachers.map(renderCard)}
-              </div>
-              {visibleCount < filteredTeachers.length && (
-                <div style={{ textAlign: "center", marginTop: 32 }}>
-                  <button
-                    onClick={() => setVisibleCount((c) => c + 20)}
-                    style={{
-                      padding: "12px 32px",
-                      borderRadius: 10,
-                      border: "2px solid #2f6175",
-                      background: "white",
-                      color: "#2f6175",
-                      fontSize: 14,
-                      fontWeight: 700,
-                      cursor: "pointer",
-                    }}
-                  >
-                    Show more (
-                    {filteredTeachers.length - visibleCount} more)
-                  </button>
-                </div>
-              )}
-            </>
           )}
         </div>
       </section>
@@ -538,7 +533,25 @@ export default function Tutors({ standalone = false }) {
 
             {teachers.length === 0 ? (
               <div className={styles.empty}>
-                <p>😴 No tutors registered yet. Check back soon!</p>
+                <p>
+                  Our mentor team is growing. Tell us what you'd like to
+                  research and we'll match you with the right mentor.
+                </p>
+                <button
+                  onClick={() => navigate("/tell-us-what-you-need")}
+                  style={{
+                    marginTop: 12,
+                    padding: "10px 20px",
+                    borderRadius: 8,
+                    border: "none",
+                    background: "var(--primary)",
+                    color: "white",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  Tell us what you need →
+                </button>
               </div>
             ) : filteredTeachers.length === 0 ? (
               <div className={styles.empty}>
