@@ -70,7 +70,12 @@ export function refreshUser() {
 }
 
 export async function login(email, password) {
-  const res = await api.post("/auth/login", { email: email.trim(), password });
+  return signInWith(await api.post("/auth/login", { email: email.trim(), password }));
+}
+
+// Sign in from a { token, user } response (password login, or a mentor
+// applicant's "continue your application" email link).
+export function signInWith(res) {
   writeToken(res.token);
   setUser(res.user);
   return res.user;

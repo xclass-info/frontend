@@ -1,15 +1,14 @@
-"""Mentors: public listings/profiles, the mentor's own profile, the mentor
-verification workflow, and availability slots."""
-from flask import Blueprint, current_app, jsonify, request
+"""Mentors: public listings/profiles (live mentors only), the mentor's own
+profile, university-email verification links, and availability slots. The
+application itself is in mentor_application.py."""
+from flask import Blueprint, jsonify
 
-from .. import emails, storage
 from ..errors import ApiError
 from ..extensions import db, limiter
 from ..models import Availability, Teacher, utcnow
-from ..security import current_teacher, random_token
+from ..security import current_teacher, current_user
 from ..serializers import rows, teacher_json
-from ..uploads import read_upload
-from . import body, text, valid_email
+from . import body, text
 
 bp = Blueprint("teachers", __name__, url_prefix="/api/teachers")
 
@@ -19,15 +18,28 @@ MENTOR_TYPES = ("phd_student", "phd_graduate", "faculty")
 # ── Public ────────────────────────────────────────────────────────────────
 
 
+def is_live(teacher):
+    return bool(teacher) and teacher.verificationStatus == "approved" and not teacher.disabled
+
+
+def can_see_mentor(teacher):
+    """Applicants aren't public; they and admins can still see their record."""
+    user = current_user()
+    return is_live(teacher) or (user and (user.isAdmin or user.id == teacher.id))
+
+
 @bp.get("")
 def list_teachers():
-    return jsonify([teacher_json(t) for t in Teacher.query.all()])
+    live = Teacher.query.filter(
+        Teacher.verificationStatus == "approved", Teacher.disabled.isnot(True)
+    )
+    return jsonify([teacher_json(t) for t in live.all()])
 
 
 @bp.get("/<teacher_id>")
 def get_teacher(teacher_id):
     teacher = db.session.get(Teacher, teacher_id)
-    if not teacher:
+    if not teacher or not can_see_mentor(teacher):
         raise ApiError(404, "NOT_FOUND", "Mentor not found.")
     return jsonify(teacher_json(teacher))
 
@@ -76,69 +88,6 @@ def update_me():
     if "yearsOfExperience" in data and data["yearsOfExperience"] is not None:
         teacher.yearsOfExperience = str(data["yearsOfExperience"])
     teacher.updatedAt = utcnow()
-    db.session.commit()
-    return jsonify(teacher_json(teacher, "owner"))
-
-
-@bp.post("/me/mentor-type")
-def set_mentor_type():
-    teacher = current_teacher()
-    value = body().get("mentorType")
-    if value is None:
-        # "Change type" - back to the type picker, status untouched.
-        teacher.mentorType = None
-    elif value in MENTOR_TYPES:
-        teacher.mentorType = value
-        teacher.verificationStatus = "incomplete"
-    else:
-        raise ApiError(400, "INVALID_MENTOR_TYPE", "Unknown mentor type.")
-    db.session.commit()
-    return jsonify(teacher_json(teacher, "owner"))
-
-
-@bp.post("/me/verification-document")
-@limiter.limit("10 per minute")
-def upload_verification_document():
-    teacher = current_teacher()
-    if teacher.mentorType not in ("phd_student", "phd_graduate"):
-        raise ApiError(400, "WRONG_MENTOR_TYPE", "Choose PhD Student or PhD Graduate first.")
-    data, filename, content_type = read_upload(allow_pdf=True)
-    ref = storage.put(
-        storage.make_key(f"mentor-documents/{teacher.id}", filename), data, content_type
-    )
-    field = "transcriptURL" if teacher.mentorType == "phd_student" else "degreeCertificateURL"
-    setattr(teacher, field, ref)
-    teacher.verificationStatus = "pending_review"
-    teacher.rejectionReason = None
-    teacher.submittedAt = utcnow()
-    db.session.commit()
-    return jsonify(teacher_json(teacher, "owner"))
-
-
-@bp.post("/me/work-email")
-@limiter.limit("5 per minute")
-def send_work_email():
-    teacher = current_teacher()
-    work_email = text(body(), "workEmail", required=True, max_len=320)
-    if not valid_email(work_email):
-        raise ApiError(400, "INVALID_EMAIL", "Please enter a valid email address.")
-    token = random_token()
-    teacher.workEmail = work_email
-    teacher.workEmailToken = token
-    teacher.workEmailVerified = False
-    db.session.commit()
-    emails.send_work_email_verification(work_email, teacher.name, teacher.id, token)
-    return jsonify(teacher_json(teacher, "owner"))
-
-
-@bp.post("/me/faculty-application")
-def submit_faculty_application():
-    teacher = current_teacher()
-    profile_url = text(body(), "universityProfileURL", required=True, max_len=2000)
-    teacher.universityProfileURL = profile_url
-    teacher.verificationStatus = "pending_review"
-    teacher.rejectionReason = None
-    teacher.submittedAt = utcnow()
     db.session.commit()
     return jsonify(teacher_json(teacher, "owner"))
 

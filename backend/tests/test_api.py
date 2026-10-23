@@ -139,34 +139,6 @@ def test_booking_flow(client, outbox):
     assert again.json["code"] == "SLOT_BOOKED"
 
 
-def test_mentor_verification_document_is_private(client):
-    t = make_user("t@example.com", teacher=True, verificationStatus="incomplete")
-    make_user("admin@example.com", admin=True)
-    ht = login(client, "t@example.com")
-    client.post("/api/teachers/me/mentor-type", json={"mentorType": "phd_student"}, headers=ht)
-    res = client.post(
-        "/api/teachers/me/verification-document",
-        data={"file": (io.BytesIO(b"%PDF-1.4"), "transcript.pdf", "application/pdf")},
-        headers=ht,
-        content_type="multipart/form-data",
-    )
-    assert res.status_code == 200 and res.json["verificationStatus"] == "pending_review"
-    key = db.session.get(Teacher, t.id).transcriptURL[3:]
-    # Not reachable without a signed link...
-    assert client.get(f"/files/{key}").status_code == 404
-    assert client.get(f"/files/{key}?expires=9999999999&sig=forged").status_code == 404
-
-    # ...which only the mentor and admins are given.
-    hadmin = login(client, "admin@example.com")
-    admin_view = next(m for m in client.get("/api/admin/teachers", headers=hadmin).json if m["id"] == t.id)
-    signed = admin_view["transcriptURL"].replace("http://api.test", "")
-    res = client.get(signed)
-    assert res.status_code == 200 and res.data == b"%PDF-1.4"
-    assert "transcriptURL" not in client.get(f"/api/teachers/{t.id}").json
-
-    assert client.post(f"/api/admin/teachers/{t.id}/approve", headers=hadmin).json["verificationStatus"] == "approved"
-
-
 def test_showcase_file_must_be_own_upload(client):
     make_user("t@example.com", teacher=True)
     make_user("o@example.com", teacher=True)

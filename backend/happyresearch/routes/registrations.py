@@ -10,6 +10,7 @@ from ..extensions import db, limiter
 from ..models import ITEM_MODELS, Registration, Teacher
 from ..security import current_student, current_user
 from . import body, text
+from .teachers import is_live
 
 bp = Blueprint("registrations", __name__, url_prefix="/api")
 
@@ -51,6 +52,8 @@ def register_for_item():
     data = body()
     kind = data.get("kind")
     item = _locked_item(kind, text(data, "itemId", required=True, max_len=64))
+    if not is_live(db.session.get(Teacher, item.teacherId)):
+        raise ApiError(404, "NOT_FOUND", "This is no longer available.")
 
     email = user.email
     reg_id = registration_id(item.id, email)

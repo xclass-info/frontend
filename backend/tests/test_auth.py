@@ -1,5 +1,5 @@
 from happyresearch.extensions import db
-from happyresearch.models import Student, Teacher, User
+from happyresearch.models import Student, User
 
 from .conftest import login, make_user
 
@@ -48,7 +48,7 @@ def test_duplicate_email_and_bad_password(client):
     make_user("a@example.com")
     res = client.post(
         "/api/auth/register",
-        json={"kind": "teacher", "name": "A", "email": "A@example.com", "password": "secret123"},
+        json={"kind": "student", "name": "A", "email": "A@example.com", "password": "secret123"},
     )
     assert res.json["code"] == "EMAIL_IN_USE"
     res = client.post("/api/auth/login", json={"email": "a@example.com", "password": "wrong"})
@@ -98,14 +98,12 @@ def test_firebase_scrypt_hash_is_accepted_and_upgraded(app, client):
     login(client, "fb@example.com", "user1password")
 
 
-def test_teacher_signup_gives_incomplete_mentor(client):
+def test_mentors_cannot_use_student_signup(client):
     res = client.post(
         "/api/auth/register",
         json={"kind": "teacher", "name": "Dr. Who", "email": "who@example.com", "password": "secret123"},
     )
-    teacher = db.session.get(Teacher, res.json["uid"])
-    assert teacher.verificationStatus == "incomplete"
-    assert teacher.accountEmailVerified is False
+    assert res.json["code"] == "USE_MENTOR_APPLICATION"
 
 
 def test_admin_email_gets_admin_role(client):

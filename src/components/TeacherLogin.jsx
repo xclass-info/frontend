@@ -48,7 +48,7 @@ export default function TeacherLogin() {
         setError("Invalid email or password.");
       } else if (err.code === "PASSWORD_RESET_REQUIRED") {
         setError(
-          'We\'ve moved to a new login system - please click "Forgot password?" below to set your password.',
+          'This account doesn\'t have a password yet - click "Forgot password?" below to set one.',
         );
       } else if (err.code === "RATE_LIMITED") {
         setError("Too many failed attempts. Please try again later.");
@@ -212,8 +212,8 @@ export default function TeacherLogin() {
           </form>
 
           <p className={styles.switch}>
-            Don't have an account?{" "}
-            <Link to='/teacher/register'>Register here</Link>
+            Want to mentor with us?{" "}
+            <Link to='/become-a-mentor'>Apply here</Link>
           </p>
         </div>
       </div>

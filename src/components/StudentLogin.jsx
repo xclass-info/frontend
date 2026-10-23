@@ -57,7 +57,7 @@ export default function StudentLogin() {
         setError("Invalid email or password.");
       } else if (err.code === "PASSWORD_RESET_REQUIRED") {
         setError(
-          'We\'ve moved to a new login system - please click "Forgot password?" below to set your password.',
+          'This account doesn\'t have a password yet - click "Forgot password?" below to set one.',
         );
       } else if (err.code === "RATE_LIMITED") {
         setError("Too many failed attempts. Please try again later.");

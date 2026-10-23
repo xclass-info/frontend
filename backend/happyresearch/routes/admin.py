@@ -1,14 +1,15 @@
 """Admin dashboard API. Every route requires an admin account."""
 from flask import Blueprint, jsonify
 
-from .. import storage
+from .. import emails, storage
 from ..errors import ApiError
 from ..extensions import db
-from ..models import Registration, Research, Student, Teacher
+from ..models import Registration, Research, Student, Teacher, utcnow
 from ..security import admin_required
 from ..serializers import teacher_json
 from ..uploads import read_upload
 from . import body, text
+from .mentor_application import maybe_go_live
 from .registrations import _locked_item, _seats_full, student_registrations
 
 bp = Blueprint("admin", __name__, url_prefix="/api/admin")
@@ -104,23 +105,92 @@ def upload_photo(teacher_id):
     return jsonify(_json(teacher))
 
 
+# ── Mentor application review ────────────────────────────────────────────
+# Each action emails the mentor first, so a failed send leaves the
+# application unchanged and the admin can simply retry.
+
+REVIEWABLE = ("submitted", "interview_requested", "changes_requested")
+
+
+def _reviewable(teacher_id, allowed=REVIEWABLE):
+    teacher = _row("teachers", teacher_id)
+    if teacher.verificationStatus not in allowed:
+        raise ApiError(409, "WRONG_STATUS", "This application isn't waiting for that action.")
+    if not teacher.email:
+        raise ApiError(400, "NO_EMAIL", "This mentor has no email address.")
+    return teacher
+
+
 @bp.post("/teachers/<teacher_id>/approve")
 @admin_required
 def approve_mentor(teacher_id):
-    teacher = _row("teachers", teacher_id)
-    teacher.verificationStatus = "approved"
+    """Passes review. The mentor moves to onboarding (guidelines + background
+    check) and goes live once both are done."""
+    teacher = _reviewable(teacher_id)
+    emails.send_mentor_review_passed(teacher.email, teacher.name)
+    teacher.verificationStatus = "onboarding"
+    teacher.reviewedAt = utcnow()
     teacher.rejectionReason = None
+    db.session.commit()
+    maybe_go_live(teacher)
+    return jsonify(_json(teacher))
+
+
+@bp.post("/teachers/<teacher_id>/request-changes")
+@admin_required
+def request_changes(teacher_id):
+    teacher = _reviewable(teacher_id, ("submitted", "interview_requested"))
+    note = text(body(), "note", required=True, max_len=5000)
+    emails.send_mentor_changes_requested(teacher.email, teacher.name, note)
+    teacher.verificationStatus = "changes_requested"
+    teacher.adminNote = note
+    teacher.reviewedAt = utcnow()
     db.session.commit()
     return jsonify(_json(teacher))
 
 
-@bp.post("/teachers/<teacher_id>/reject")
+@bp.post("/teachers/<teacher_id>/request-interview")
 @admin_required
-def reject_mentor(teacher_id):
-    teacher = _row("teachers", teacher_id)
-    teacher.verificationStatus = "rejected"
-    teacher.rejectionReason = text(body(), "reason", required=True, max_len=5000)
+def request_interview(teacher_id):
+    """Optional - only when the admin wants to meet the applicant first."""
+    teacher = _reviewable(teacher_id, ("submitted", "interview_requested"))
+    message = text(body(), "message", required=True, max_len=5000)
+    emails.send_interview_request(teacher.email, teacher.name, message)
+    teacher.verificationStatus = "interview_requested"
+    teacher.interviewMessage = message
+    teacher.interviewRequestedAt = utcnow()
     db.session.commit()
+    return jsonify(_json(teacher))
+
+
+@bp.post("/teachers/<teacher_id>/decline")
+@admin_required
+def decline_mentor(teacher_id):
+    teacher = _reviewable(teacher_id, (*REVIEWABLE, "onboarding"))
+    reason = text(body(), "reason", required=True, max_len=5000)
+    emails.send_mentor_declined(teacher.email, teacher.name, reason)
+    teacher.verificationStatus = "declined"
+    teacher.rejectionReason = reason
+    teacher.reviewedAt = utcnow()
+    db.session.commit()
+    return jsonify(_json(teacher))
+
+
+@bp.post("/teachers/<teacher_id>/background-check")
+@admin_required
+def record_background_check(teacher_id):
+    """Record the result of the background check (for now: the admin's own
+    search of the national sex-offender registry, nsopw.gov)."""
+    teacher = _row("teachers", teacher_id)
+    data = body()
+    status = data.get("status")
+    if status not in ("passed", "failed"):
+        raise ApiError(400, "INVALID_STATUS", "status must be passed or failed.")
+    teacher.backgroundCheckStatus = status
+    teacher.backgroundCheckNote = text(data, "note", max_len=5000) or None
+    teacher.backgroundCheckAt = utcnow()
+    db.session.commit()
+    maybe_go_live(teacher)
     return jsonify(_json(teacher))
 
 

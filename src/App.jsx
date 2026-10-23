@@ -6,7 +6,10 @@ import HowItWorks from "./components/HowItWorks";
 import Tutors from "./components/Tutors";
 import Testimonials from "./components/Testimonials";
 import Footer from "./components/Footer";
-import TeacherRegister from "./components/TeacherRegister";
+import BecomeMentor from "./components/BecomeMentor";
+import MentorContinue from "./components/MentorContinue";
+import MentorApplication from "./components/MentorApplication";
+import MentorGuidelines from "./components/MentorGuidelines";
 import TeacherLogin from "./components/TeacherLogin";
 import TeacherDashboard from "./components/TeacherDashboard";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -110,7 +113,11 @@ export default function App() {
           path='/student/registrations'
           element={<Navigate to='/student/dashboard' replace />}
         />
-        <Route path='/teacher/register' element={<TeacherRegister />} />
+        <Route path='/become-a-mentor' element={<BecomeMentor />} />
+        <Route path='/mentor/continue' element={<MentorContinue />} />
+        <Route path='/mentor/application' element={<MentorApplication />} />
+        <Route path='/mentor/guidelines' element={<MentorGuidelines />} />
+        <Route path='/teacher/register' element={<Navigate to='/become-a-mentor' replace />} />
         <Route path='/teacher/login' element={<TeacherLogin />} />
         <Route path='/teacher/dashboard' element={<TeacherDashboard />} />
         <Route path='/admin' element={<AdminDashboard />} />

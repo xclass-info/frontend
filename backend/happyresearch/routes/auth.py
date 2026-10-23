@@ -46,6 +46,9 @@ def _find_user(email):
 def register():
     data = body()
     kind = data.get("kind")
+    if kind == "teacher":
+        # Mentors apply through the mentor application instead.
+        raise ApiError(400, "USE_MENTOR_APPLICATION", "Please apply at /become-a-mentor.")
     if kind not in PROFILE_MODELS:
         raise ApiError(400, "INVALID_KIND", "kind must be student or teacher.")
     name = text(data, "name", required=True, max_len=200)

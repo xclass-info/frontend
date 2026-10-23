@@ -11,11 +11,6 @@ import InitialsAvatar from "./InitialsAvatar";
 import { formatMentorName } from "../utils/mentorName";
 import { mentorTypeLabel } from "../utils/mentorVerification";
 
-const VERIFIED_VIA = {
-  phd_student: "via transcript",
-  phd_graduate: "via degree certificate",
-  faculty: "via verified work email",
-};
 import { toPrereqArray } from "../utils/prerequisites";
 
 const cardStyle = {
@@ -588,11 +583,6 @@ export default function TeacherProfile() {
                   >
                     ✓ Verified {mentorTypeLabel(teacher.mentorType)}
                   </span>
-                  {VERIFIED_VIA[teacher.mentorType] && (
-                    <p style={{ margin: "4px 0 0", fontSize: 11, color: "var(--muted)" }}>
-                      {VERIFIED_VIA[teacher.mentorType]}
-                    </p>
-                  )}
                 </div>
               )}
 

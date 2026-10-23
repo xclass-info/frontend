@@ -4,6 +4,7 @@ import { api, live, seg, toMillis, formatDate } from "../api";
 import { onAuthStateChanged, login, logout, sendPasswordReset } from "../auth";
 import { Link } from "react-router-dom";
 import { mentorTypeLabel } from "../utils/mentorVerification";
+import MentorApplicationsAdmin, { needsAdminAction } from "./MentorApplicationsAdmin";
 import { loadStudentRegistrations } from "../utils/studentData";
 import {
   approveStudentApplication,
@@ -24,14 +25,13 @@ export default function AdminDashboard() {
   const [research, setResearch] = useState([]);
   const [mentors, setMentors] = useState([]);
   const [registrations, setRegistrations] = useState([]);
-  const pendingApplications = mentors.filter(
-    (m) => m.verificationStatus === "pending_review",
-  );
+  // Mentor applications waiting on an admin action (review or background check).
+  const pendingApplications = mentors.filter(needsAdminAction);
   const pendingStudentApplications = registrations.filter(
     (r) => r.status === "pending",
   );
-  // rejectTarget is { type: "mentor" | "student", id } or null - shared by
-  // both the mentor-verification and student-application reject flows below.
+  // rejectTarget is { type: "student", id } or null - the student-application
+  // reject flow below. (Mentor applications: see MentorApplicationsAdmin.)
   const [rejectTarget, setRejectTarget] = useState(null);
   const [rejectReason, setRejectReason] = useState("");
   const [rejectError, setRejectError] = useState("");
@@ -65,9 +65,6 @@ export default function AdminDashboard() {
     useState("all");
   const [mentorSort, setMentorSort] = useState("name");
 
-  const [applicationSearch, setApplicationSearch] = useState("");
-  const [applicationTypeFilter, setApplicationTypeFilter] = useState("all");
-  const [applicationSort, setApplicationSort] = useState("oldest");
 
   const [studentAppSearch, setStudentAppSearch] = useState("");
   const [studentAppKindFilter, setStudentAppKindFilter] = useState("all");
@@ -135,7 +132,7 @@ export default function AdminDashboard() {
         );
       } else if (err.code === "PASSWORD_RESET_REQUIRED") {
         setError(
-          'We\'ve moved to a new login system - click "Forgot password?" below to set your password.',
+          'This account doesn\'t have a password yet - click "Forgot password?" below to set one.',
         );
       } else {
         setError("Invalid email or password.");
@@ -172,31 +169,6 @@ export default function AdminDashboard() {
     setUser(null);
   }
 
-  async function approveApplication(mentorId) {
-    if (actionBusy) return;
-    setActionBusy(true);
-    try {
-      await api.post(`/admin/teachers/${seg(mentorId)}/approve`);
-    } catch (err) {
-      console.error(err);
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setActionBusy(false);
-    }
-  }
-
-  async function rejectApplication(mentorId, reason) {
-    await api.post(`/admin/teachers/${seg(mentorId)}/reject`, {
-      reason: reason.trim(),
-    });
-  }
-
-  function openRejectModal(mentorId) {
-    setRejectTarget({ type: "mentor", id: mentorId });
-    setRejectReason("");
-    setRejectError("");
-  }
-
   async function approveStudentApp(regId) {
     if (actionBusy) return;
     setActionBusy(true);
@@ -231,11 +203,7 @@ export default function AdminDashboard() {
     if (actionBusy) return;
     setActionBusy(true);
     try {
-      if (rejectTarget.type === "student") {
-        await rejectStudentApplication(rejectTarget.id, trimmed);
-      } else {
-        await rejectApplication(rejectTarget.id, trimmed);
-      }
+      await rejectStudentApplication(rejectTarget.id, trimmed);
       setRejectTarget(null);
     } catch (err) {
       console.error(err);
@@ -501,7 +469,7 @@ export default function AdminDashboard() {
     if (mentorStatusFilter === "disabled" && !m.disabled) return false;
     if (
       mentorVerificationFilter !== "all" &&
-      (m.verificationStatus || "incomplete") !== mentorVerificationFilter
+      (m.verificationStatus || "started") !== mentorVerificationFilter
     )
       return false;
     const q = mentorSearch.trim().toLowerCase();
@@ -520,24 +488,6 @@ export default function AdminDashboard() {
             (a.university || "").localeCompare(b.university || ""),
           )
         : sortByDate(visibleMentors, "createdAt", mentorSort);
-
-  let visibleApplications = pendingApplications.filter((m) => {
-    if (applicationTypeFilter !== "all" && m.mentorType !== applicationTypeFilter)
-      return false;
-    const q = applicationSearch.trim().toLowerCase();
-    if (!q) return true;
-    return [m.name, m.email].filter(Boolean).some((s) => s.toLowerCase().includes(q));
-  });
-  visibleApplications =
-    applicationSort === "name"
-      ? [...visibleApplications].sort((a, b) =>
-          (a.name || "").localeCompare(b.name || ""),
-        )
-      : [...visibleApplications].sort((a, b) => {
-          const ta = toMillis(a.submittedAt) || toMillis(a.createdAt);
-          const tb = toMillis(b.submittedAt) || toMillis(b.createdAt);
-          return applicationSort === "oldest" ? ta - tb : tb - ta;
-        });
 
   let visibleStudentApplications = pendingStudentApplications.filter((r) => {
     if (studentAppKindFilter !== "all" && r.kind !== studentAppKindFilter)
@@ -960,177 +910,7 @@ export default function AdminDashboard() {
       )}
 
       {/* ── Applications Tab ── */}
-      {tab === "applications" && (
-        <div>
-          <p style={{ color: "#888", marginBottom: 16 }}>
-            {visibleApplications.length} of {pendingApplications.length}{" "}
-            pending application{pendingApplications.length === 1 ? "" : "s"}
-          </p>
-          <div
-            style={{
-              display: "flex",
-              gap: 10,
-              marginBottom: 16,
-              flexWrap: "wrap",
-            }}
-          >
-            <input
-              type='text'
-              placeholder='Search name or email...'
-              value={applicationSearch}
-              onChange={(e) => setApplicationSearch(e.target.value)}
-              style={{ ...filterInputStyle, flex: "1 1 220px" }}
-            />
-            <select
-              value={applicationTypeFilter}
-              onChange={(e) => setApplicationTypeFilter(e.target.value)}
-              style={filterInputStyle}
-            >
-              <option value='all'>All types</option>
-              <option value='phd_student'>PhD Student</option>
-              <option value='phd_graduate'>PhD Graduate</option>
-              <option value='faculty'>Faculty</option>
-            </select>
-            <select
-              value={applicationSort}
-              onChange={(e) => setApplicationSort(e.target.value)}
-              style={filterInputStyle}
-            >
-              <option value='oldest'>Oldest first</option>
-              <option value='newest'>Newest first</option>
-              <option value='name'>Name (A-Z)</option>
-            </select>
-          </div>
-          {visibleApplications.length === 0 ? (
-            <p style={{ color: "#aaa" }}>
-              {pendingApplications.length === 0
-                ? "No applications waiting on review."
-                : "No applications match these filters."}
-            </p>
-          ) : (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
-                gap: 16,
-              }}
-            >
-              {visibleApplications.map((mentor) => (
-                <div
-                  key={mentor.id}
-                  style={{
-                    background: "white",
-                    borderRadius: 12,
-                    padding: 20,
-                    border: "1px solid #eee",
-                  }}
-                >
-                  <div style={{ fontWeight: 700, fontSize: 16 }}>
-                    {mentor.name || "(no name)"}
-                  </div>
-                  <div style={{ color: "#888", fontSize: 13, marginBottom: 8 }}>
-                    {mentor.email}
-                  </div>
-                  <span
-                    style={{
-                      fontSize: 11,
-                      background: "#e3eff3",
-                      color: "#2f6175",
-                      padding: "2px 8px",
-                      borderRadius: 20,
-                      display: "inline-block",
-                      marginBottom: 12,
-                    }}
-                  >
-                    {mentorTypeLabel(mentor.mentorType)}
-                  </span>
-
-                  <div style={{ fontSize: 13, color: "#333", marginBottom: 14 }}>
-                    {mentor.mentorType === "phd_student" && (
-                      <div>
-                        Transcript:{" "}
-                        {mentor.transcriptURL ? (
-                          <a
-                            href={mentor.transcriptURL}
-                            target='_blank'
-                            rel='noopener noreferrer'
-                            style={{ color: "#2f6175" }}
-                          >
-                            View file
-                          </a>
-                        ) : (
-                          <span style={{ color: "#a01f13" }}>Not uploaded</span>
-                        )}
-                      </div>
-                    )}
-                    {mentor.mentorType === "phd_graduate" && (
-                      <div>
-                        Degree certificate:{" "}
-                        {mentor.degreeCertificateURL ? (
-                          <a
-                            href={mentor.degreeCertificateURL}
-                            target='_blank'
-                            rel='noopener noreferrer'
-                            style={{ color: "#2f6175" }}
-                          >
-                            View file
-                          </a>
-                        ) : (
-                          <span style={{ color: "#a01f13" }}>Not uploaded</span>
-                        )}
-                      </div>
-                    )}
-                    {mentor.mentorType === "faculty" && (
-                      <>
-                        <div>
-                          Work email: {mentor.workEmail || "—"}{" "}
-                          {mentor.workEmailVerified ? (
-                            <span style={{ color: "#14532d" }}>✓ Verified</span>
-                          ) : (
-                            <span style={{ color: "#a01f13" }}>Not verified</span>
-                          )}
-                        </div>
-                        <div>
-                          University profile:{" "}
-                          {mentor.universityProfileURL ? (
-                            <a
-                              href={mentor.universityProfileURL}
-                              target='_blank'
-                              rel='noopener noreferrer'
-                              style={{ color: "#2f6175" }}
-                            >
-                              View profile
-                            </a>
-                          ) : (
-                            <span style={{ color: "#a01f13" }}>Not provided</span>
-                          )}
-                        </div>
-                      </>
-                    )}
-                  </div>
-
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <button
-                      style={btnStyle("#14532d")}
-                      disabled={actionBusy}
-                      onClick={() => approveApplication(mentor.id)}
-                    >
-                      Approve
-                    </button>
-                    <button
-                      style={btnStyle("#a01f13")}
-                      disabled={actionBusy}
-                      onClick={() => openRejectModal(mentor.id)}
-                    >
-                      Reject
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+      {tab === "applications" && <MentorApplicationsAdmin mentors={mentors} />}
 
       {tab === "student-applications" && (
         <div>
@@ -1295,11 +1075,14 @@ export default function AdminDashboard() {
               onChange={(e) => setMentorVerificationFilter(e.target.value)}
               style={filterInputStyle}
             >
-              <option value='all'>All verification</option>
-              <option value='approved'>Approved</option>
-              <option value='pending_review'>Pending Review</option>
-              <option value='rejected'>Rejected</option>
-              <option value='incomplete'>Incomplete</option>
+              <option value='all'>All statuses</option>
+              <option value='approved'>Live</option>
+              <option value='onboarding'>Onboarding</option>
+              <option value='submitted'>In review</option>
+              <option value='interview_requested'>Interview</option>
+              <option value='changes_requested'>Changes requested</option>
+              <option value='started'>Started</option>
+              <option value='declined'>Declined</option>
             </select>
             <select
               value={mentorSort}
@@ -1490,9 +1273,7 @@ export default function AdminDashboard() {
               </button>
             </div>
             <p style={{ color: "#888", fontSize: 13, marginBottom: 12 }}>
-              {rejectTarget?.type === "student"
-                ? "Explain why this application was rejected. This is shown to the student."
-                : "Explain what needs to change before this can be approved. This is shown to the mentor."}
+              Explain why this application was rejected. This is shown to the student.
             </p>
             <textarea
               autoFocus

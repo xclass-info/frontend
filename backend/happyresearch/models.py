@@ -79,6 +79,8 @@ class User(Model):
         "tokenVersion",
         "resetTokenHash",
         "resetTokenExpires",
+        "continueTokenHash",
+        "continueTokenExpires",
     )
 
     id = col("id", db.String(64), primary_key=True, default=new_id)
@@ -94,6 +96,10 @@ class User(Model):
     tokenVersion = col("token_version", db.Integer, nullable=False, default=0)
     resetTokenHash = col("reset_token_hash", db.String(64), index=True)
     resetTokenExpires = col("reset_token_expires", db.DateTime(timezone=True))
+    # Mentor applicants sign in from a "continue your application" email link
+    # (no password until they submit) - see routes/mentor_application.py.
+    continueTokenHash = col("continue_token_hash", db.String(64), index=True)
+    continueTokenExpires = col("continue_token_expires", db.DateTime(timezone=True))
     createdAt = col("created_at", db.DateTime(timezone=True), default=utcnow)
 
 
@@ -113,6 +119,14 @@ class Student(Model):
 
 
 class Teacher(Model):
+    """A mentor - from first application step to live profile.
+
+    verificationStatus is the mentor's place in the application pipeline:
+      started -> submitted -> [changes_requested | interview_requested]
+      -> onboarding -> approved (live: public profile, can be booked)
+    plus declined. Only "approved" (and not disabled) mentors are public.
+    """
+
     __tablename__ = "teachers"
     PRIVATE = ("accountEmailToken", "workEmailToken")
     # Visible to anyone (public mentor listings / profile pages).
@@ -128,7 +142,7 @@ class Teacher(Model):
         "yearsOfExperience", "languages", "website",
     )
     # Uploaded files (stored as object-storage keys, served via /files).
-    FILE_FIELDS = ("photoURL", "transcriptURL", "degreeCertificateURL")
+    FILE_FIELDS = ("photoURL", "transcriptURL", "degreeCertificateURL", "cvURL", "credentialURL")
 
     id = col("id", db.String(64), primary_key=True)
     name = col("name", db.Text)
@@ -158,6 +172,29 @@ class Teacher(Model):
     workEmailToken = col("work_email_token", db.String(128))
     workEmailVerified = col("work_email_verified", db.Boolean)
     submittedAt = col("submitted_at", db.DateTime(timezone=True))
+
+    # Mentor application (see routes/mentor_application.py).
+    cvURL = col("cv_url", db.Text)
+    # Proof of PhD status when no university email is verified: enrollment
+    # letter, transcript or diploma.
+    credentialURL = col("credential_url", db.Text)
+    # {"title", "description", "output"} - the idea they'd like to supervise.
+    projectIdea = col("project_idea", JSON)
+    workAuthorized = col("work_authorized", db.Boolean)
+    agreedTermsAt = col("agreed_terms_at", db.DateTime(timezone=True))
+    backgroundCheckConsentAt = col("background_check_consent_at", db.DateTime(timezone=True))
+    # Admin review.
+    adminNote = col("admin_note", db.Text)  # what to fix (changes_requested)
+    reviewedAt = col("reviewed_at", db.DateTime(timezone=True))
+    # Set when an admin asks for an interview; says how to schedule it.
+    interviewMessage = col("interview_message", db.Text)
+    interviewRequestedAt = col("interview_requested_at", db.DateTime(timezone=True))
+    # Onboarding: both are needed before going live.
+    backgroundCheckStatus = col("background_check_status", db.String(16))  # passed | failed
+    backgroundCheckNote = col("background_check_note", db.Text)
+    backgroundCheckAt = col("background_check_at", db.DateTime(timezone=True))
+    guidelinesAcceptedAt = col("guidelines_accepted_at", db.DateTime(timezone=True))
+    lastReminderAt = col("last_reminder_at", db.DateTime(timezone=True))
 
     accountEmailVerified = col("account_email_verified", db.Boolean)
     accountEmailToken = col("account_email_token", db.String(128))

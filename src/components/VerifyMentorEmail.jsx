@@ -1,5 +1,5 @@
 // src/components/VerifyMentorEmail.jsx
-// Landing page for the link sent to a faculty mentor's work email. Reads
+// Landing page for the link sent to a mentor applicant's university email. Reads
 // ?uid=&token= from the URL, and if they match what's on the teacher doc,
 // marks the work email verified (checked by the backend).
 import { useEffect, useState } from "react";
@@ -55,11 +55,11 @@ export default function VerifyMentorEmail() {
               <p style={{ fontSize: 48, marginBottom: 8 }}>✅</p>
               <h2 style={{ margin: "0 0 8px" }}>Email verified!</h2>
               <p style={{ color: "#666", fontSize: 14, marginBottom: 20 }}>
-                Head back to your dashboard to finish your mentor
-                application.
+                Your university email is confirmed. Head back to your
+                application to finish the remaining steps.
               </p>
               <Link
-                to='/teacher/dashboard'
+                to='/mentor/application'
                 style={{
                   display: "inline-block",
                   padding: "12px 28px",
@@ -70,7 +70,7 @@ export default function VerifyMentorEmail() {
                   textDecoration: "none",
                 }}
               >
-                Go to Dashboard →
+                Back to my application →
               </Link>
             </>
           )}
@@ -80,8 +80,8 @@ export default function VerifyMentorEmail() {
               <h2 style={{ margin: "0 0 8px" }}>Link not valid</h2>
               <p style={{ color: "#666", fontSize: 14 }}>
                 This verification link is invalid or has already been used.
-                You can request a new one from your dashboard's Verification
-                tab.
+                You can request a new one from the Credentials step of your
+                application.
               </p>
             </>
           )}
@@ -90,7 +90,7 @@ export default function VerifyMentorEmail() {
               <p style={{ fontSize: 48, marginBottom: 8 }}>❌</p>
               <h2 style={{ margin: "0 0 8px" }}>Something went wrong</h2>
               <p style={{ color: "#666", fontSize: 14 }}>
-                Please try again, or request a new link from your dashboard.
+                Please try again, or request a new link from your application.
               </p>
             </>
           )}

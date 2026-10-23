@@ -189,6 +189,16 @@ export default function Footer() {
                 Contact Us
               </Link>
               <Link
+                to='/become-a-mentor'
+                style={{
+                  color: "#555f66",
+                  fontSize: 14,
+                  textDecoration: "none",
+                }}
+              >
+                Become a Mentor
+              </Link>
+              <Link
                 to='/'
                 onClick={() =>
                   setTimeout(() => {

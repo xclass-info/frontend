@@ -56,3 +56,31 @@ def register(app):
             updated += 1
         db.session.commit()
         click.echo(f"done - {updated} account(s) can now log in with their old password.")
+
+    @app.cli.command("send-application-reminders")
+    def send_application_reminders():
+        """Email mentor applicants who started 3+ days ago but haven't
+        submitted (once each). Meant to run daily, e.g. via Heroku Scheduler."""
+        from datetime import timedelta
+
+        from . import emails
+        from .extensions import db
+        from .models import Teacher, User, utcnow
+        from .routes.mentor_application import issue_continue_link
+
+        cutoff = utcnow() - timedelta(days=3)
+        stale = Teacher.query.filter(
+            Teacher.verificationStatus == "started",
+            Teacher.createdAt <= cutoff,
+            Teacher.lastReminderAt.is_(None),
+        ).all()
+        for teacher in stale:
+            user = db.session.get(User, teacher.id)
+            if not user:
+                continue
+            token = issue_continue_link(user)
+            teacher.lastReminderAt = utcnow()
+            db.session.commit()
+            emails.send_mentor_continue_link(teacher.email, teacher.name, token, reminder=True)
+            click.echo(f"reminded {teacher.email}")
+        click.echo(f"done - {len(stale)} reminder(s).")

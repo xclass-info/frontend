@@ -1,15 +1,16 @@
 """Research posts, projects and showcase entries - public reads, and
 create/edit/delete by the mentor who owns them."""
-from flask import Blueprint, current_app, jsonify, request
+from flask import Blueprint, jsonify, request
 
 from .. import storage
 from ..errors import ApiError
 from ..extensions import db, limiter
-from ..models import Project, Research, Showcase, utcnow
-from ..security import current_teacher
+from ..models import Project, Research, Showcase, Teacher, utcnow
+from ..security import current_teacher, current_user
 from ..serializers import showcase_json
 from ..uploads import read_upload
 from . import body
+from .teachers import is_live
 
 bp = Blueprint("content", __name__, url_prefix="/api")
 
@@ -83,12 +84,23 @@ def _owned(model, item_id, teacher):
     return row
 
 
+def _live_teacher_ids():
+    return db.session.query(Teacher.id).filter(
+        Teacher.verificationStatus == "approved", Teacher.disabled.isnot(True)
+    )
+
+
 def _register(kind, model):
     def list_items():
         q = model.query
         teacher_id = request.args.get("teacherId")
+        user = current_user()
         if teacher_id:
             q = q.filter_by(teacherId=teacher_id)
+        # Mentors who aren't live yet (applicants) can draft posts; those stay
+        # hidden from everyone except the mentor themselves and admins.
+        if not (user and (user.isAdmin or user.id == teacher_id)):
+            q = q.filter(model.teacherId.in_(_live_teacher_ids()))
         status = request.args.get("status")
         if status and hasattr(model, "status"):
             q = q.filter_by(status=status)
@@ -100,7 +112,12 @@ def _register(kind, model):
 
     def get_item(item_id):
         row = db.session.get(model, item_id)
-        if not row:
+        user = current_user()
+        visible = row and (
+            is_live(db.session.get(Teacher, row.teacherId))
+            or (user and (user.isAdmin or user.id == row.teacherId))
+        )
+        if not visible:
             raise ApiError(404, "NOT_FOUND", "Not found.")
         return jsonify(_json(row))
 

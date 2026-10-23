@@ -7,6 +7,9 @@ def teacher_json(teacher, view="public"):
     """view: "public" (anyone), "owner" (the mentor themselves) or "admin"."""
     if view == "public":
         data = {k: v for k, v in teacher.to_dict().items() if k in Teacher.PUBLIC}
+    elif view == "owner":
+        # The admin's background-check note is internal.
+        data = teacher.to_dict(exclude=("backgroundCheckNote",))
     else:
         data = teacher.to_dict()
     for field in Teacher.FILE_FIELDS:

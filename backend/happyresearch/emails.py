@@ -77,14 +77,140 @@ def send_password_reset(to_email, token):
 def send_work_email_verification(to_email, mentor_name, uid, token):
     link = _frontend(f"/verify-mentor-email?uid={uid}&token={token}")
     send(
-        "Verify your work email for HappyResearch",
+        "Verify your university email for HappyResearch",
         to_email,
         _wrap(f"""
   <p>Hi {escape(mentor_name or "there")},</p>
-  <p>Click the button below to verify this is your work email and continue your mentor application.</p>
-  {_button(link, "Verify Work Email")}
+  <p>Click the button below to confirm this is your university email. It verifies your academic status for your HappyResearch mentor application.</p>
+  {_button(link, "Verify University Email")}
   <p style="font-size:13px; color:#666;">If you didn't request this, you can ignore this email.</p>
   {_SIGNOFF}"""),
+    )
+
+
+# ── Mentor application ───────────────────────────────────────────────────
+
+
+def mentor_continue_link(token):
+    return _frontend(f"/mentor/continue?token={token}")
+
+
+def send_mentor_continue_link(to_email, mentor_name, token, reminder=False):
+    intro = (
+        "Your HappyResearch mentor application is waiting for you - it only takes about 15 minutes to finish, and everything you've entered so far is saved."
+        if reminder
+        else "Thanks for your interest in mentoring with HappyResearch! Use the button below to continue your application. It takes about 15 minutes, and your progress is saved as you go."
+    )
+    send(
+        "Finish your HappyResearch mentor application" if reminder else "Continue your HappyResearch mentor application",
+        to_email,
+        _wrap(f"""
+  <p>Hi {escape(mentor_name or "there")},</p>
+  <p>{intro}</p>
+  {_button(mentor_continue_link(token), "Continue My Application")}
+  <p style="font-size:13px; color:#666;">This link signs you in and works for 14 days. Don't forward it.</p>
+  {_SIGNOFF}"""),
+        reply_to=current_app.config["TEAM_INBOX"],
+    )
+
+
+def send_mentor_submitted(to_email, mentor_name):
+    send(
+        "We received your HappyResearch mentor application",
+        to_email,
+        _wrap(f"""
+  <p>Hi {escape(mentor_name or "there")},</p>
+  <p>Thank you for applying to mentor with HappyResearch! We review applications within about 3 business days and will email you as soon as there's an update.</p>
+  {_button(_frontend("/mentor/application"), "View My Application")}
+  {_SIGNOFF}"""),
+        reply_to=current_app.config["TEAM_INBOX"],
+    )
+
+
+def send_team_new_mentor_application(mentor_name, mentor_email):
+    send(
+        f"New mentor application: {mentor_name}",
+        current_app.config["TEAM_INBOX"],
+        _wrap(f"""
+  <p><strong>{escape(mentor_name or "")}</strong> &lt;{escape(mentor_email)}&gt; submitted a mentor application.</p>
+  {_button(_frontend("/admin"), "Review in Admin")}"""),
+        reply_to=mentor_email,
+    )
+
+
+def send_mentor_changes_requested(to_email, mentor_name, note):
+    body = escape(note).replace("\n", "<br/>")
+    send(
+        "Your HappyResearch mentor application needs a small update",
+        to_email,
+        _wrap(f"""
+  <p>Hi {escape(mentor_name or "there")},</p>
+  <p>Thanks for applying! Before we can continue, please update the following:</p>
+  <div style="background:#f5f8fa; border-left:4px solid #2f6175; padding:12px 16px; margin:16px 0;">{body}</div>
+  {_button(_frontend("/mentor/application"), "Update My Application")}
+  {_SIGNOFF}"""),
+        reply_to=current_app.config["TEAM_INBOX"],
+    )
+
+
+def send_mentor_review_passed(to_email, mentor_name):
+    send(
+        "Good news about your HappyResearch mentor application",
+        to_email,
+        _wrap(f"""
+  <p>Hi {escape(mentor_name or "there")},</p>
+  <p>Great news - your application has passed our review! Two last steps before your profile goes live:</p>
+  <ol>
+    <li><strong>Read and accept the Mentor Guidelines</strong> (about 5 minutes).</li>
+    <li><strong>Background check</strong> - we run this for every mentor before they work with students. You don't need to do anything for it right now.</li>
+  </ol>
+  {_button(_frontend("/mentor/application"), "Finish Onboarding")}
+  {_SIGNOFF}"""),
+        reply_to=current_app.config["TEAM_INBOX"],
+    )
+
+
+def send_mentor_declined(to_email, mentor_name, reason):
+    body = escape(reason).replace("\n", "<br/>")
+    send(
+        "Your HappyResearch mentor application",
+        to_email,
+        _wrap(f"""
+  <p>Hi {escape(mentor_name or "there")},</p>
+  <p>Thank you for your interest in mentoring with HappyResearch. After reviewing your application, we're not able to move forward at this time.</p>
+  <div style="background:#f5f8fa; border-left:4px solid #94a3b8; padding:12px 16px; margin:16px 0;">{body}</div>
+  <p>We truly appreciate the time you took to apply.</p>
+  {_SIGNOFF}"""),
+        reply_to=current_app.config["TEAM_INBOX"],
+    )
+
+
+def send_mentor_live(to_email, mentor_name):
+    send(
+        "You're live on HappyResearch!",
+        to_email,
+        _wrap(f"""
+  <p>Hi {escape(mentor_name or "there")},</p>
+  <p>Welcome aboard - your mentor profile is now live, and students can find you and apply for your research. A great next step is turning your project idea into your first research post.</p>
+  {_button(_frontend("/teacher/dashboard"), "Go to My Dashboard")}
+  {_SIGNOFF}"""),
+        reply_to=current_app.config["TEAM_INBOX"],
+    )
+
+
+def send_interview_request(to_email, mentor_name, message):
+    body = escape(message).replace("\n", "<br/>")
+    send(
+        "HappyResearch mentor application - let's schedule a short interview",
+        to_email,
+        _wrap(f"""
+  <p>Hi {escape(mentor_name or "there")},</p>
+  <p>Thank you for applying to mentor with HappyResearch! Before we finish reviewing your application, we'd like to meet you in a short interview.</p>
+  <div style="background:#f5f8fa; border-left:4px solid #2f6175; padding:12px 16px; margin:16px 0;">{body}</div>
+  {_button(_frontend("/teacher/dashboard"), "View My Application")}
+  <p style="font-size:13px; color:#666;">You can reply to this email with any questions.</p>
+  {_SIGNOFF}"""),
+        reply_to=current_app.config["TEAM_INBOX"],
     )
 
 

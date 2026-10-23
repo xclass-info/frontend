@@ -8,6 +8,7 @@ from ..extensions import db, limiter
 from ..models import Availability, Booking, Teacher
 from ..security import current_teacher
 from . import body, text, valid_email
+from .teachers import is_live
 
 bp = Blueprint("bookings", __name__, url_prefix="/api")
 
@@ -18,7 +19,7 @@ def request_booking():
     data = body()
     teacher = db.session.get(Teacher, text(data, "teacherId", required=True, max_len=64))
     slot = db.session.get(Availability, text(data, "slotId", required=True, max_len=64))
-    if not teacher or not slot or slot.teacherId != teacher.id:
+    if not is_live(teacher) or not slot or slot.teacherId != teacher.id:
         raise ApiError(404, "NOT_FOUND", "That time slot no longer exists.")
     if slot.booked:
         raise ApiError(409, "SLOT_BOOKED", "That time slot was just booked.")

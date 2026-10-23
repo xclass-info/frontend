@@ -4,9 +4,15 @@ from ..errors import ApiError
 
 
 def register_blueprints(app):
-    from . import admin, auth, bookings, contact, content, files, registrations, teachers
+    from . import (
+        admin, auth, bookings, contact, content, files, mentor_application, registrations,
+        teachers,
+    )
 
-    for module in (auth, teachers, content, registrations, bookings, admin, contact, files):
+    for module in (
+        auth, teachers, mentor_application, content, registrations, bookings, admin,
+        contact, files,
+    ):
         app.register_blueprint(module.bp)
 
 
