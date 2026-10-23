@@ -526,10 +526,12 @@ export default function Tutors({ standalone = false }) {
               </select>
             </div>
 
-            <p style={{ color: "var(--muted)", fontSize: 13, margin: "0 0 20px" }}>
-              {filteredTeachers.length} of {teachers.length} mentor
-              {teachers.length === 1 ? "" : "s"} match your filters
-            </p>
+            {teachers.length > 0 && (
+              <p style={{ color: "var(--muted)", fontSize: 13, margin: "0 0 20px" }}>
+                {filteredTeachers.length} of {teachers.length} mentor
+                {teachers.length === 1 ? "" : "s"} match your filters
+              </p>
+            )}
 
             {teachers.length === 0 ? (
               <div className={styles.empty}>
